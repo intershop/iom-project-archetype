@@ -1,0 +1,277 @@
+# Default values for iom.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+downtime: true
+
+image:
+  repository: blueprint-customer-iom-app
+  # Overrides the image tag whose default is the chart version.
+  tag: "3.1.0.0"
+  pullPolicy: Never
+
+# the type of test is fixed, as it is an important characteristics of the container.
+# to test liveness, the static HTML page at / of the wildfly application server is tested.
+livenessProbe:
+  periodSeconds: 10
+  initialDelaySeconds: 60
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+# the type of test is fixed, as it is an important characteristics of the container.
+# to test readiness, the healthckeck service of IOM is tested.
+readinessProbe:
+  periodSeconds: 10
+  initialDelaySeconds: 60
+  timeoutSeconds: 8
+  failureThreshold: 1
+  successThreshold: 1
+
+dbaccount:
+  # if enabled, dbaccount will be executed during installation process only, not on upgrade!
+  enabled: true
+  # reinitialize database
+  resetData: true
+  # name of dedicated tablespace
+  tablespace:
+  # options allows to set database options.
+  options: "ENCODING='UTF8' LC_COLLATE='en_US.utf8' LC_CTYPE='en_US.utf8' CONNECTION LIMIT=-1 TEMPLATE=template0"
+  # searchPath extends the search-path for DB objects, e.g.:
+  # searchPath: "testcases"
+  searchPath:
+  image:
+    repository: docker-internal.rnd.intershop.de/intershop/iom-dbaccount
+    tag:        1.2.1.0
+    pullPolicy: IfNotPresent
+  resources: {}
+  
+config:
+  image:
+    repository: blueprint-customer-iom-config
+    tag: 3.1.0.0
+    pullPolicy: Never
+  resources: {}
+
+# general postgres settings, required to connect to postgres server
+# If postgres sub-chart is enabled, these settings are ignored by all other
+# components, including dbaccount job. Instead of it, the settings defined
+# by the postgres sub-chart will be used.
+pg:
+  host:               postgres-service
+  port:               "5432"
+  userConnectionSuffix:
+  sslMode:            prefer
+  sslCompression:     "0"
+  sslRootCert:
+  #
+  # all following pg parameters are used only by dbaccount. Hence, if
+  # dbaccount.enabled is false, they are ignored completely.
+  #
+  # super-user access to postgres server
+  user:               postgres
+  userSecretKeyRef:
+  passwd:             postgres
+  passwdSecretKeyRef:
+  db:                 postgres
+  
+oms:
+  # public URL of IOM
+  # used internally by IOM for link generation.
+  publicUrl:                       http://k8s.ics.j.intershop.de
+  mailResourcesBaseUrl:            https://localhost/mailimages/customers
+  # Shared secret for JWT creation / validation
+  jwtSecret:                       length_must_be_at_least_32_chars
+  jwtSecretKeyRef:
+  archiveOrderMessageLogMinAge:    "90"
+  deleteOrderMessageLogMinAge:     "180"
+  archiveShopCustomerMailMinAge:   "1826"
+  archiveShopCustomerMailMaxCount: "10000"
+  deleteShopCustomerMailMinAge:    "2190"
+  # if set to true, secure flag is set to cookies. if secure flag is set, OMT
+  # requires HTTPS to function properly.
+  secureCookiesEnabled:            false
+  
+  # IOM database related settings
+  db:
+    name:               oms_db
+    user:               oms_user
+    userSecretKeyRef:
+    passwd:             OmsDB
+    passwdSecretKeyRef:
+    # defaults to combination of pg.host and pg.port, which are used by the config-container.
+    # can be overwritten to enable failover of the app-container 
+    hostlist:
+    
+  # mail-server related settings
+  # if mailhog sub-chart is enabled, these settings are ignored.
+  # Instead of it, the values of mailhog sub-chart will be used.
+  smtp:
+    host:               mail-service
+    port:               "1025"
+    user:
+    userSecretKeyRef:   
+    passwd:
+    passwdSecretKeyRef: 
+
+# Wildfly related settings
+jboss:
+  # set java options
+  javaOpts: "-Xms512M -Xmx2048M"
+  # set options for wildfly application server, e.g.:
+  # opt: "--debug *:8787"
+  opts:
+  # set pool-size of XA-datasource:
+  xaPoolsizeMin: "50"
+  xaPoolsizeMax: "125"
+
+# IOM logging related settings
+log:
+  level:
+    # log-level for scripts can be one of: ERROR, WARN, INFO, DEBUG
+    scripts:       INFO
+    # log-level for following scopes can be one of: FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL
+    console:       WARN
+    iom:           WARN
+    hibernate:     WARN
+    quartz:        WARN
+    activeMQ:      WARN
+    customization: DEBUG
+  access:
+    enabled:       true
+  metadata:
+    tenant:        blueprint-test
+    environment:   ci
+
+# project related settings
+caas:
+  # CaaS projects are supporting different settings for different environments
+  # envName defined, which one has to be used.
+  envName:               ci
+  # controls the import of test data, which are part of the project.
+  importTestData:        true
+  # number of seconds after that the import of test-data has to be finished.
+  # If not, the container will end with an error.
+  importTestDataTimeout: 300
+
+persistence:
+  storageClass: 
+  storageSize: 5Gi
+  # To be used in simple environments (e.g. demos) to persist data on local host.
+  # if set, storageClass will be ignored.
+  hostPath: blueprint-project-pv
+
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+imagePullSecrets: []
+nameOverride: 
+fullnameOverride: 
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+postgres:
+  enabled: true
+  persistence:
+    enabled: true
+    accessMode: ReadWriteOnce
+    storageSize: 2Gi
+    forceReset: false
+
+mailhog:
+  enabled: true
+  ingress:
+    enabled: false
+    annotations:
+      {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: mailhog-test.poc.intershop.de
+        paths: ["/"]
+
+    #    hosts:
+    #      - chart-example.local
+
+iom-tests:
+  enabled: false
+
+# internal ingress-nginx controller
+# this ingress-nginx controller cannot be globally used, it is restricted to the namespace
+# There is also a strong problem with the name "ingress-nginx". It contains a '-', which is
+# invalid for names of variables, hence these variables cannot be accessed within templates!
+# As a workaround "nginx" was added. Therefore ingress-nginx is only used to configure the
+# nginx-controller statically. 
+# ingress-nginx:
+  # rbac:
+    # create: true
+    # scope: true
+  # controller:
+    # admissionWebhooks:
+      # enabled: false
+    # config:
+      # use-forwarded-headers: "true"
+      # proxy-add-original-uri-header: "true"
+    # ingressClass: nginx-iom
+    # extraArgs:
+      # # increase verbosity
+      # # v: 3
+    # replicaCount: 2
+    # # watch only for ingress in current namespace
+    # scope:
+      # enabled: true
+    # service:
+      # # internal ingress-nginx controller must never be accessed from public network
+      # type: "ClusterIP"
+
+# Workaround to overcome the problem with '-' in names of variables.
+# The following variables do not have any impact on the configuration of ingress-nginx (except the enabled flag).
+# They are provided to be used in templates.
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 10m
+  hosts:
+  - host: k8s.ics.j.intershop.de
+    paths: ["/"]

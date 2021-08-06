@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+<!-- 
+  <parent>
+    <groupId>bakery.parent</groupId>
+    <artifactId>bakery.parent</artifactId>
+    <version>bakery.pom-trunk-SNAPSHOT</version>
+    <relativePath>../bakery/pom.xml</relativePath>
+  </parent>
+    -->
+  <groupId>com.intershop.oms.archetype</groupId>
+  <artifactId>iom-project-archetype</artifactId>
+  <version>3.5.0.0</version>
+  <packaging>maven-archetype</packaging>
+
+  <name>[Tool] IOM Project Bootstrap Archetype</name>
+  
+  <build>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.archetype</groupId>
+        <artifactId>archetype-packaging</artifactId>
+        <version>3.2.0</version>
+      </extension>
+    </extensions>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-archetype-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <configuration>
+              <!-- Required so that .gitignore gets included in archetypes -->
+              <!-- see https://issues.apache.org/jira/browse/MRESOURCES-190 -->
+              <addDefaultExcludes>false</addDefaultExcludes>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>3.0.0</version>
+            <executions>
+                <execution>
+                    <id>BuildAndDeployImage</id>
+                    <phase>integration-test</phase>
+                    <goals>
+                        <goal>exec</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <executable>bash</executable>
+                <arguments>
+                    <argument>${basedir}/verify_image_deployment.sh</argument>
+                </arguments>
+                <workingDirectory>${basedir}</workingDirectory>
+            </configuration>
+        </plugin>
+    </plugins>
+  </build>
+
+</project>

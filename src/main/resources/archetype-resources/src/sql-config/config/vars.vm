@@ -1,0 +1,125 @@
+#set($do = '$$')
+DO $do
+DECLARE
+#set($vars_shop_supplier = '
+-- internal
+shop_int int8 = 1;
+supplier_int int8 = 1;
+
+-- parent shops
+shop_belux int8 = 10010;
+
+-- actual shops
+shop_belux_contract int8 = 10011;
+shop_belux_online int8 = 10012;
+
+-- all non-abstract shops
+shops_all int8[] = ARRAY[shop_belux_contract, shop_belux_online];
+
+-- all abstract shops
+shops_parent_all int8[] = ARRAY[shop_belux];
+
+-- shops by country
+shops_belux int8[] = ARRAY[shop_belux_contract, shop_belux_online];
+
+-- Supplier
+supplier_erp_belux int8 = 20010;
+
+-- all suppliers
+suppliers_all int8[] = array(select id from oms."SupplierDO" where id > 1);
+
+-- payment provider
+--pp_paypal int8 = 100;
+--pp_stripe int8 = 200;
+--pp_total_zero int8 = 300;
+-- fc_sce int8 = 100;
+
+
+')
+
+#set($vars_shop2supplier = '
+-- naming convention: s2s_[shop_prefix]_[shop_country]_[supplier_shortcut]
+
+-- belux
+s2s_belux_contract_int int8 = (select s2s_id(shop_belux_contract, supplier_int));
+s2s_belux_online_int int8 = (select s2s_id(shop_belux_online, supplier_int));
+')
+
+#set($vars_country_codes = '
+-- country codes
+cc_lu int = 8;
+cc_be int = 9;
+
+
+')
+
+#set($vars_config_types = '
+
+-- erp export
+config_erp varchar = ''erpService'';
+av_erp_endpoint varchar = ''erpEndpointUrl'';
+av_erp_username varchar = ''erpUsername'';
+av_erp_password varchar = ''erpPassword'';
+
+-- db atp
+config_db_atp varchar = ''stdDatabaseAtp'';
+av_dummy varchar = ''dummy'';
+
+')
+
+#set($vars_execution_beans = '
+eb_erp int = 1000;
+eb_mail_sender int = 1001;
+')
+
+#set($vars_decision_beans = '
+db_mail int = 1000;
+')
+
+#set($vars_payment_methods = '
+-- payment provider
+pp_dummy int8 = 10000;
+-- payment methods
+pm_invoice int = 5;
+pm_total_zero int = 100;
+')
+
+#set($vars_jobs = '
+--jobs
+job_stuck_order_confirmation int = 1000;
+')
+
+#set($vars_carriers ='
+-- carrier
+carrier_dhl int8 = (SELECT id FROM oms."CarrierDO" WHERE name = ''DHL'');
+carrier_besseling int8 = 10000;
+carrier_city_depot int8 = 10001;
+carrier_dhl_pallet int8 = 10002;
+carrier_dissam int8 = 10003;
+carrier_gls int8 = 10004;
+carrier_gls_daw_nl_return int8 = 10005;
+carrier_gls_express int8 = 10006;
+carrier_gls_pallet int8 = 10007;
+carrier_gls_parcel int8 = 10008;
+carrier_glu int8 = 10009;
+carrier_holwerda int8 = 10010;
+carrier_holwerda_spoed int8 = 10011;
+carrier_hwe_pallet int8 = 10012;
+carrier_hwe_parcel int8 = 10013;
+carrier_kbc_taxipost int8 = 10014;
+carrier_postnl_sns int8 = 10015;
+carrier_postnl_sns_franchise int8 = 10016;
+carrier_postnl_regiobank int8 = 10017;
+carrier_staples_europe_import int8 = 10018;
+carrier_taxipost int8 = 10019;
+
+
+carriers_benelux int8[] = ARRAY[carrier_besseling, carrier_city_depot, carrier_dhl_pallet, 
+				carrier_dissam, carrier_gls, carrier_gls_daw_nl_return, carrier_gls_express, 
+				carrier_gls_pallet, carrier_gls_parcel, carrier_glu, carrier_holwerda, 
+				carrier_holwerda_spoed, carrier_hwe_pallet, carrier_hwe_parcel, carrier_kbc_taxipost, 
+				carrier_postnl_sns, carrier_postnl_sns_franchise, carrier_postnl_regiobank, 
+				carrier_staples_europe_import, carrier_taxipost];
+
+carriers_all int8[] = carriers_benelux;
+')
