@@ -42,6 +42,6 @@ steps:
 
 - task: Maven@3
   inputs:
-    goals: clean compile
+    goals: clean verify
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
