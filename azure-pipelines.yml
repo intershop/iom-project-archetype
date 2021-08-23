@@ -11,6 +11,10 @@ pool: 'ubuntu-20.4-DS2_v2-adopt-jdk'
 variables:
   M2_LOCAL_REPO: $(Pipeline.Workspace)/local-maven-repo
   MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
+  IOM_DOCKERHUB_HOST: intershophub
+  IOM_REPO_NAME: "intershophub/"
+  IOM_DOCKERHUB_CONNECTION: release-dockerhub
+
 steps:
 - script: |
     # stop on any error
@@ -39,6 +43,12 @@ steps:
     artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
   timeoutInMinutes: 1
   displayName: "Maven authenticate"
+- task: Docker@2
+  inputs:
+    command: login
+    containerRegistry: $(IOM_DOCKERHUB_CONNECTION)
+  timeoutInMinutes: 1
+  displayName: "Login to docker hub"
 
 - task: Maven@3
   inputs:

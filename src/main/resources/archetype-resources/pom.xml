@@ -22,27 +22,16 @@
 	</properties>
 	
 	<repositories>
-		<repository>
-			<id>caas-snapshot-repo</id>
-			<url>https://repo.rnd.intershop.de/caas-local-mvn-snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>caas-release-repo</id>
-			<url>https://repo.rnd.intershop.de/caas-local-mvn-releases/</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>ish.local.releases</id>
-			<url>https://repo.rnd.intershop.de/local-mvn-intershop-iom/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-		</repository>
+        <repository>
+          <id>order-iom-releases</id>
+          <url>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/order-iom-releases/maven/v1</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
 	</repositories>
 
 	<dependencyManagement>
