@@ -1,0 +1,38 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+# trigger build for every branch
+#trigger:
+#- feature/65868-iom-bootstrap-project
+
+pool: 'ubuntu-20.4-DS2_v2-adopt-jdk'
+variables:
+  M2_LOCAL_REPO: $(Pipeline.Workspace)/local-maven-repo
+  MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
+steps:
+- checkout: self
+  timeoutInMinutes: 5
+  displayName: "checkout order-iom-project-archetype@$(Build.SourceBranchName)"
+  #enabled: false
+- task: Cache@2
+  inputs:
+    # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
+    # this variable expansion should not work, but it's the only way I got to work.
+    key: 'mvn_repo_cache_archetype'
+    path: "$(M2_LOCAL_REPO)"
+    cacheHitVar: M2_REPO_CACHE_HIT
+  timeoutInMinutes: 5
+  displayName: "create/restore local maven cache at $(M2_LOCAL_REPO)"
+- task: MavenAuthenticate@0
+  inputs:
+    artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
+  timeoutInMinutes: 1
+  displayName: "Maven authenticate"
+
+- task: Maven@3
+  inputs:
+    goals: clean compile
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
