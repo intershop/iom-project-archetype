@@ -12,6 +12,15 @@ variables:
   M2_LOCAL_REPO: $(Pipeline.Workspace)/local-maven-repo
   MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
 steps:
+- script: |
+    # stop on any error
+    set -e
+
+    echo '##[debug] install tools'
+    sudo apt update
+    sudo apt install -y maven
+  timeoutInMinutes: 3
+  displayName: "Install tools"
 - checkout: self
   timeoutInMinutes: 5
   displayName: "checkout order-iom-project-archetype@$(Build.SourceBranchName)"
