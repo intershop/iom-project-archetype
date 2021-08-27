@@ -96,13 +96,13 @@ steps:
   timeoutInMinutes: "5"
   displayName: "build caas images"
 
-- task: HelmDeploy@0
-  displayName: helm install iom
-  inputs:
-    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
-    azureResourceGroup: $(azureResourceGroup)
-    kubernetesCluster: $(kubernetesCluster)
-    command: install
-    chartType: FilePath
-    chartPath: s/$(IOM_HELM_CHART_PATH)
-    arguments: FAIL
+# - task: HelmDeploy@0
+#   displayName: helm install iom
+#   inputs:
+#     azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+#     azureResourceGroup: $(azureResourceGroup)
+#     kubernetesCluster: $(kubernetesCluster)
+#     command: install
+#     chartType: FilePath
+#     chartPath: s/$(IOM_HELM_CHART_PATH)
+#     arguments: FAIL
