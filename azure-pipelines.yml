@@ -88,6 +88,13 @@ steps:
     mavenPomFile: 'order-iom-project-archetype/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
 
+- task: Docker@2
+  inputs:
+    command: login
+    containerRegistry: $(IOM_INTERNAL_ACR_CONNECTION)
+  timeoutInMinutes: 1
+  displayName: Login into Internal ACR
+
 # run build_image.sh script from the created archive
 - script: |
     # stop on any error
