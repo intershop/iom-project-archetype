@@ -93,7 +93,7 @@ steps:
     # stop on any error
     set -e
 
-    .s/order-iom-project-archetype/target/test-classes/projects/basic/project/build_image.sh
+    ./s/order-iom-project-archetype/target/test-classes/projects/basic/project/build_image.sh
   timeoutInMinutes: "5"
   displayName: "build caas images"
 
