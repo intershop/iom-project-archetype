@@ -92,7 +92,7 @@ steps:
 - script: |
     # stop on any error
     set -e
-
+    chmod +x $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
     $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
   timeoutInMinutes: "5"
   displayName: "build caas images"
