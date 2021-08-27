@@ -109,6 +109,9 @@ steps:
     touch $C2D_CONFIG_IMAGE_TAG_FILE
     touch $C2D_CONFIG_IMAGE_NAME_FILE
 
+    ls -la $PIPELINE_WORKSPACE
+    printenv
+
     chmod +x $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
     $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
   timeoutInMinutes: "5"
