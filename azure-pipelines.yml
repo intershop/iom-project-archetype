@@ -29,11 +29,11 @@ variables:
   C2D_CONFIG_IMAGE_TAG_FILE: $(Pipeline.Workspace)/config-image-tag.txt
   C2D_CONFIG_IMAGE_NAME_FILE: $(Pipeline.Workspace)/config-image-name.txt
   C2D_OPTS_APP: >-
-    --get-image-name="$(C2D_APP_IMAGE_NAME_FILE)"
-    --get-image-tag="$(C2D_APP_IMAGE_TAG_FILE)"
+    --get-image-name=$(C2D_APP_IMAGE_NAME_FILE)
+    --get-image-tag=$(C2D_APP_IMAGE_TAG_FILE)
   C2D_OPTS_CONFIG: >-
-    --get-image-name="$(C2D_CONFIG_IMAGE_NAME_FILE)"
-    --get-image-tag="$(C2D_CONFIG_IMAGE_TAG_FILE)"
+    --get-image-name=$(C2D_CONFIG_IMAGE_NAME_FILE)
+    --get-image-tag=$(C2D_CONFIG_IMAGE_TAG_FILE)
   IMAGE_VERSION: 1.0.0-SNAPSHOT.$(Build.BuildId)
   IOM_REPO_NAME: $(IOM_INTERNAL_ACR_HOST)
 
