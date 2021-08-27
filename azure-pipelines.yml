@@ -25,11 +25,11 @@ variables:
 
   # wrap environment variables for build_image.sh
   C2D_OPTS_APP: >-
-    --get-image-name="$PIPELINE_WORKSPACE/app-image-name.txt"
-    --get-image-tag="$PIPELINE_WORKSPACE/app-image-tag.txt"
+    --get-image-name="$(Pipeline.Workspace)/app-image-name.txt"
+    --get-image-tag="$(Pipeline.Workspace)/app-image-tag.txt"
   C2D_OPTS_CONFIG: >-
-    --get-image-name="$PIPELINE_WORKSPACE/config-image-name.txt"
-    --get-image-tag="$PIPELINE_WORKSPACE/config-image-tag.txt"
+    --get-image-name="$(Pipeline.Workspace)/config-image-name.txt"
+    --get-image-tag="$(Pipeline.Workspace)/config-image-tag.txt"
   IMAGE_VERSION: 1.0.0-SNAPSHOT.$(Build.BuildId)
   IOM_REPO_NAME: $(IOM_INTERNAL_ACR_HOST)
 
