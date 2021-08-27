@@ -48,6 +48,7 @@ steps:
   displayName: Helm installer
   
 - checkout: self
+  path: s/order-iom-project-archetype
   timeoutInMinutes: "5"
   displayName: "checkout order-iom-project-archetype@$(Build.SourceBranchName)"
   #enabled: false
@@ -84,7 +85,7 @@ steps:
 - task: Maven@3
   inputs:
     goals: clean verify
-    mavenPomFile: 'pom.xml'
+    mavenPomFile: 'order-iom-project-archetype/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
 
 # run build_image.sh script from the created archive
@@ -92,7 +93,7 @@ steps:
     # stop on any error
     set -e
 
-    ./order-iom-project-archetype/target/test-classes/projects/basic/project/build_image.sh
+    .s/order-iom-project-archetype/target/test-classes/projects/basic/project/build_image.sh
   timeoutInMinutes: "5"
   displayName: "build caas images"
 
