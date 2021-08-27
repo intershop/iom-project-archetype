@@ -1,9 +1,6 @@
 DO $$
 BEGIN
     -- Function: oms.create_or_update_shop(bigint, boolean, integer, boolean, integer, boolean, character varying, integer, boolean, bigint, numeric, integer, character varying, character varying, boolean, bigint, bigint, boolean, boolean, character varying, boolean, character varying, boolean, character varying, character varying, character varying, character varying, smallint, smallint)
-
-	
-    DROP FUNCTION IF EXISTS oms.create_or_update_shop(bigint, boolean, integer, boolean, integer, boolean, character varying, integer, boolean, bigint, numeric, integer, character varying, character varying, boolean, bigint, bigint, boolean, boolean, character varying, boolean, character varying, boolean, character varying, character varying, character varying, character varying, smallint, smallint, boolean);
 	
     CREATE OR REPLACE FUNCTION oms.create_or_update_shop(
         p_id bigint,
@@ -16,6 +13,7 @@ BEGIN
         p_orderoptimizedefref integer,
         p_overwriteselectedsupplierallowed boolean,
         p_parentref bigint,
+        p_parentorganization character varying,
         p_returncharge numeric,
         p_returndeadline integer,
         p_shopname character varying,
@@ -32,7 +30,6 @@ BEGIN
         p_orderprocessingdelay character varying,
         p_shopordersequencenumberformatstring character varying,
         p_ordertokenvalidityduration character varying,
-        p_ceo character varying,
         p_amountdaysforpaymentremindermailofprepaidorders smallint,
         p_amountdaysforautocancellationofprepaidorders smallint,
         p_isreservationwithdose boolean,
@@ -80,7 +77,7 @@ BEGIN
                 ;
             IF p_parentRef IS NULL THEN
 				-- TODO adjust in new project or make configurable
-                PERFORM admin.set_parent_org(p_name, 'CHANGEME ORG');
+                PERFORM admin.set_parent_org(p_name, p_parentorganization);
             END IF;
 
 

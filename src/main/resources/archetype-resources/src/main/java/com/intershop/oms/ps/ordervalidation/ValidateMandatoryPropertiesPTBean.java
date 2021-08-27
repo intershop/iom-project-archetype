@@ -98,7 +98,7 @@ public class ValidateMandatoryPropertiesPTBean implements ValidateOrderPT
 
         if (validationException.hasExceptions())
         {
-            log.error("Order is missing mandatory propreties: " + orderDO.getShopOrderNo());
+            log.error("Order is missing mandatory properties: " + orderDO.getShopOrderNo());
             orderDO.addErrorText(ErrorTextFormatter.formattingErrorText(validationException));
             throw validationException;
         }

@@ -95,7 +95,7 @@ public final class CustomizationUtilityStatic
 
     public static void setOrUpdateProperty(OrderPosDO orderPosDO, String groupId, String key, String value)
     {
-        for (OrderPosPropertyDO prop : orderPosDO.getOrderPosPropertyList())
+        for (OrderPosPropertyDO prop : orderPosDO.getPropertyList())
         {
             if (groupId.equals(prop.getGroup()) && key.equals(prop.getKey()))
             {
@@ -110,7 +110,7 @@ public final class CustomizationUtilityStatic
 
     public static void setOrUpdateProperty(OrderDO orderDO, String groupId, String key, String value)
     {
-        for (OrderPropertyDO prop : orderDO.getOrderPropertyList())
+        for (OrderPropertyDO prop : orderDO.getPropertyList())
         {
             if (groupId.equals(prop.getGroup()) && key.equals(prop.getKey()))
             {

@@ -78,7 +78,7 @@ the location of this file.
           <font-triplet name="ArialMT" style="normal" weight="bold"/>
         </font>
         -->
-		<!-- FUER OCELOT -->
+		<!-- Example 
 	<font metrics-url="fonts/PFCentroSansPro-Black.xml" kerning="yes" embed-url="fonts/PFCentroSansPro-Black.ttf">
           <font-triplet name="PFCentroSansProBlack" style="normal" weight="normal"/>
         </font>
@@ -88,6 +88,7 @@ the location of this file.
         <font metrics-url="fonts/PFCentroSansPro-Light.xml" kerning="yes" embed-url="fonts/PFCentroSansPro-Light.ttf">
           <font-triplet name="PFCentroSansProLight" style="normal" weight="normal"/>
         </font>        
+        -->
         
 		<!-- automatically detect operating system installed fonts -->
         <!-- auto-detect/-->

@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 # trigger build for every branch
 #trigger:
 #- feature/65868-iom-bootstrap-project
@@ -11,9 +6,32 @@ pool: 'ubuntu-20.4-DS2_v2-adopt-jdk'
 variables:
   M2_LOCAL_REPO: $(Pipeline.Workspace)/local-maven-repo
   MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
-  IOM_DOCKERHUB_HOST: intershophub
-  IOM_REPO_NAME: "intershophub/"
+  #IOM_DOCKERHUB_HOST: intershophub
+  #IOM_REPO_NAME: "intershophub/"
   IOM_DOCKERHUB_CONNECTION: release-dockerhub
+
+  # Helm Repo URL
+  IOM_HELM_CHART_REPO_URL: git://Products/order-iom-helm
+  IOM_HELM_CHART_BRANCH: develop
+  IOM_HELM_CHART_PATH: helm
+  HELM_RELEASE_NAME: archetype-test-$(Build.BuildId)
+
+  # ACR
+  IOM_CI_ACR_HOST: iomci.azurecr.io
+  IOM_CI_ACR_CONNECTION: order-iomci-ISH-ENG-IOM
+
+  IOM_INTERNAL_ACR_HOST: iominternalacr.azurecr.io
+  IOM_INTERNAL_ACR_CONNECTION: order-iomInternalACR-ISH-ENG-IOM
+
+  # wrap environment variables for build_image.sh
+  C2D_OPTS_APP: >-
+    --get-image-name="$PIPELINE_WORKSPACE/app-image-name.txt" \
+    --get-image-tag="$PIPELINE_WORKSPACE/app-image-tag.txt"
+  C2D_OPTS_CONFIG: >-
+    --get-image-name="$PIPELINE_WORKSPACE/config-image-name.txt" \
+    --get-image-tag="$PIPELINE_WORKSPACE/config-image-tag.txt"
+  IMAGE_VERSION: 1.0.0-SNAPSHOT.$(Build.BuildId)
+  IOM_REPO_NAME: $(IOM_INTERNAL_ACR_HOST)
 
 steps:
 - script: |
@@ -22,13 +40,24 @@ steps:
 
     echo '##[debug] install tools'
     sudo apt update
-    sudo apt install -y maven
-  timeoutInMinutes: 3
+    sudo apt install -y maven unzip
+  timeoutInMinutes: "3"
   displayName: "Install tools"
+  
+- task: HelmInstaller@1
+  displayName: Helm installer
+  
 - checkout: self
-  timeoutInMinutes: 5
+  timeoutInMinutes: "5"
   displayName: "checkout order-iom-project-archetype@$(Build.SourceBranchName)"
   #enabled: false
+  
+- checkout: ${{variables.IOM_HELM_CHART_REPO_URL}}@${{variables.IOM_HELM_CHART_BRANCH}}
+  path: s/$(IOM_HELM_CHART_PATH)
+  displayName: checkout order-iom-helm@$(IOM_HELM_CHART_BRANCH)
+  #enabled: false
+  timeoutInMinutes: "5"
+
 - task: Cache@2
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
@@ -38,20 +67,42 @@ steps:
     cacheHitVar: M2_REPO_CACHE_HIT
   timeoutInMinutes: 5
   displayName: "create/restore local maven cache at $(M2_LOCAL_REPO)"
+  
 - task: MavenAuthenticate@0
   inputs:
     artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
   timeoutInMinutes: 1
   displayName: "Maven authenticate"
-- task: Docker@2
-  inputs:
-    command: login
-    containerRegistry: $(IOM_DOCKERHUB_CONNECTION)
-  timeoutInMinutes: 1
-  displayName: "Login to docker hub"
+  
+# - task: Docker@2
+#   inputs:
+#     command: login
+#     containerRegistry: $(IOM_DOCKERHUB_CONNECTION)
+#   timeoutInMinutes: 1
+#   displayName: "Login to docker hub"
 
 - task: Maven@3
   inputs:
     goals: clean verify
     mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m $(MAVEN_OPTS)'
+    mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+
+# run build_image.sh script from the created archive
+- script: |
+    # stop on any error
+    set -e
+
+    ./order-iom-project-archetype/target/test-classes/projects/basic/project/build_image.sh
+  timeoutInMinutes: "5"
+  displayName: "build caas images"
+
+- task: HelmDeploy@0
+  displayName: helm install iom
+  inputs:
+    azureSubscriptionEndpoint: $(azureSubscriptionEndpoint)
+    azureResourceGroup: $(azureResourceGroup)
+    kubernetesCluster: $(kubernetesCluster)
+    command: install
+    chartType: FilePath
+    chartPath: s/$(IOM_HELM_CHART_PATH)
+    arguments: FAIL

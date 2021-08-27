@@ -17,21 +17,26 @@ import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 
+// this test class can be used to perform some static "code analysis" to check
+// for missing annotations
 public class BeanAnnotationTest
 {
     @SuppressWarnings("static-method")
     @Test
     public void test() throws Exception
     {
-        Reflections reflectionsSN = new Reflections("com.intershop.oms.musgrave", new SubTypesScanner(false));
         Reflections reflectionsFramework = new Reflections("com.intershop.oms.ps", new SubTypesScanner(false));
+        // you can add custom java packages like this:
+        Reflections reflectionsProject = new Reflections("com.intershop.oms.example", new SubTypesScanner(false));
 
         List<Class<? extends Object>> classes = new ArrayList<>();
-        classes.addAll(reflectionsSN.getSubTypesOf(Object.class));
+        classes.addAll(reflectionsProject.getSubTypesOf(Object.class));
         classes.addAll(reflectionsFramework.getSubTypesOf(Object.class));
 
         for (Class<? extends Object> clazz : classes)
         {
+            // abstract classes and JAX-RS provider classes do not require
+            // annotations like Stateless or Singleton
             if (Modifier.isAbstract(clazz.getModifiers()) || isJaxRsProvider(clazz))
             {
                 continue;
@@ -50,6 +55,7 @@ public class BeanAnnotationTest
 
     private static boolean isJaxRsProvider(Class<? extends Object> clazz)
     {
+        // adjust this if necessary
         return clazz.getPackageName().startsWith("com.intershop.oms.ps.rest.filter");
     }
 }

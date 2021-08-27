@@ -17,9 +17,12 @@
                 <include>**/*.xml</include>
             </includes>
         </fileSet>
+         <fileSet filtered="false" encoding="UTF-8">
+            <directory>src/main/java</directory>
+        </fileSet>
         <fileSet filtered="false" encoding="UTF-8">
             <directory>devenv-share</directory>
-        </fileSet>
+        </fileSet><!-- 
         <fileSet filtered="false" encoding="UTF-8">
             <directory></directory>
             <includes>
@@ -33,10 +36,7 @@
             <includes>
                 <include>*.properties</include>
             </includes>
-        </fileSet>
-        <fileSet filtered="false" encoding="UTF-8">
-            <directory>src/main/java</directory>
-        </fileSet>
+        </fileSet> -->
         <fileSet encoding="UTF-8">
             <directory>src/main/resources</directory>
         </fileSet>
