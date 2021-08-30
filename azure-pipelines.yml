@@ -97,25 +97,32 @@ steps:
     command: login
     containerRegistry: $(IOM_INTERNAL_ACR_CONNECTION)
   timeoutInMinutes: 1
-  displayName: Login into Internal ACR
+  displayName: Login - Internal ACR
+
+- task: Docker@2
+  inputs:
+    command: login
+    containerRegistry: $IOM_CI_ACR_CONNECTION)
+  timeoutInMinutes: 1
+  displayName: Login - CI ACR
+
 
 # run build_image.sh script from the created archive
 - script: |
     # stop on any error
     set -e
 
-    touch $C2D_APP_IMAGE_TAG_FILE
-    touch $C2D_APP_IMAGE_NAME_FILE
-    touch $C2D_CONFIG_IMAGE_TAG_FILE
-    touch $C2D_CONFIG_IMAGE_NAME_FILE
-
-    ls -la $PIPELINE_WORKSPACE
-    printenv
-
     chmod +x $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
     $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
-  timeoutInMinutes: "5"
-  displayName: "build caas images"
+    docker tag "$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" \
+    "$IOM_CI_ACR_HOST/$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" 
+    docker tag "$(cat $C2D_CONFIG_IMAGE_NAME_FILE):$(cat $C2D_CONFIG_IMAGE_TAG_FILE)" \
+    "$IOM_CI_ACR_HOST/$(cat $C2D_CONFIG_IMAGE_NAME_FILE):$(cat $C2D_CONFIG_IMAGE_TAG_FILE)" 
+    docker push "$IOM_CI_ACR_HOST/$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" 
+    docker push "$IOM_CI_ACR_HOST/$(cat $C2D_CONFIG_IMAGE_NAME_FILE):$(cat $C2D_CONFIG_IMAGE_TAG_FILE)" 
+
+  timeoutInMinutes: "10"
+  displayName: "build & push caas images"
 
 # - task: HelmDeploy@0
 #   displayName: helm install iom
