@@ -102,7 +102,7 @@ steps:
 - task: Docker@2
   inputs:
     command: login
-    containerRegistry: $IOM_CI_ACR_CONNECTION)
+    containerRegistry: $(IOM_CI_ACR_CONNECTION)
   timeoutInMinutes: 1
   displayName: Login - CI ACR
 
