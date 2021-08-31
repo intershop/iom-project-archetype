@@ -100,6 +100,11 @@ steps:
     goals: clean verify
     mavenPomFile: 'order-iom-project-archetype/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  
+- script: |
+    # display cache size for debugging
+    du -hs $(M2_LOCAL_REPO)
+  displayName: "DEBUG: show cache size"
 
 - task: Docker@2
   inputs:
@@ -152,7 +157,7 @@ steps:
       --create-namespace 
       --set image.repository=$(IOM_CI_ACR_HOST)/$(C2D_APP_IMAGE_NAME)
       --set image.tag=$(C2D_APP_IMAGE_TAG)
-      -- set config.image.repository=$(IOM_CI_ACR_HOST)/$(C2D_CONFIG_IMAGE_NAME)
+      --set config.image.repository=$(IOM_CI_ACR_HOST)/$(C2D_CONFIG_IMAGE_NAME)
       --set config.image.tag=$(C2D_CONFIG_IMAGE_TAG)
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
       --timeout 600s 
