@@ -76,7 +76,10 @@ steps:
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
     # this variable expansion should not work, but it's the only way I got to work.
-    key: 'mvn_repo_cache_archetype'
+    key: 'mvn_ipa | "$(Agent.OS)" | **/pom.xml'
+    restoreKeys: |
+      mvn_ipa | "$(Agent.OS)"
+      mvn_ipa
     path: "$(M2_LOCAL_REPO)"
     cacheHitVar: M2_REPO_CACHE_HIT
   timeoutInMinutes: 5
