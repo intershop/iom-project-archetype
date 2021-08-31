@@ -216,7 +216,7 @@ postgres:
     enabled: true
     accessMode: ReadWriteOnce
     storageSize: 2Gi
-    forceReset: false
+    forceReset: true
 
 mailhog:
   enabled: true
