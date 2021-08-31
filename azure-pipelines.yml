@@ -150,9 +150,9 @@ steps:
     namespace: $(IOM_AKS_NAMESPACE)
     command: install
     chartType: FilePath
-    chartPath: s/$(IOM_HELM_CHART_PATH)
+    chartPath: $(IOM_HELM_CHART_PATH)
     waitForExecution: true
-    valueFile: s/order-iom-project-archetype/helm-values-test.yaml
+    valueFile: order-iom-project-archetype/helm-values-test.yaml
     arguments: >-
       --create-namespace 
       --set image.repository=$(IOM_CI_ACR_HOST)/$(C2D_APP_IMAGE_NAME)
