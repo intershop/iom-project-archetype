@@ -163,7 +163,7 @@ steps:
       --set config.image.repository=$(IOM_CI_ACR_HOST)/$(C2D_CONFIG_IMAGE_NAME)
       --set config.image.tag=$(C2D_CONFIG_IMAGE_TAG)
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
-      --timeout 600s 
+      --timeout 3600s 
 
 # TODO add some simple tests?
 
