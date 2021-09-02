@@ -76,7 +76,7 @@ steps:
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
     # this variable expansion should not work, but it's the only way I got to work.
-    key: 'mvn_ipa | "$(Agent.OS)" | s/order-iom-project-archetype/pom.xml'
+    key: 'mvn_ipa | "$(Agent.OS)" | order-iom-project-archetype/pom.xml'
     restoreKeys: |
       mvn_ipa | "$(Agent.OS)"
       mvn_ipa
