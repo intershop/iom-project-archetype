@@ -41,7 +41,7 @@ dbaccount:
   # searchPath: "testcases"
   searchPath:
   image:
-    repository: iominternalacr.azurecr.io/intershop/iom-dbaccount
+    repository: iomci.azurecr.io/iom-dbaccount
     tag:        1.2.1.0
     pullPolicy: IfNotPresent
   resources: {}
