@@ -155,11 +155,11 @@ caas:
   importTestDataTimeout: 300
 
 persistence:
-  storageClass: 
-  storageSize: 5Gi
+  storageClass: azurefile
+  storageSize: 1Gi
   # To be used in simple environments (e.g. demos) to persist data on local host.
   # if set, storageClass will be ignored.
-  hostPath: blueprint-project-pv
+  #hostPath: blueprint-project-pv
 
 
 resources: {}
@@ -212,11 +212,21 @@ affinity: {}
 
 postgres:
   enabled: true
+  image:
+    tag: "12"
+  args: ["-N", "500", "-c", "max_prepared_transactions=100", "-c", "log_directory=/tmp", "-c", "log_destination=stderr,csvlog", "-c", "logging_collector=on", "-c", "log_filename=pg-G18-%Y%m%d_%H%M.log", "-c", "log_lock_waits=on", "-c", "log_min_duration_statement=500" ]
   persistence:
-    enabled: true
+    enabled: false
     accessMode: ReadWriteOnce
     storageSize: 2Gi
-    forceReset: true
+    forceReset: false
+  resources:
+    requests:
+      memory: "3000Mi"
+      cpu: "0.75"
+    limits:
+      memory: "3000Mi"
+      cpu: "0.75"    
 
 mailhog:
   enabled: true
