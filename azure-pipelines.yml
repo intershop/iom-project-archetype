@@ -158,8 +158,6 @@ steps:
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
       --timeout 3600s 
 
-# TODO add some simple tests?
-
 # CLEANUP TASKS
 - task: HelmDeploy@0
   displayName: uninstall helm release
@@ -169,11 +167,13 @@ steps:
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
     namespace: $(IOM_AKS_NAMESPACE)
     command: uninstall
-    releaseName: $(HELM_RELEASE_NAME)
+    # NOTE: releaseName parameter doesn't work for uninstall command!
+    #releaseName: $(HELM_RELEASE_NAME)
     waitForExecution: true
     valueFile: order-iom-project-archetype/helm-values-test.yaml
     arguments: >-
       --timeout 300s 
+      $(HELM_RELEASE_NAME)
 
 - task: Kubernetes@1
   displayName: clean up / delete kubernetes namespace
