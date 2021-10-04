@@ -76,9 +76,8 @@ steps:
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
     # this variable expansion should not work, but it's the only way I got to work.
-    key: 'mvn_ipa | "$(Agent.OS)" | order-iom-project-archetype/pom.xml'
+    key: '"mvn_ipa" | order-iom-project-archetype/pom.xml | src/test/resources/projects/basic/archetype.properties'
     restoreKeys: |
-      mvn_ipa | "$(Agent.OS)"
       mvn_ipa
     path: "$(M2_LOCAL_REPO)"
     cacheHitVar: M2_REPO_CACHE_HIT
@@ -91,13 +90,6 @@ steps:
   timeoutInMinutes: 1
   displayName: "Maven authenticate"
   
-# - task: Docker@2
-#   inputs:
-#     command: login
-#     containerRegistry: $(IOM_DOCKERHUB_CONNECTION)
-#   timeoutInMinutes: 1
-#   displayName: "Login to docker hub"
-
 - task: Maven@3
   inputs:
     goals: clean verify
@@ -151,6 +143,7 @@ steps:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
     namespace: $(IOM_AKS_NAMESPACE)
+    releaseName: $(HELM_RELEASE_NAME)
     command: install
     chartType: FilePath
     chartPath: $(IOM_HELM_CHART_PATH)
@@ -166,6 +159,21 @@ steps:
       --timeout 3600s 
 
 # TODO add some simple tests?
+
+# CLEANUP TASKS
+- task: HelmDeploy@0
+  displayName: uninstall helm release
+  condition: always()
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
+    namespace: $(IOM_AKS_NAMESPACE)
+    command: uninstall
+    releaseName: $(HELM_RELEASE_NAME)
+    waitForExecution: true
+    valueFile: order-iom-project-archetype/helm-values-test.yaml
+    arguments: >-
+      --timeout 300s 
 
 - task: Kubernetes@1
   displayName: clean up / delete kubernetes namespace

@@ -9,6 +9,11 @@
         <requiredProperty key="platformVersion">
             <defaultValue>3.3.0.0</defaultValue>
         </requiredProperty>
+        <requiredProperty key="DOT">
+            <!-- empty string as workaround for https://issues.apache.org/jira/browse/ARCHETYPE-505 -->
+            <defaultValue>.</defaultValue>
+            <validationRegex>\.</validationRegex>
+        </requiredProperty>
     </requiredProperties>
     <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
@@ -21,13 +26,11 @@
             <directory>src/main/java</directory>
         </fileSet>
         <fileSet filtered="false" encoding="UTF-8">
-            <directory>devenv-share</directory>
-        </fileSet>
-        <fileSet filtered="false" encoding="UTF-8">
             <directory></directory>
             <includes>
-                <include>.gitattributes</include>
-                <include>.gitignore</include>
+                <!-- temporarily disabled - workaround for https://issues.apache.org/jira/browse/ARCHETYPE-505 -->
+                <!--<include>.gitattributes</include>
+                <include>.gitignore</include>-->
                 <include>*.sh</include>
             </includes>
         </fileSet>
@@ -35,6 +38,8 @@
             <directory></directory>
             <includes>
                 <include>*.properties</include>
+                <!-- workaround for https://issues.apache.org/jira/browse/ARCHETYPE-505 -->
+                <include>*git*</include>
             </includes>
         </fileSet>
         <fileSet encoding="UTF-8">
