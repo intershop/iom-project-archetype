@@ -25,7 +25,6 @@
         <version>3.2.0</version>
       </extension>
     </extensions>
-
     <pluginManagement>
       <plugins>
         <plugin>
@@ -41,30 +40,41 @@
           </configuration>
         </plugin>
       </plugins>
-    </pluginManagement><!-- 
+    </pluginManagement>
     <plugins>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>3.0.0</version>
-            <executions>
-                <execution>
-                    <id>BuildAndDeployImage</id>
-                    <phase>integration-test</phase>
-                    <goals>
-                        <goal>exec</goal>
-                    </goals>
-                </execution>
-            </executions>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>javadoc-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
             <configuration>
-                <executable>bash</executable>
-                <arguments>
-                    <argument>${basedir}/verify_image_deployment.sh</argument>
-                </arguments>
-                <workingDirectory>${basedir}</workingDirectory>
+              <classifier>javadoc</classifier>
+              <includes>
+                <include>README.md</include>
+              </includes>
             </configuration>
-        </plugin>
-    </plugins> -->
+          </execution>
+          <execution>
+            <id>sources-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <classifier>sources</classifier>
+              <includes>
+                <include>README.md</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>    
+    </plugins>
   </build>
 
 </project>
