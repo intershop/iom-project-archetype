@@ -55,21 +55,19 @@ steps:
     sudo apt update
     sudo apt install -y maven unzip
   timeoutInMinutes: "3"
-  displayName: "Install tools"
+  displayName: "Prepare - install tools"
   
 - task: HelmInstaller@1
-  displayName: Helm installer
+  displayName: "Prepare - install Helm"
   
 - checkout: self
   path: s/order-iom-project-archetype
+  displayName: "Checkout - order-iom-project-archetype@$(Build.SourceBranchName)"
   timeoutInMinutes: "5"
-  displayName: "checkout order-iom-project-archetype@$(Build.SourceBranchName)"
-  #enabled: false
   
 - checkout: ${{variables.IOM_HELM_CHART_REPO_URL}}@${{variables.IOM_HELM_CHART_BRANCH}}
   path: s/$(IOM_HELM_CHART_PATH)
-  displayName: checkout order-iom-helm@$(IOM_HELM_CHART_BRANCH)
-  #enabled: false
+  displayName: "Checkout - order-iom-helm@$(IOM_HELM_CHART_BRANCH)"
   timeoutInMinutes: "5"
 
 - task: Cache@2
@@ -82,38 +80,34 @@ steps:
     path: "$(M2_LOCAL_REPO)"
     cacheHitVar: M2_REPO_CACHE_HIT
   timeoutInMinutes: 5
-  displayName: "create/restore local maven cache at $(M2_LOCAL_REPO)"
+  displayName: "Cache - create/restore local maven cache at $(M2_LOCAL_REPO)"
   
 - task: MavenAuthenticate@0
   inputs:
     artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
   timeoutInMinutes: 1
-  displayName: "Maven authenticate"
+  displayName: "Maven - authenticate"
   
 - task: Maven@3
   inputs:
     goals: clean verify
     mavenPomFile: 'order-iom-project-archetype/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-  
-- script: |
-    # display cache size for debugging
-    du -hs $(M2_LOCAL_REPO)
-  displayName: "DEBUG: show cache size"
+  displayName: "Maven - run verify goal"
 
 - task: Docker@2
   inputs:
     command: login
     containerRegistry: $(IOM_INTERNAL_ACR_CONNECTION)
   timeoutInMinutes: 1
-  displayName: Login - Internal ACR
+  displayName: Docker - login to internal ACR
 
 - task: Docker@2
   inputs:
     command: login
     containerRegistry: $(IOM_CI_ACR_CONNECTION)
   timeoutInMinutes: 1
-  displayName: Login - CI ACR
+  displayName: Docker - login to CI ACR
 
 # run build_image.sh script from the created archive
 - script: |
@@ -135,10 +129,10 @@ steps:
     echo "##vso[task.setvariable variable=C2D_CONFIG_IMAGE_NAME;]$(cat $C2D_CONFIG_IMAGE_NAME_FILE)"
 
   timeoutInMinutes: "10"
-  displayName: "build & push caas images"
+  displayName: "Docker - build & deploy images with caas2docker wrapper script"
 
 - task: HelmDeploy@0
-  displayName: helm install iom
+  displayName: "Helm - install blueprint-test release"
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
@@ -160,7 +154,7 @@ steps:
 
 # CLEANUP TASKS
 - task: HelmDeploy@0
-  displayName: uninstall helm release
+  displayName: "Cleanup - uninstall blueprint-test release"
   condition: always()
   inputs:
     connectionType: Kubernetes Service Connection
@@ -176,7 +170,7 @@ steps:
       $(HELM_RELEASE_NAME)
 
 - task: Kubernetes@1
-  displayName: clean up / delete kubernetes namespace
+  displayName: "Cleanup - delete Kubernetes namespace"
   condition: always()
   inputs:
     connectionType: Kubernetes Service Connection
