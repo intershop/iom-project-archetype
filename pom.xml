@@ -2,20 +2,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-<!-- 
-  <parent>
-    <groupId>bakery.parent</groupId>
-    <artifactId>bakery.parent</artifactId>
-    <version>bakery.pom-trunk-SNAPSHOT</version>
-    <relativePath>../bakery/pom.xml</relativePath>
-  </parent>
-    -->
   <groupId>com.intershop.oms.archetype</groupId>
   <artifactId>iom-project-archetype</artifactId>
   <version>3.5.1.0</version>
   <packaging>maven-archetype</packaging>
 
   <name>[Tool] IOM Project Bootstrap Archetype</name>
+  <description>A maven-archetype to bootstrap new projects for Intershop Order Management.</description>
+  <url>https://github.com/TODO</url>
+  
+  <licenses>
+  <!-- TODO -->
+  </licenses>
+  
+  <developers>
+    <developer>
+        <id>pborchert</id>
+        <name>Philipp Borchert</name>
+        <email>p.borchert@intershop.de</email>
+        <organization>Intershop Communications AG</organization>
+        <organizationUrl>https://www.intershop.com/</organizationUrl>
+    </developer>
+  </developers>
+  
+  <scm>
+    <!-- TODO -->
+  </scm>
   
   <build>
     <extensions>
