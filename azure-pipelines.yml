@@ -82,6 +82,12 @@ steps:
   timeoutInMinutes: 5
   displayName: "Cache - create/restore local maven cache at $(M2_LOCAL_REPO)"
   
+- task: DownloadSecureFile@1
+  name: pgpPrivateKey
+  displayName: 'Secrets - download pgp key'
+  inputs:
+    secureFile: 'order-iom-project-archetype-gpg_private_key_iom_TEST.pgp'
+
 - task: MavenAuthenticate@0
   inputs:
     artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
@@ -94,6 +100,9 @@ steps:
     mavenPomFile: 'order-iom-project-archetype/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against archetype"
+  env:
+    PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
+    PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
   
 - task: Maven@3
   inputs:
