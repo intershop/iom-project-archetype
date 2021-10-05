@@ -2,7 +2,8 @@
 set -e
 cd "$(dirname "$0")"
 # check mvn binary installed/available
-command -v mvn >/dev/null 2>&1 || { echo >&2 "mvn binary not found"; exit 1; }
+command -v mvn >/dev/null 2>&1 || { echo >&2 "mvn binary not found - please install maven"; exit 1; }
+command -v unzip >/dev/null 2>&1 || { echo >&2 "unzip binary not found - please install unzip"; exit 1; }
 # read default properties and export them
 set -a
 . caas2docker.properties
@@ -17,7 +18,5 @@ mkdir $CAAS_PROJECT_DIR
 # extract locally built project artifacts
 cat target/*.tgz | tar -C $CAAS_PROJECT_DIR -zxf - -i
 # run CaaS2Docker app+config
-echo "OPTS: $C2D_OPTS_APP //"
-whoami
 ./c2d/caas2docker/app/build.sh $C2D_OPTS_APP
 ./c2d/caas2docker/config/build.sh $C2D_OPTS_CONFIG

@@ -108,33 +108,10 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>bakery.util</groupId>
-            <artifactId>bakery.util-util</artifactId>
-            <type>ejb</type>
-            <scope>provided</scope>
-            <version>${platform.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>bakery.persistence</groupId>
-            <artifactId>bakery.persistence-common-article</artifactId>
-            <scope>provided</scope>
-            <version>${platform.version}</version>
-        </dependency>
-        <dependency>
             <groupId>bakery.logic</groupId>
             <artifactId>bakery.logic-common</artifactId>
             <scope>provided</scope>
             <version>${platform.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.xmlgraphics</groupId>
-                    <artifactId>*</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>bakery.security</groupId>
@@ -142,18 +119,7 @@
             <scope>provided</scope>
             <version>${platform.version}</version>
         </dependency>
-        <dependency>
-            <groupId>oms.rolemgmt</groupId>
-            <artifactId>oms.rolemgmt-api</artifactId>
-            <scope>provided</scope>
-            <version>${platform.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>bakery.schemas</groupId>
-            <artifactId>bakery.schemas-communication</artifactId>
-            <scope>provided</scope>
-            <version>${platform.version}</version>
-        </dependency>
+
         <!-- TEST dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -187,29 +153,6 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.32</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-undertow</artifactId>
-            <version>${org.jboss.resteasy.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.wildfly</groupId>
-            <artifactId>wildfly-jaxws-client-bom</artifactId>
-            <scope>test</scope>
-            <type>pom</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>xml-apis</groupId>
-                    <artifactId>xml-apis</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
     </dependencies>
