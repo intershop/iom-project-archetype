@@ -93,6 +93,20 @@ steps:
     artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
   timeoutInMinutes: 1
   displayName: "Maven - authenticate"
+
+- task: Docker@2
+  inputs:
+    command: login
+    containerRegistry: $(IOM_INTERNAL_ACR_CONNECTION)
+  timeoutInMinutes: 1
+  displayName: "Docker - login to internal ACR"
+
+- task: Docker@2
+  inputs:
+    command: login
+    containerRegistry: $(IOM_CI_ACR_CONNECTION)
+  timeoutInMinutes: 1
+  displayName: "Docker - login to CI ACR"
   
 - task: Maven@3
   inputs:
@@ -110,20 +124,6 @@ steps:
     mavenPomFile: 'order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against dependency-helper"
-
-- task: Docker@2
-  inputs:
-    command: login
-    containerRegistry: $(IOM_INTERNAL_ACR_CONNECTION)
-  timeoutInMinutes: 1
-  displayName: "Docker - login to internal ACR"
-
-- task: Docker@2
-  inputs:
-    command: login
-    containerRegistry: $(IOM_CI_ACR_CONNECTION)
-  timeoutInMinutes: 1
-  displayName: "Docker - login to CI ACR"
 
 # run build_image.sh script from the created archive
 - script: |
