@@ -6,7 +6,7 @@ replicaCount: 1
 downtime: true
 
 image:
-  repository: blueprint-customer-iom-app
+  repository: blueprint-project-iom-app
   # Overrides the image tag whose default is the chart version.
   tag: "3.1.0.0"
   pullPolicy: IfNotPresent
@@ -48,7 +48,7 @@ dbaccount:
   
 config:
   image:
-    repository: blueprint-customer-iom-config
+    repository: blueprint-project-iom-config
     tag: 3.1.0.0
     pullPolicy: IfNotPresent
   resources: {}

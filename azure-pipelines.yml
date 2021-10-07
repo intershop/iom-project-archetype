@@ -130,8 +130,8 @@ steps:
     # stop on any error
     set -e
 
-    chmod +x $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
-    $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
+    #chmod +x $PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
+    #$PIPELINE_WORKSPACE/s/order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/build_image.sh
     docker tag "$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" \
     "$IOM_CI_ACR_HOST/$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" 
     docker tag "$(cat $C2D_CONFIG_IMAGE_NAME_FILE):$(cat $C2D_CONFIG_IMAGE_TAG_FILE)" \

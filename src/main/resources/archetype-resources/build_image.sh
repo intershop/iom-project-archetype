@@ -18,5 +18,6 @@ mkdir $CAAS_PROJECT_DIR
 # extract locally built project artifacts
 cat target/*.tgz | tar -C $CAAS_PROJECT_DIR -zxf - -i
 # run CaaS2Docker app+config
+printenv
 ./c2d/caas2docker/app/build.sh $C2D_OPTS_APP
 ./c2d/caas2docker/config/build.sh $C2D_OPTS_CONFIG
