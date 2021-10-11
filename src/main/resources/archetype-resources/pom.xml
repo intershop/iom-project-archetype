@@ -367,6 +367,17 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>ci</id>
+            <activation>
+                <property>
+                    <name>env.INTERSHOP_DOCKER_REPO</name>
+                </property>
+            </activation>
+            <properties>
+                <intershop.docker.repo>${env.INTERSHOP_DOCKER_REPO}</intershop.docker.repo>
+            </properties>
+        </profile>
     </profiles>
 
 </project>
