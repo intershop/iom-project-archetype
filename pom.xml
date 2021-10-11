@@ -1,149 +1,157 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.intershop.oms.archetype</groupId>
-  <artifactId>iom-project-archetype</artifactId>
-  <version>3.5.1.0</version>
-  <packaging>maven-archetype</packaging>
+    <groupId>com.intershop.oms.archetype</groupId>
+    <artifactId>iom-project-archetype</artifactId>
+    <version>3.5.1.0</version>
+    <packaging>maven-archetype</packaging>
 
-  <name>[Tool] IOM Project Bootstrap Archetype</name>
-  <description>A maven-archetype to bootstrap new projects for Intershop Order Management.</description>
-  <url>https://github.com/TODO</url>
-  
-  <licenses>
-  <!-- TODO -->
-  </licenses>
-  
-  <developers>
-    <developer>
-        <id>pborchert</id>
-        <name>Philipp Borchert</name>
-        <email>p.borchert@intershop.de</email>
-        <organization>Intershop Communications AG</organization>
-        <organizationUrl>https://www.intershop.com/</organizationUrl>
-    </developer>
-  </developers>
-  
-  <scm>
-    <!-- TODO -->
-  </scm>
-  
-  <build>
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.archetype</groupId>
-        <artifactId>archetype-packaging</artifactId>
-        <version>3.2.0</version>
-      </extension>
-    </extensions>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-archetype-plugin</artifactId>
-          <version>3.2.0</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <configuration>
-              <!-- Required so that .gitignore gets included in archetypes -->
-              <!-- see https://issues.apache.org/jira/browse/MRESOURCES-190 -->
-              <addDefaultExcludes>false</addDefaultExcludes>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-    <plugins>    
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <id>javadoc-jar</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <classifier>javadoc</classifier>
-              <includes>
-                <include>README.md</include>
-              </includes>
-            </configuration>
-          </execution>
-          <execution>
-            <id>sources-jar</id>
-            <phase>package</phase>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <configuration>
-              <classifier>sources</classifier>
-              <includes>
-                <include>README.md</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-  <profiles>
-    <profile>
-        <id>pgpSigned</id>
-        <activation>
-            <property>
-                <name>env.PGP_SECRETKEY</name>
-            </property>
-        </activation>
-        <build>
+    <name>[Tool] IOM Project Bootstrap Archetype</name>
+    <description>A maven-archetype to bootstrap new projects for Intershop Order Management.</description>
+    <url>https://github.com/TODO</url>
+
+    <licenses>
+        <!-- TODO -->
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>pborchert</id>
+            <name>Philipp Borchert</name>
+            <email>p.borchert@intershop.de</email>
+            <organization>Intershop Communications AG</organization>
+            <organizationUrl>https://www.intershop.com/</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <!-- TODO -->
+    </scm>
+
+    <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.archetype</groupId>
+                <artifactId>archetype-packaging</artifactId>
+                <version>3.2.0</version>
+            </extension>
+        </extensions>
+        <pluginManagement>
             <plugins>
-              <plugin>
-                <groupId>org.kohsuke</groupId>
-                <artifactId>pgp-maven-plugin</artifactId>
-                <version>1.1</version>
-                    <executions>
-                  <execution>
-                    <goals>
-                      <goal>sign</goal>
-                    </goals>        
-                  </execution>
-                </executions>
-              </plugin>
-            </plugins>
-        </build>
-    </profile>
-    <profile>
-        <id>ci</id>
-        <activation>
-            <property>
-                <name>env.INTERSHOP_DOCKER_REPO</name>
-            </property>
-        </activation>
-        <build>
-            <plugins>
-              <plugin>
-                <artifactId>maven-archetype-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <id>default-integration-test</id>
-                    <phase>verify</phase>
-                    <goals>
-                      <goal>integration-test</goal>
-                    </goals>
+                <plugin>
+                    <artifactId>maven-archetype-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
                     <configuration>
-                        <properties>
-                          <intershop.docker.repo>${env.INTERSHOP_DOCKER_REPO}</intershop.docker.repo>
-                          <image.docker.opts.app>${env.IMAGE_DOCKER_OPTS_APP}</image.docker.opts.app>
-                          <image.docker.opts.config>${env.IMAGE_DOCKER_OPTS_CONFIG}</image.docker.opts.config>
-                        </properties>
+                        <!-- Required so that .gitignore gets included in 
+                            archetypes -->
+                        <!-- see https://issues.apache.org/jira/browse/MRESOURCES-190 -->
+                        <addDefaultExcludes>false</addDefaultExcludes>
                     </configuration>
-                  </execution>
-                </executions>
-               </plugin>
+                </plugin>
             </plugins>
-        </build>
-    </profile>
-  </profiles>
+        </pluginManagement>
+        <plugins>
+            <!-- we need dummy sources/javadoc for maven central -->
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>javadoc-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>javadoc</classifier>
+                            <includes>
+                                <include>README.md</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>sources-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>sources</classifier>
+                            <includes>
+                                <include>README.md</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <!-- if PGP_SECRETKEY env var is present enable pgp plugin to sign 
+            artifacts -->
+        <profile>
+            <id>pgpSigned</id>
+            <activation>
+                <property>
+                    <name>env.PGP_SECRETKEY</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.kohsuke</groupId>
+                        <artifactId>pgp-maven-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- if INTERSHOP_DOCKER_REPO env var is present, forward related 
+            variables as properties to the integration test lifecycle -->
+        <profile>
+            <id>ci</id>
+            <activation>
+                <property>
+                    <name>env.INTERSHOP_DOCKER_REPO</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-archetype-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-integration-test</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                </goals>
+                                <configuration>
+                                    <properties>
+                                        <intershop.docker.repo>${env.INTERSHOP_DOCKER_REPO}</intershop.docker.repo>
+                                        <image.docker.opts.app>${env.IMAGE_DOCKER_OPTS_APP}</image.docker.opts.app>
+                                        <image.docker.opts.config>${env.IMAGE_DOCKER_OPTS_CONFIG}</image.docker.opts.config>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

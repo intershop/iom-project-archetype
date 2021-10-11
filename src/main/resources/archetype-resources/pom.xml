@@ -247,37 +247,37 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <profiles>
         <profile>
             <id>docker</id>
             <build>
                 <plugins>
                     <plugin>
-                         <groupId>org.apache.maven.plugins</groupId>
-                         <artifactId>maven-dependency-plugin</artifactId>
-                         <version>3.2.0</version>
-                         <executions>
-                           <execution>
-                             <id>unpack</id>
-                             <phase>prepare-package</phase>
-                             <goals>
-                               <goal>unpack</goal>
-                             </goals>
-                             <configuration>
-                               <artifactItems>
-                                 <artifactItem>
-                                   <groupId>com.intershop.oms</groupId>
-                                   <artifactId>caas2docker</artifactId>
-                                   <version>${platform.version}</version>
-                                   <type>zip</type>
-                                   <outputDirectory>${project.build.directory}/c2d</outputDirectory>
-                                 </artifactItem>
-                               </artifactItems>
-                             </configuration>
-                           </execution>
-                         </executions>                    
-                        </plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.intershop.oms</groupId>
+                                            <artifactId>caas2docker</artifactId>
+                                            <version>${platform.version}</version>
+                                            <type>zip</type>
+                                            <outputDirectory>${project.build.directory}/c2d</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
@@ -325,9 +325,11 @@
                                 </goals>
                                 <configuration>
                                     <executable>bash</executable>
-                                    <!-- NOTE: We're using commandlineArgs in order to allow property expansion at runtime. 
-                                        When using <arguments> instead you can't expand multiple CLI switches from a single property.  -->
-                                    <commandlineArgs>${project.build.directory}/c2d/caas2docker/app/build.sh ${image.docker.opts.app}</commandlineArgs>
+                                    <!-- NOTE: We're using commandlineArgs 
+                                        in order to allow property expansion at runtime. When using <arguments> instead 
+                                        you can't expand multiple CLI switches from a single property. -->
+                                    <commandlineArgs>${project.build.directory}/c2d/caas2docker/app/build.sh
+                                        ${image.docker.opts.app}</commandlineArgs>
                                     <environmentVariables>
                                         <IMAGE_APP_VERSION>${image.version}</IMAGE_APP_VERSION>
                                         <IMAGE_APP_TAG>${image.version}</IMAGE_APP_TAG>
@@ -335,7 +337,7 @@
                                     </environmentVariables>
                                     <workingDirectory>${basedir}</workingDirectory>
                                 </configuration>
-                            </execution>                            
+                            </execution>
                             <execution>
                                 <id>Build Config Image</id>
                                 <phase>package</phase>
@@ -344,7 +346,8 @@
                                 </goals>
                                 <configuration>
                                     <executable>bash</executable>
-                                    <commandlineArgs>${project.build.directory}/c2d/caas2docker/config/build.sh ${image.docker.opts.config}</commandlineArgs>
+                                    <commandlineArgs>${project.build.directory}/c2d/caas2docker/config/build.sh
+                                        ${image.docker.opts.config}</commandlineArgs>
                                     <environmentVariables>
                                         <IMAGE_CONFIG_VERSION>${image.version}</IMAGE_CONFIG_VERSION>
                                         <IMAGE_CONFIG_TAG>${image.version}</IMAGE_CONFIG_TAG>
@@ -352,7 +355,7 @@
                                     </environmentVariables>
                                     <workingDirectory>${basedir}</workingDirectory>
                                 </configuration>
-                            </execution>                            
+                            </execution>
                         </executions>
                         <configuration>
                             <environmentVariables>
