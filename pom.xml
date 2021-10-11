@@ -126,7 +126,7 @@
                 <artifactId>maven-archetype-plugin</artifactId>
                 <executions>
                   <execution>
-                    <id>archetype-verification</id>
+                    <id>default-integration-test</id>
                     <phase>verify</phase>
                     <goals>
                       <goal>integration-test</goal>
