@@ -1,1 +1,1 @@
-verify
+verify -Pdocker -Dimage.docker.opts.app="--get-image-name=app-image-name.txt --get-image-tag=app-image-tag.txt" -Dimage.docker.opts.config="--get-image-name=config-image-name.txt --get-image-tag=config-image-tag.txt"

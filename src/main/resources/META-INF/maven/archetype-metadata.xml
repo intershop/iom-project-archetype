@@ -9,6 +9,9 @@
         <requiredProperty key="platformVersion">
             <defaultValue>3.5.1.0</defaultValue>
         </requiredProperty>
+        <requiredProperty key="intershopDockerRepo">
+            <defaultValue>intershophub/</defaultValue>
+        </requiredProperty>
         <requiredProperty key="DOT">
             <!-- empty string as workaround for https://issues.apache.org/jira/browse/ARCHETYPE-505 -->
             <defaultValue>.</defaultValue>

@@ -14,6 +14,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <platform.version>${platformVersion}</platform.version>
+        <platform.app.image.name>x</platform.app.image.name>
+        <intershop.docker.repo>${intershopDockerRepo}</intershop.docker.repo>
+        <image.base.name>${projectName}</image.base.name>
+        <image.version>${project.version}</image.version>
+        <image.docker.opts.app>--docker-opts="--no-cache"</image.docker.opts.app>
+        <image.docker.opts.config>--docker-opts="--no-cache"</image.docker.opts.config>
         <!-- bom doesn't expose resteasy-undertow version, it is required 
             for testing -->
         <org.jboss.resteasy.version>3.13.2.Final</org.jboss.resteasy.version>
@@ -239,28 +245,128 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>Build Images</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <executable>bash</executable>
-                    <arguments>
-                        <argument>${basedir}/build_image.sh</argument>
-                    </arguments>
-                    <workingDirectory>${basedir}</workingDirectory>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+    
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <build>
+                <plugins>
+                    <plugin>
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-dependency-plugin</artifactId>
+                         <version>3.2.0</version>
+                         <executions>
+                           <execution>
+                             <id>unpack</id>
+                             <phase>prepare-package</phase>
+                             <goals>
+                               <goal>unpack</goal>
+                             </goals>
+                             <configuration>
+                               <artifactItems>
+                                 <artifactItem>
+                                   <groupId>com.intershop.oms</groupId>
+                                   <artifactId>caas2docker</artifactId>
+                                   <version>${platform.version}</version>
+                                   <type>zip</type>
+                                   <outputDirectory>${project.build.directory}/c2d</outputDirectory>
+                                 </artifactItem>
+                               </artifactItems>
+                             </configuration>
+                           </execution>
+                         </executions>                    
+                        </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions>
+                            <execution>
+                                <id>prepare directory</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>mkdir</executable>
+                                    <arguments>
+                                        <argument>c2d/caas-dl</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>unpack assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>tar</executable>
+                                    <arguments>
+                                        <argument>-zxf</argument>
+                                        <argument>${project.artifactId}.tgz</argument>
+                                        <argument>-C</argument>
+                                        <argument>c2d/caas-dl/</argument>
+                                    </arguments>
+                                    <environmentVariables>
+                                        <CAAS_PROJECT_DIR>${project.build.directory}/c2d/caas-dl/</CAAS_PROJECT_DIR>
+                                    </environmentVariables>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>Build App Image</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <!-- NOTE: We're using commandlineArgs in order to allow property expansion at runtime. 
+                                        When using <arguments> instead you can't expand multiple CLI switches from a single property.  -->
+                                    <commandlineArgs>${project.build.directory}/c2d/caas2docker/app/build.sh ${image.docker.opts.app}</commandlineArgs>
+                                    <environmentVariables>
+                                        <IMAGE_APP_VERSION>${image.version}</IMAGE_APP_VERSION>
+                                        <IMAGE_APP_TAG>${image.version}</IMAGE_APP_TAG>
+                                        <IOM_APP_IMAGE_NAME>iom-app</IOM_APP_IMAGE_NAME>
+                                    </environmentVariables>
+                                    <workingDirectory>${basedir}</workingDirectory>
+                                </configuration>
+                            </execution>                            
+                            <execution>
+                                <id>Build Config Image</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>bash</executable>
+                                    <commandlineArgs>${project.build.directory}/c2d/caas2docker/config/build.sh ${image.docker.opts.config}</commandlineArgs>
+                                    <environmentVariables>
+                                        <IMAGE_CONFIG_VERSION>${image.version}</IMAGE_CONFIG_VERSION>
+                                        <IMAGE_CONFIG_TAG>${image.version}</IMAGE_CONFIG_TAG>
+                                        <IOM_CONFIG_IMAGE_NAME>iom-config</IOM_CONFIG_IMAGE_NAME>
+                                    </environmentVariables>
+                                    <workingDirectory>${basedir}</workingDirectory>
+                                </configuration>
+                            </execution>                            
+                        </executions>
+                        <configuration>
+                            <environmentVariables>
+                                <IMAGE_BASE_NAME>${image.base.name}</IMAGE_BASE_NAME>
+                                <IOM_VERSION>${platform.version}</IOM_VERSION>
+                                <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                                <IOM_REPO_NAME>${intershop.docker.repo}</IOM_REPO_NAME>
+                                <CAAS_PROJECT_DIR>${project.build.directory}/c2d/caas-dl/</CAAS_PROJECT_DIR>
+                            </environmentVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
