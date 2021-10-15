@@ -54,7 +54,7 @@
         </fileSet>
         <!-- velocity - text data only -->
         <fileSet>
-            <directory>src/templates</directory>
+            <directory>src/mail-templates</directory>
             <outputDirectory>templates</outputDirectory>
             <lineEnding>unix</lineEnding>
             <includes>
@@ -64,7 +64,7 @@
         </fileSet>
         <!-- xslt - text data (*.xslt) -->
         <fileSet>
-            <directory>src/xslt</directory>
+            <directory>src/xsl-templates</directory>
             <outputDirectory>xslt</outputDirectory>
             <includes>
                 <include>**/*.xslt</include>

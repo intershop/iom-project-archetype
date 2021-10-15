@@ -88,12 +88,6 @@
         <fileSet encoding="UTF-8">
             <directory>src/test-data</directory>
         </fileSet>
-        <fileSet encoding="UTF-8">
-            <directory>src/xslt</directory>
-            <includes>
-                <include>**/*.xml</include>
-            </includes>
-        </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
             <directory>src/assembly</directory>
             <includes>
@@ -101,17 +95,18 @@
             </includes>
         </fileSet>
         <fileSet encoding="UTF-8">
-            <directory>src/xslt</directory>
+            <directory>src/xsl-templates</directory>
             <includes>
                 <include>**/*.gitkeep</include>
                 <include>**/*.svg</include>
                 <include>**/*.ttf</include>
                 <include>**/*.png</include>
                 <include>**/*.xslt</include>
+                <include>**/*.xml</include>
             </includes>
         </fileSet>
         <fileSet encoding="UTF-8">
-            <directory>src/templates</directory>
+            <directory>src/mail-templates</directory>
             <includes>
                 <include>**/*.gitkeep</include>
             </includes>
