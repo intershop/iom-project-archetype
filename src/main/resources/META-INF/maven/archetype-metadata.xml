@@ -6,9 +6,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <requiredProperties>
         <requiredProperty key="projectName" />
-        <requiredProperty key="platformVersion">
-            <defaultValue>3.5.1.0</defaultValue>
-        </requiredProperty>
+        <requiredProperty key="platformVersion" />
         <requiredProperty key="intershopDockerRepo">
             <defaultValue>intershophub/</defaultValue>
         </requiredProperty>
