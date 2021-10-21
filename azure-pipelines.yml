@@ -85,7 +85,7 @@ steps:
   name: pgpPrivateKey
   displayName: 'Secrets - download pgp key'
   inputs:
-    secureFile: 'order-iom-project-archetype-gpg_private_key_iom_TEST.pgp'
+    secureFile: 'order-iom-project-archetype-gpg_private_key_iom.pgp'
 
 - task: MavenAuthenticate@0
   inputs:
