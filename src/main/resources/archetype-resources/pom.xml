@@ -24,7 +24,7 @@
             for testing -->
         <org.jboss.resteasy.version>3.13.2.Final</org.jboss.resteasy.version>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <wildfly.version>21.0.2.Final</wildfly.version>
+        <wildfly.version>24.0.1.Final</wildfly.version>
         <org.junit.version>5.7.2</org.junit.version>
         <org.mockito.version>3.11.2</org.mockito.version>
         <org.apache.commons-lang.version>3.12.0</org.apache.commons-lang.version>
