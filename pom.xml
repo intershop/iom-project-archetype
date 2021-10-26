@@ -6,7 +6,7 @@
 
     <groupId>com.intershop.oms.archetype</groupId>
     <artifactId>iom-project-archetype</artifactId>
-    <version>3.5.1.0</version>
+    <version>3.6.0.0</version>
     <packaging>maven-archetype</packaging>
 
     <name>[Tool] IOM Project Bootstrap Archetype</name>
