@@ -14,10 +14,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <platform.version>${platformVersion}</platform.version>
-        <platform.app.image.name>x</platform.app.image.name>
         <intershop.docker.repo>${intershopDockerRepo}</intershop.docker.repo>
         <image.base.name>${projectName}</image.base.name>
-        <image.version>${project.version}</image.version>
+        <image.version.suffix></image.version.suffix>
+        <image.version>${project.version}${image.version.suffix}</image.version>
         <image.docker.opts.app>--docker-opts="--no-cache"</image.docker.opts.app>
         <image.docker.opts.config>--docker-opts="--no-cache"</image.docker.opts.config>
         <!-- bom doesn't expose resteasy-undertow version, it is required 
