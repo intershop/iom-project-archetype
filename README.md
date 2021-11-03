@@ -1,4 +1,4 @@
-woop woop
+woop woop  - woop
 # Introduction 
 In order to enable implementation partners and customers to quickly ramp up new IOM customization projects, Intershop provides a so called "maven archetype" that allows them to create a standardized project/directory structure according to our best practices, within a matter of minutes. The objective of this tool is to create projects that fulfill these typical requirements:
 
