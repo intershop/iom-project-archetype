@@ -45,6 +45,8 @@ variables:
   IMAGE_VERSION: 1.0.0-SNAPSHOT.$(Build.BuildId)
   INTERSHOP_DOCKER_REPO: $(IOM_INTERNAL_ACR_HOST)
 
+  IS_RELEASE_BUILD:
+
 steps:
 - script: |
     # stop on any error
@@ -63,6 +65,7 @@ steps:
   path: s/order-iom-project-archetype
   displayName: "Checkout - order-iom-project-archetype@$(Build.SourceBranchName)"
   timeoutInMinutes: "5"
+  persistCredentials: true
   
 - checkout: ${{variables.IOM_HELM_CHART_REPO_URL}}@${{variables.IOM_HELM_CHART_BRANCH}}
   path: s/$(IOM_HELM_CHART_PATH)
@@ -107,23 +110,42 @@ steps:
   timeoutInMinutes: 1
   displayName: "Docker - login to CI ACR"
   
+- script: |
+    if xml_grep --text_only /project/version order-iom-project-archetype/pom.xml | grep -q -- -SNAPSHOT ; then
+      echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]false"
+    else
+      echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]true"
+    fi
+  displayName: "Read variables - SNAPSHOT or Release build"
+
 - task: Maven@3
+  condition: eq(variables.IS_RELEASE_BUILD, 'false')
   inputs:
     goals: clean verify
     mavenPomFile: 'order-iom-project-archetype/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-  displayName: "Maven - run verify goal against archetype"
+  displayName: "Maven - run verify goal against archetype snapshot"
   env:
     PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
     PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
-  
+
+- task: Maven@3
+  condition: eq(variables.IS_RELEASE_BUILD, 'true')
+  inputs:
+    goals: clean deploy
+    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  displayName: "Maven - run deploy goal against archetype release"
+  env:
+    PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
+    PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
+    
 - task: Maven@3
   inputs:
     goals: clean verify
     mavenPomFile: 'order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against dependency-helper"
-
 # run build_image.sh script from the created archive
 - script: |
     # stop on any error
@@ -191,4 +213,37 @@ steps:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
     command: delete
-    arguments: namespace $(IOM_AKS_NAMESPACE) 
+    arguments: namespace $(IOM_AKS_NAMESPACE)
+
+- task: Maven@3
+  condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
+  inputs:
+    goals: nexus-staging:release
+    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  displayName: "Maven - stage successful release"
+
+- task: Maven@3
+  condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
+  inputs:
+    goals: org.codehaus.mojo:versions-maven-plugin:2.7:set -DgenerateBackupPoms=false -DnextSnapshot
+    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  displayName: "Maven - set next snapshot version"
+
+- script: |
+    git config user.email pborchert@intershop.com
+    git config user.name "Azure DevOps Build User"
+    git add order-iom-project-archetype/pom.xml
+    git commit -m "[skip ci] set next snapshot version"
+    git push
+  displayName: "Git - push changes to pom.xml"
+  condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
+
+- task: Maven@3
+  condition: and(failed(), eq(variables.IS_RELEASE_BUILD, 'true'))
+  inputs:
+    goals: nexus-staging:drop
+    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  displayName: "Maven - rollback failed release in sonatype nexus"
