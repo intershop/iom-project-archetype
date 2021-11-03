@@ -111,7 +111,7 @@ steps:
   displayName: "Docker - login to CI ACR"
   
 - script: |
-    if xml_grep --text_only /project/version order-iom-project-archetype/pom.xml | grep -q -- -SNAPSHOT ; then
+    if mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f order-iom-project-archetype/pom.xml | tail -1 | grep -q -- -SNAPSHOT ; then
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]false"
     else
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]true"
