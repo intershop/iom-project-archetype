@@ -48,13 +48,13 @@ _Note: you can find the full documentation for devenv-4-iom in the according [gi
 
 The general recommendation is to integrate devenv-4-iom as a [git subtree](https://www.atlassian.com/git/tutorials/git-subtree). In the most simple form this can be achieved by running the following commands in your project directory:
 ```bash
-git subtree add --prefix devenv-4-iom git@github.com:intershop/iom-devenv.git master --squash
+git subtree add --prefix devenv-4-iom git@github.com:intershop/iom-devenv.git main --squash
 git push
 ```
 
 To update devenv-4-iom at a later point run the following commands in the same directory:
 ```bash
-git subtree pull --prefix devenv-4-iom git@github.com:intershop/iom-devenv.git master --squash
+git subtree pull --prefix devenv-4-iom git@github.com:intershop/iom-devenv.git main --squash
 git push
 ```
 
