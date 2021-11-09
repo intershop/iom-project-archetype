@@ -206,9 +206,24 @@ steps:
       --timeout 300s 
       $(HELM_RELEASE_NAME)
 
+- script: |
+    echo "##[debug] cleanup IOM and namespace $IOM_AKS_NAMESPACE"
+    # wait for pv to disappear before deleting the namespace, otherwise the pv cannot be deleted
+    PV=$(kubectl get pv | grep " $IOM_AKS_NAMESPACE/" | { read ID REST; echo $ID; })
+    while kubectl get pv | grep -q "$PV"; do
+      sleep 10
+    done
+    kubectl delete namespace "$IOM_AKS_NAMESPACE" || true
+  continueOnError: true
+  timeoutInMinutes: 5
+  displayName: "Cleanup - wait for PV deletion, delete namespace"
+  #enabled: false
+  condition: eq(variables.AKS_AQUIRED, true)
+
 - task: Kubernetes@1
   displayName: "Cleanup - delete Kubernetes namespace"
   condition: always()
+  enabled: false
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
