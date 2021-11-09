@@ -218,7 +218,7 @@ steps:
   timeoutInMinutes: 5
   displayName: "Cleanup - wait for PV deletion, delete namespace"
   #enabled: false
-  condition: eq(variables.AKS_AQUIRED, true)
+  condition: always()
 
 - task: Kubernetes@1
   displayName: "Cleanup - delete Kubernetes namespace"
