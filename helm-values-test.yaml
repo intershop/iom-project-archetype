@@ -158,6 +158,8 @@ caas:
 persistence:
   storageClass: azurefile
   storageSize: 1Gi
+  # set empty annotations to allow deletion of PV
+  annotations:
   # To be used in simple environments (e.g. demos) to persist data on local host.
   # if set, storageClass will be ignored.
   #hostPath: blueprint-project-pv

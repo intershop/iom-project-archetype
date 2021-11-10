@@ -93,6 +93,7 @@ steps:
 - task: MavenAuthenticate@0
   inputs:
     artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
+    mavenServiceConnections: order-iom-sonatype-ossrh
   timeoutInMinutes: 1
   displayName: "Maven - authenticate"
 
@@ -205,6 +206,15 @@ steps:
     arguments: >-
       --timeout 300s 
       $(HELM_RELEASE_NAME)
+
+- task: Kubernetes@1
+  displayName: "Kubernetes - Login for cleanup step"
+  condition: always()
+  enabled: true
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
+    command: login
 
 - script: |
     echo "##[debug] cleanup IOM and namespace $IOM_AKS_NAMESPACE"
