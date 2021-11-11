@@ -253,6 +253,7 @@ steps:
     git add order-iom-project-archetype/pom.xml
     git commit -m "[skip ci] set next snapshot version"
     git push
+  workingDirectory: 'order-iom-project-archetype'
   displayName: "Git - push changes to pom.xml"
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
 
