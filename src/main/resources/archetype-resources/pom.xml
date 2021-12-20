@@ -24,7 +24,7 @@
             for testing -->
         <org.jboss.resteasy.version>3.13.2.Final</org.jboss.resteasy.version>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <wildfly.version>24.0.1.Final</wildfly.version>
+        <wildfly.version>25.0.1.Final</wildfly.version>
         <org.junit.version>5.7.2</org.junit.version>
         <org.mockito.version>3.11.2</org.mockito.version>
         <org.apache.commons-lang.version>3.12.0</org.apache.commons-lang.version>
@@ -66,7 +66,12 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
+            <artifactId>resteasy-core-spi</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-client</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -88,8 +93,7 @@
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
-            <!-- 0.9.12 is broken -->
-            <version>0.9.11</version>
+            <version>0.10.2</version>
         </dependency>
 
         <!-- IOM Platform -->

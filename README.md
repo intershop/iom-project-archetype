@@ -71,3 +71,10 @@ __TODO add link__ After adding devenv-4-iom to your project structure, please fo
 For further information please refer to the [devenv-4-iom documentation][devenv git repo].
 
 [devenv git repo]: https://github.com/intershop/iom-devenv
+
+# Version compatibility
+iom-project-archetype is only used once in a project lifecycle - hence there are no plans to support any IOM version other than the latest release. The following table will show the compatibility of iom-project-archetype to the according IOM minor versions. If the latest IOM version is not listed yet it is (1) not supported by iom-project-archetype or (2) still supported by the previous release - this might be the case if there were no "breaking" changes like a wildfly version upgrade in the latest release.
+|IOM Version|iom-project-archetype Version|
+|-----------|-----------------------------|
+|3.6        |1.0.0                        |
+|3.7        |1.0.1                        |
