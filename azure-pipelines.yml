@@ -246,6 +246,7 @@ steps:
     mavenPomFile: 'order-iom-project-archetype/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - set next snapshot version"
+  enabled: false
 
 - script: |
     git config user.email pborchert@intershop.com
@@ -256,6 +257,7 @@ steps:
   workingDirectory: 'order-iom-project-archetype'
   displayName: "Git - push changes to pom.xml"
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
+  enabled: false
 
 - task: Maven@3
   condition: and(failed(), eq(variables.IS_RELEASE_BUILD, 'true'))
