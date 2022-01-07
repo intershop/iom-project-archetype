@@ -23,7 +23,7 @@ In order to create a new project structure from the archetype you have to define
 |intershopDockerRepo|intershophub/|Docker registry for the standard IOM images - e.g. a proxy repo / mirror of dockerhub. This parameter needs a trailing slash.|
 |DOT|.|This is a workaround due to an issue with the maven archetype plugin, please don't change the default value.|
 
-To start archetype generation execute the following command in an interactive terminal:
+To start archetype generation execute the following command in an interactive terminal - please do this in an empty directory, there is no need to clone this repository:
 
 ```bash
 mvn archetype:generate -DarchetypeArtifactId=iom-project-archetype -DarchetypeGroupId=com.intershop.oms.archetype -DarchetypeVersion=LATEST
