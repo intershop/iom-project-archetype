@@ -1,14 +1,14 @@
 # trigger build for every branch
-#trigger:
-#- feature/65868-iom-bootstrap-project
+trigger:
+  batch: true
+  #- feature/65868-iom-bootstrap-project
 
-pool: 'ubuntu-20.4-DS2_v2-adopt-jdk'
+pool: 'ubuntu-20.4-DS2_v2-adopt-adoptium-jdk'
 variables:
   M2_LOCAL_REPO: $(Pipeline.Workspace)/local-maven-repo
   MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
   #IOM_DOCKERHUB_HOST: intershophub
   #IOM_REPO_NAME: "intershophub/"
-  IOM_DOCKERHUB_CONNECTION: release-dockerhub
 
   # Helm Repo URL
   IOM_HELM_CHART_REPO_URL: git://Products/order-iom-helm
@@ -20,30 +20,25 @@ variables:
   IOM_CI_ACR_HOST: iomci.azurecr.io
   IOM_CI_ACR_CONNECTION: order-iomci-ISH-ENG-IOM
 
-  IOM_INTERNAL_ACR_HOST: iominternalacr.azurecr.io
-  IOM_INTERNAL_ACR_CONNECTION: order-iomInternalACR-ISH-ENG-IOM
-
   IOM_AKS_SERVICE_ENDPOINT: order-CiAksAutoScaledConnection-ISH-ENG-IOM
   IOM_AKS_NAMESPACE: $(HELM_RELEASE_NAME)
+  
+  # IOM Docker Hub
+  # contains all release images, that are made public for our customers.
+  IOM_DOCKERHUB_HOST: intershophub
+  IOM_DOCKERHUB_CONNECTION: release-dockerhub
+  
 
   # wrap environment variables for build_image.sh
-  C2D_APP_IMAGE_TAG_FILE: $(Pipeline.Workspace)/app-image-tag.txt
-  C2D_APP_IMAGE_NAME_FILE: $(Pipeline.Workspace)/app-image-name.txt
-  C2D_CONFIG_IMAGE_TAG_FILE: $(Pipeline.Workspace)/config-image-tag.txt
-  C2D_CONFIG_IMAGE_NAME_FILE: $(Pipeline.Workspace)/config-image-name.txt
+  PROJECT_IMAGE_TAG_FILE: $(Pipeline.Workspace)/image-tag.txt
+  PROJECT_IMAGE_NAME_FILE: $(Pipeline.Workspace)/image-name.txt
   # these will be set by a later job step
-  C2D_APP_IMAGE_TAG:
-  C2D_APP_IMAGE_NAME:
-  C2D_CONFIG_IMAGE_TAG:
-  C2D_CONFIG_IMAGE_NAME:
-  IMAGE_DOCKER_OPTS_APP: >-
-    --get-image-name=$(C2D_APP_IMAGE_NAME_FILE)
-    --get-image-tag=$(C2D_APP_IMAGE_TAG_FILE)
-  IMAGE_DOCKER_OPTS_CONFIG: >-
-    --get-image-name=$(C2D_CONFIG_IMAGE_NAME_FILE)
-    --get-image-tag=$(C2D_CONFIG_IMAGE_TAG_FILE)
+  PROJECT_IMAGE_TAG:
+  PROJECT_IMAGE_NAME:
+  IMAGE_DOCKER_OPTS: >-
+    --get-image-name=$(PROJECT_IMAGE_NAME_FILE)
+    --get-image-tag=$(PROJECT_IMAGE_TAG_FILE)
   IMAGE_VERSION: 1.0.0-SNAPSHOT.$(Build.BuildId)
-  INTERSHOP_DOCKER_REPO: $(IOM_INTERNAL_ACR_HOST)
 
   IS_RELEASE_BUILD:
 
@@ -100,17 +95,46 @@ steps:
 - task: Docker@2
   inputs:
     command: login
-    containerRegistry: $(IOM_INTERNAL_ACR_CONNECTION)
-  timeoutInMinutes: 1
-  displayName: "Docker - login to internal ACR"
-
-- task: Docker@2
-  inputs:
-    command: login
     containerRegistry: $(IOM_CI_ACR_CONNECTION)
   timeoutInMinutes: 1
   displayName: "Docker - login to CI ACR"
   
+- task: Docker@2
+  inputs:
+    command: login
+    containerRegistry: $(IOM_DOCKERHUB_CONNECTION)
+  timeoutInMinutes: 1
+  displayName: "Docker - login to Dockerhub"
+  
+- task: Kubernetes@1
+  displayName: "Kubernetes - Login"
+  condition: always()
+  enabled: true
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
+    command: login
+  
+- task: Kubernetes@1
+  displayName: "Kubernetes - Create Namespace"
+  condition: always()
+  enabled: true
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
+    command: create
+    arguments: namespace $(IOM_AKS_NAMESPACE)
+  
+- task: KubernetesManifest@0
+  displayName: Create pull secret
+  inputs: 
+    action: createSecret
+    secretType: dockerRegistry
+    secretName: dbaccount-pull-secret
+    dockerRegistryEndpoint: $(IOM_DOCKERHUB_CONNECTION)
+    kubernetesServiceConnection: $(IOM_AKS_SERVICE_ENDPOINT)
+    namespace: $(IOM_AKS_NAMESPACE)
+      
 - script: |
     if mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f order-iom-project-archetype/pom.xml | tail -1 | grep -q -- -SNAPSHOT ; then
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]false"
@@ -155,17 +179,12 @@ steps:
     # stop on any error
     set -e
 
-    docker tag "$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" \
-    "$IOM_CI_ACR_HOST/$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" 
-    docker tag "$(cat $C2D_CONFIG_IMAGE_NAME_FILE):$(cat $C2D_CONFIG_IMAGE_TAG_FILE)" \
-    "$IOM_CI_ACR_HOST/$(cat $C2D_CONFIG_IMAGE_NAME_FILE):$(cat $C2D_CONFIG_IMAGE_TAG_FILE)" 
-    docker push "$IOM_CI_ACR_HOST/$(cat $C2D_APP_IMAGE_NAME_FILE):$(cat $C2D_APP_IMAGE_TAG_FILE)" 
-    docker push "$IOM_CI_ACR_HOST/$(cat $C2D_CONFIG_IMAGE_NAME_FILE):$(cat $C2D_CONFIG_IMAGE_TAG_FILE)" 
+    docker tag "$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" \
+    "$IOM_CI_ACR_HOST/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
+    docker push "$IOM_CI_ACR_HOST/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
     # set variables
-    echo "##vso[task.setvariable variable=C2D_APP_IMAGE_TAG;]$(cat $C2D_APP_IMAGE_TAG_FILE)"
-    echo "##vso[task.setvariable variable=C2D_APP_IMAGE_NAME;]$(cat $C2D_APP_IMAGE_NAME_FILE)"
-    echo "##vso[task.setvariable variable=C2D_CONFIG_IMAGE_TAG;]$(cat $C2D_CONFIG_IMAGE_TAG_FILE)"
-    echo "##vso[task.setvariable variable=C2D_CONFIG_IMAGE_NAME;]$(cat $C2D_CONFIG_IMAGE_NAME_FILE)"
+    echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)"
+    echo "##vso[task.setvariable variable=PROJECT_IMAGE_NAME;]$(cat $PROJECT_IMAGE_NAME_FILE)"
 
   timeoutInMinutes: "10"
   displayName: "Docker - tag images and push to ACR"
@@ -184,10 +203,8 @@ steps:
     valueFile: order-iom-project-archetype/helm-values-test.yaml
     arguments: >-
       --create-namespace 
-      --set image.repository=$(IOM_CI_ACR_HOST)/$(C2D_APP_IMAGE_NAME)
-      --set image.tag=$(C2D_APP_IMAGE_TAG)
-      --set config.image.repository=$(IOM_CI_ACR_HOST)/$(C2D_CONFIG_IMAGE_NAME)
-      --set config.image.tag=$(C2D_CONFIG_IMAGE_TAG)
+      --set image.repository=$(IOM_CI_ACR_HOST)/$(PROJECT_IMAGE_NAME)
+      --set image.tag=$(PROJECT_IMAGE_TAG)
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
       --timeout 3600s 
 
@@ -207,15 +224,6 @@ steps:
     arguments: >-
       --timeout 300s 
       $(HELM_RELEASE_NAME)
-
-- task: Kubernetes@1
-  displayName: "Kubernetes - Login for cleanup step"
-  condition: always()
-  enabled: true
-  inputs:
-    connectionType: Kubernetes Service Connection
-    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
-    command: login
 
 - script: |
     echo "##[debug] cleanup IOM and namespace $IOM_AKS_NAMESPACE"
