@@ -14,19 +14,18 @@ In order to create a new project structure from the archetype you have to define
 
 |Name|Example|Description
 |---|---|---|
-|package|com.intershop.oms.blueprint|"Top level" java package that should include all project sources. It is used to setup the initial logger configuration for the CUSTOMIZATION logger. <br/>Usually this is the same as the groupId parameter (see below).|
+|platformVersion|4.1.0|Initial IOM version for the project. Should be the latest release.|
+|intershopDockerRepo|intershophub/|Docker registry for the standard IOM images - e.g. a proxy repo / mirror of dockerhub. This parameter needs a trailing slash.|
+|version|1.0.0-SNAPSHOT|Initial version of the project package|
 |groupId|com.intershop.oms.blueprint|Maven groupId for the created project package.|
 |artifactId|blueprint-project|Maven artifactId for the created project package.|
-|version|1.0.0-SNAPSHOT|Initial version of the project package|
-|projectName|blueprint-project|Used for some placeholders like the image name.<br/>Usually this is the same as the artifactId parameter.|
-|platformVersion|3.6.0.0|Initial IOM version for the project. Should be the latest release.|
-|intershopDockerRepo|intershophub/|Docker registry for the standard IOM images - e.g. a proxy repo / mirror of dockerhub. This parameter needs a trailing slash.|
-|DOT|.|This is a workaround due to an issue with the maven archetype plugin, please don't change the default value.|
+|package|com.intershop.oms.blueprint|"Top level" java package that should include all project sources. It is used to setup the initial logger configuration for the CUSTOMIZATION logger. <br/>Defaults to groupId parameter.|
+|projectName|blueprint-project|Used for some placeholders like the image name.<br/>Defaults to artifactId parameter.|
 
 To start archetype generation execute the following command in an interactive terminal - please do this in an empty directory, there is no need to clone this repository:
 
 ```bash
-mvn archetype:generate -DarchetypeArtifactId=iom-project-archetype -DarchetypeGroupId=com.intershop.oms.archetype -DarchetypeVersion=LATEST
+mvn org.apache.maven.plugins:maven-archetype-plugin:3.2.1:generate -DaskForDefaultPropertyValues -DarchetypeArtifactId=iom-project-archetype -DarchetypeGroupId=com.intershop.oms.archetype -DarchetypeVersion=LATEST
 ```
 
 After entering the requested parameters you'll find a new directory named like the "artifactId" in your current working directory. To generate a project in non-interactive mode please have a look at the according [documentation](https://maven.apache.org/archetype/maven-archetype-plugin/examples/generate-batch.html).
@@ -79,3 +78,5 @@ iom-project-archetype is only used once in a project lifecycle - hence there are
 |-----------|-----------------------------|
 |3.6        |1.0.0                        |
 |3.7        |1.0.1                        |
+|4.0        |2.0.0                        |
+|4.1        |2.1.0                        |
