@@ -5,15 +5,17 @@
     xmlns="https://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.1.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <requiredProperties>
-        <requiredProperty key="projectName" />
-        <requiredProperty key="platformVersion" />
+        <requiredProperty key="projectName">
+            <defaultValue>${artifactId}</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="platformVersion">
+            <defaultValue>4.1.0</defaultValue>
+        </requiredProperty>
         <requiredProperty key="intershopDockerRepo">
             <defaultValue>intershophub/</defaultValue>
         </requiredProperty>
-        <requiredProperty key="DOT">
-            <!-- empty string as workaround for https://issues.apache.org/jira/browse/ARCHETYPE-505 -->
-            <defaultValue>.</defaultValue>
-            <validationRegex>\.</validationRegex>
+        <requiredProperty key="version">
+            <defaultValue>1.0.0-SNAPSHOT</defaultValue>
         </requiredProperty>
     </requiredProperties>
     <fileSets>
