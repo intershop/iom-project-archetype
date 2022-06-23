@@ -1,14 +1,6 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-$symbol_pound add logger com.intershop.oms.demoapp
-if (outcome != success) of /subsystem=logging/logger=com.intershop.oms.demoapp:read-resource
-/subsystem=logging/logger=com.intershop.oms.demoapp:add()
-end-if
-if (result != ["CUSTOMIZATION"]) of /subsystem=logging/logger=com.intershop.oms.demoapp:read-attribute(name=handlers)
-/subsystem=logging/logger=com.intershop.oms.demoapp:add-handler(name=CUSTOMIZATION)
-end-if
-
 $symbol_pound add logger com.intershop.oms.ps
 if (outcome != success) of /subsystem=logging/logger=com.intershop.oms.ps:read-resource
 /subsystem=logging/logger=com.intershop.oms.ps:add()
@@ -17,7 +9,7 @@ if (result != ["CUSTOMIZATION"]) of /subsystem=logging/logger=com.intershop.oms.
 /subsystem=logging/logger=com.intershop.oms.ps:add-handler(name=CUSTOMIZATION)
 end-if
 
-$symbol_pound add logger com.intershop.oms.musgrave
+$symbol_pound add logger ${package}
 if (outcome != success) of /subsystem=logging/logger=${package}:read-resource
 /subsystem=logging/logger=${package}:add()
 end-if
