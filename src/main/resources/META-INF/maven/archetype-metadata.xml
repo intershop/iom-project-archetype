@@ -12,7 +12,7 @@
             <defaultValue>4.1.0</defaultValue>
         </requiredProperty>
         <requiredProperty key="intershopDockerRepo">
-            <defaultValue>intershophub/</defaultValue>
+            <defaultValue>docker.tools.intershop.com/iom/intershophub/</defaultValue>
         </requiredProperty>
         <requiredProperty key="version">
             <defaultValue>1.0.0-SNAPSHOT</defaultValue>
