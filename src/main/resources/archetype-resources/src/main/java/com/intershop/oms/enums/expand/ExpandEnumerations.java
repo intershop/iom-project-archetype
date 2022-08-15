@@ -58,7 +58,7 @@ public final class ExpandEnumerations
     private static ExpandedTransmissionTypeDefDO[] enumValuesExpandedTransmissionTypeDefDO = ExpandedTransmissionTypeDefDO
                     .values();
     private static ExpandedProcessTaskDefDO[] enumValuesExpandedProcessTaskDefDO = ExpandedProcessTaskDefDO.values();
-    
+
     private static ExpandedEventDefDO[] enumValuesExpandedEventDefDO = ExpandedEventDefDO.values();
 
     private ExpandEnumerations()
