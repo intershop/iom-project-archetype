@@ -11,14 +11,13 @@ variables:
   #IOM_REPO_NAME: "intershophub/"
 
   # Helm Repo URL
-  IOM_HELM_CHART_REPO_URL: git://Products/order-iom-helm
-  IOM_HELM_CHART_BRANCH: develop
-  IOM_HELM_CHART_PATH: helm
+  IOM_HELM_VERSION: 2.1.0
+  IOM_HELM_URL: https://intershop.github.io/helm-charts
   HELM_RELEASE_NAME: archetype-test-$(Build.BuildId)
 
   # ACR & AKS
-  IOM_CI_ACR_HOST: iomci.azurecr.io
-  IOM_CI_ACR_CONNECTION: order-iomci-ISH-ENG-IOM
+  IOM_DEVOPS_ACR_HOST: iomdevopsacr.azurecr.io
+  IOM_DEVOPS_ACR_CONNECTION: order-iomDevopsACR-ISH-ENG-IOM
 
   IOM_AKS_SERVICE_ENDPOINT: order-CiAksAutoScaledConnection-ISH-ENG-IOM
   IOM_AKS_NAMESPACE: $(HELM_RELEASE_NAME)
@@ -62,11 +61,6 @@ steps:
   timeoutInMinutes: "5"
   persistCredentials: true
   
-- checkout: ${{variables.IOM_HELM_CHART_REPO_URL}}@${{variables.IOM_HELM_CHART_BRANCH}}
-  path: s/$(IOM_HELM_CHART_PATH)
-  displayName: "Checkout - order-iom-helm@$(IOM_HELM_CHART_BRANCH)"
-  timeoutInMinutes: "5"
-
 - task: Cache@2
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
@@ -87,7 +81,7 @@ steps:
 
 - task: MavenAuthenticate@0
   inputs:
-    artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
+    artifactsFeeds: iom-maven-artifacts
     mavenServiceConnections: order-iom-sonatype-ossrh
   timeoutInMinutes: 1
   displayName: "Maven - authenticate"
@@ -95,9 +89,9 @@ steps:
 - task: Docker@2
   inputs:
     command: login
-    containerRegistry: $(IOM_CI_ACR_CONNECTION)
+    containerRegistry: $(IOM_DEVOPS_ACR_CONNECTION)
   timeoutInMinutes: 1
-  displayName: "Docker - login to CI ACR"
+  displayName: "Docker - login to DevOps ACR"
   
 - task: Docker@2
   inputs:
@@ -189,6 +183,13 @@ steps:
   timeoutInMinutes: "10"
   displayName: "Docker - tag images and push to ACR"
 
+- script: |
+    set -e
+    helm repo add intershop $IOM_HELM_URL
+    helm repo update
+  timeoutInMinutes: 1
+  displayName: get IOM Helm Charts
+  
 - task: HelmDeploy@0
   displayName: "Helm - install blueprint-test release"
   inputs:
@@ -197,11 +198,12 @@ steps:
     namespace: $(IOM_AKS_NAMESPACE)
     releaseName: $(HELM_RELEASE_NAME)
     command: install
-    chartType: FilePath
-    chartPath: $(IOM_HELM_CHART_PATH)
+    chartType: Name
+    chartName: intershop/iom
     waitForExecution: true
     valueFile: order-iom-project-archetype/helm-values-test.yaml
     arguments: >-
+      --version $IOM_HELM_VERSION
       --create-namespace 
       --set image.repository=$(IOM_CI_ACR_HOST)/$(PROJECT_IMAGE_NAME)
       --set image.tag=$(PROJECT_IMAGE_TAG)
