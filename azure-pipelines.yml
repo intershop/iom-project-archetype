@@ -40,7 +40,6 @@ variables:
   IMAGE_DOCKER_OPTS: >-
     --get-image-name=$(PROJECT_IMAGE_NAME_FILE)
     --get-image-tag=$(PROJECT_IMAGE_TAG_FILE)
-  IMAGE_VERSION: 1.0.0-SNAPSHOT.$(Build.BuildId)
 
   IS_RELEASE_BUILD:
 
@@ -157,7 +156,7 @@ steps:
   inputs:
     goals: clean verify
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
-    mavenOptions: '-Xmx1024m $(MAVEN_OPTS) -Dimage.version=$(IMAGE_VERSION)'
+    mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against archetype snapshot"
 
 # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
