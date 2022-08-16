@@ -104,8 +104,6 @@ steps:
   
 - task: Kubernetes@1
   displayName: "Kubernetes - Login"
-  condition: always()
-  enabled: true
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
@@ -113,13 +111,16 @@ steps:
   
 - task: Kubernetes@1
   displayName: "Kubernetes - Create Namespace"
-  condition: always()
-  enabled: true
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
     command: create
     arguments: namespace $(IOM_AKS_NAMESPACE)
+
+- script: |
+    set -ex
+    kubectl get all -n $IOM_AKS_NAMESPACE
+  displayName: call kubectl
   
 - task: KubernetesManifest@0
   displayName: Create pull secret for docker.tools.intershop.com
@@ -252,7 +253,6 @@ steps:
       sleep 10
     done
     kubectl delete namespace "$IOM_AKS_NAMESPACE" || true
-  continueOnError: true
   timeoutInMinutes: 5
   displayName: "Cleanup - wait for PV deletion, delete namespace"
   #enabled: false

@@ -41,8 +41,8 @@ dbaccount:
   # searchPath: "testcases"
   searchPath:
   image:
-    repository: intershophub/iom-dbaccount
-    tag:        1.4.0
+    repository: docker.tools.intershop.com/iom/intershophub/iom-dbaccount
+    tag:        1.5.0
     pullPolicy: IfNotPresent
   resources: {}
   
