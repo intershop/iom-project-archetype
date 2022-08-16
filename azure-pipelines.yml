@@ -179,7 +179,7 @@ steps:
 - task: Maven@3
   inputs:
     goals: clean verify
-    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/archetype-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against dependency-helper"
 
@@ -206,7 +206,7 @@ steps:
   displayName: get IOM Helm Charts
   
 - task: HelmDeploy@0
-  displayName: "Helm - install blueprint-test release"
+  displayName: "Helm - install archetype-test release"
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
@@ -237,7 +237,7 @@ steps:
 
 # CLEANUP TASKS
 - task: HelmDeploy@0
-  displayName: "Cleanup - uninstall blueprint-test release"
+  displayName: "Cleanup - uninstall archetype-test release"
   condition: always()
   inputs:
     connectionType: Kubernetes Service Connection

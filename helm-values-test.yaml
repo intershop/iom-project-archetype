@@ -6,7 +6,7 @@ replicaCount: 1
 downtime: true
 
 image:
-  repository: blueprint-project-iom
+  repository: archetype-project-iom
   # Overrides the image tag whose default is the chart version.
   tag: "3.1.0.0"
   pullPolicy: IfNotPresent
@@ -134,7 +134,7 @@ log:
   access:
     enabled:       true
   metadata:
-    tenant:        blueprint-test
+    tenant:        archetype-test
     environment:   ci
 
 # project related settings
@@ -155,7 +155,7 @@ persistence:
   annotations:
   # To be used in simple environments (e.g. demos) to persist data on local host.
   # if set, storageClass will be ignored.
-  #hostPath: blueprint-project-pv
+  #hostPath: archetype-project-pv
 
 
 resources:
