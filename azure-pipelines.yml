@@ -63,6 +63,7 @@ steps:
     cacheHitVar: M2_REPO_CACHE_HIT
   timeoutInMinutes: 5
   displayName: "Cache - create/restore local maven cache at $(M2_LOCAL_REPO)"
+  enabled: false
   
 - task: DownloadSecureFile@1
   name: pgpPrivateKey
