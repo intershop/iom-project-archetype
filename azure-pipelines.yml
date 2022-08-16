@@ -207,7 +207,7 @@ steps:
     waitForExecution: true
     valueFile: $(ARCHETYPE_PATH)/helm-values-test.yaml
     arguments: >-
-      --version $IOM_HELM_VERSION
+      --version $(IOM_HELM_VERSION)
       --create-namespace 
       --set image.repository=$(IOM_DEVOPS_ACR_HOST)/ci/$(PROJECT_IMAGE_NAME)
       --set image.tag=$(PROJECT_IMAGE_TAG)
