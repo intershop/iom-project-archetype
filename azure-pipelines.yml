@@ -7,10 +7,8 @@ pool: 'ubuntu-20.4-DS2_v2-adopt-adoptium-jdk'
 variables:
   M2_LOCAL_REPO: $(Pipeline.Workspace)/local-maven-repo
   MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
-  #IOM_DOCKERHUB_HOST: intershophub
-  #IOM_REPO_NAME: "intershophub/"
 
-  # Helm Repo URL
+  # IOM Helm Chart
   IOM_HELM_VERSION: 2.1.0
   IOM_HELM_URL: https://intershop.github.io/helm-charts
   HELM_RELEASE_NAME: archetype-test-$(Build.BuildId)
@@ -27,8 +25,10 @@ variables:
   IOM_DOCKERHUB_HOST: docker.tools.intershop.com/iom/intershophub
   IOM_DOCKERHUB_CONNECTION: order-iom-docker.tools.intershop.com
 
+  # JDK to be used by Maven + Project build
   JDK_MAJOR_VERSION: 11
-  
+
+  # directory name with archetype sources
   ARCHETYPE_PATH: order-iom-project-archetype
   
   # wrap environment variables for build_image.sh
@@ -157,11 +157,8 @@ steps:
   inputs:
     goals: clean verify
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
-    mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+    mavenOptions: '-Xmx1024m $(MAVEN_OPTS) -Dimage.version=$(IMAGE_VERSION)'
   displayName: "Maven - run verify goal against archetype snapshot"
-  #env:
-  #  PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
-  #  PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
 
 # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
 # The release can be promoted to central in a later step.
@@ -188,10 +185,10 @@ steps:
     set -ex
 
     docker tag "$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" \
-    "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
-    docker push "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
+    "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-$(Build.BuildId)" 
+    docker push "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-$(Build.BuildId)" 
     # set variables
-    echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)"
+    echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)-$(Build.BuildId)"
     echo "##vso[task.setvariable variable=PROJECT_IMAGE_NAME;]$(cat $PROJECT_IMAGE_NAME_FILE)"
 
   timeoutInMinutes: "10"
