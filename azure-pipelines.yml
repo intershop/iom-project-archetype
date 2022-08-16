@@ -168,7 +168,7 @@ steps:
 - task: Maven@3
   inputs:
     goals: clean verify
-    mavenPomFile: '$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
+    mavenPomFile: '$(Pipeline.Workspace)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against dependency-helper"
 
