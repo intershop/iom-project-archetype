@@ -42,15 +42,6 @@ variables:
   IS_RELEASE_BUILD:
 
 steps:
-- script: |
-    # stop on any error
-    set -e
-
-    echo '##[debug] install tools'
-    sudo apt update
-    sudo apt install -y maven unzip
-  timeoutInMinutes: "3"
-  displayName: "Prepare - install tools"
   
 - task: HelmInstaller@1
   displayName: "Prepare - install Helm"
