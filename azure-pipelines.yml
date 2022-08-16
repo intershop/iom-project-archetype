@@ -58,13 +58,12 @@ steps:
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
     # this variable expansion should not work, but it's the only way I got to work.
-    key: '"mvn_ipa" | pom.xml | src/test/resources/projects/basic/archetype.properties'
+    key: '"mvn_ipa" | $(Pipeline.Workspace)/$(ARCHETYPE_PATH)/pom.xml | $(Pipeline.Workspace)/$(ARCHETYPE_PATH)/src/test/resources/projects/basic/archetype.properties'
     restoreKeys: |
       mvn_ipa
     path: "$(M2_LOCAL_REPO)"
     cacheHitVar: M2_REPO_CACHE_HIT
   timeoutInMinutes: 5
-  workingDirectory: $(Pipeline.Workspace)/$(ARCHETYPE_PATH)
   displayName: "Cache - create/restore local maven cache at $(M2_LOCAL_REPO)"
   #enabled: false
   
