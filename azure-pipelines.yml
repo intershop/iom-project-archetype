@@ -174,11 +174,11 @@ steps:
 
 - script: |
     # stop on any error
-    set -e
+    set -ex
 
     docker tag "$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" \
-    "$IOM_CI_ACR_HOST/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
-    docker push "$IOM_CI_ACR_HOST/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
+    "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
+    docker push "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
     # set variables
     echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)"
     echo "##vso[task.setvariable variable=PROJECT_IMAGE_NAME;]$(cat $PROJECT_IMAGE_NAME_FILE)"
@@ -187,7 +187,8 @@ steps:
   displayName: "Docker - tag images and push to ACR"
 
 - script: |
-    set -e
+    set -ex
+    
     helm repo add intershop $IOM_HELM_URL
     helm repo update
   timeoutInMinutes: 1
@@ -208,7 +209,7 @@ steps:
     arguments: >-
       --version $IOM_HELM_VERSION
       --create-namespace 
-      --set image.repository=$(IOM_CI_ACR_HOST)/$(PROJECT_IMAGE_NAME)
+      --set image.repository=$(IOM_DEVOPS_ACR_HOST)/ci/$(PROJECT_IMAGE_NAME)
       --set image.tag=$(PROJECT_IMAGE_TAG)
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
       --timeout 3600s 
