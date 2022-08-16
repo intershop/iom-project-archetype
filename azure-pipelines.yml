@@ -27,7 +27,8 @@ variables:
   IOM_DOCKERHUB_HOST: intershophub
   IOM_DOCKERHUB_CONNECTION: release-dockerhub
   
-
+  ARCHETYPE_PATH: order-iom-project-archetype
+  
   # wrap environment variables for build_image.sh
   PROJECT_IMAGE_TAG_FILE: $(Pipeline.Workspace)/image-tag.txt
   PROJECT_IMAGE_NAME_FILE: $(Pipeline.Workspace)/image-name.txt
@@ -47,8 +48,9 @@ steps:
   displayName: "Prepare - install Helm"
   
 - checkout: self
-  path: s/order-iom-project-archetype
-  displayName: "Checkout - order-iom-project-archetype@$(Build.SourceBranchName)"
+  path: $(ARCHETYPE_PATH)
+  clean: true
+  displayName: "Checkout - $(ARCHETYPE_PATH)@$(Build.SourceBranchName)"
   timeoutInMinutes: "5"
   persistCredentials: true
   
@@ -56,14 +58,14 @@ steps:
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
     # this variable expansion should not work, but it's the only way I got to work.
-    key: '"mvn_ipa" | order-iom-project-archetype/pom.xml | order-iom-project-archetype/src/test/resources/projects/basic/archetype.properties'
+    key: '"mvn_ipa" | $(ARCHETYPE_PATH)/pom.xml | $(ARCHETYPE_PATH)/src/test/resources/projects/basic/archetype.properties'
     restoreKeys: |
       mvn_ipa
     path: "$(M2_LOCAL_REPO)"
     cacheHitVar: M2_REPO_CACHE_HIT
   timeoutInMinutes: 5
   displayName: "Cache - create/restore local maven cache at $(M2_LOCAL_REPO)"
-  enabled: false
+  #enabled: false
   
 - task: DownloadSecureFile@1
   name: pgpPrivateKey
@@ -122,7 +124,7 @@ steps:
     namespace: $(IOM_AKS_NAMESPACE)
       
 - script: |
-    if mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f order-iom-project-archetype/pom.xml | tail -1 | grep -q -- -SNAPSHOT ; then
+    if mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f $(ARCHETYPE_PATH)/pom.xml | tail -1 | grep -q -- -SNAPSHOT ; then
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]false"
     else
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]true"
@@ -134,7 +136,7 @@ steps:
   condition: eq(variables.IS_RELEASE_BUILD, 'false')
   inputs:
     goals: clean verify
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against archetype snapshot"
   env:
@@ -147,7 +149,7 @@ steps:
   condition: eq(variables.IS_RELEASE_BUILD, 'true')
   inputs:
     goals: clean deploy
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run deploy goal against archetype release"
   env:
@@ -157,7 +159,7 @@ steps:
 - task: Maven@3
   inputs:
     goals: clean verify
-    mavenPomFile: 'order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
+    mavenPomFile: '$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against dependency-helper"
 
@@ -193,7 +195,7 @@ steps:
     chartType: Name
     chartName: intershop/iom
     waitForExecution: true
-    valueFile: order-iom-project-archetype/helm-values-test.yaml
+    valueFile: $(ARCHETYPE_PATH)/helm-values-test.yaml
     arguments: >-
       --version $IOM_HELM_VERSION
       --create-namespace 
@@ -214,7 +216,7 @@ steps:
     # NOTE: releaseName parameter doesn't work for uninstall command!
     #releaseName: $(HELM_RELEASE_NAME)
     waitForExecution: true
-    valueFile: order-iom-project-archetype/helm-values-test.yaml
+    valueFile: $(ARCHETYPE_PATH)/helm-values-test.yaml
     arguments: >-
       --timeout 300s 
       $(HELM_RELEASE_NAME)
@@ -237,7 +239,7 @@ steps:
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: nexus-staging:release
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - stage successful release"
 
@@ -245,7 +247,7 @@ steps:
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: org.codehaus.mojo:versions-maven-plugin:2.7:set -DgenerateBackupPoms=false -DnextSnapshot
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - set next snapshot version"
   enabled: false
@@ -253,10 +255,10 @@ steps:
 - script: |
     git config user.email pborchert@intershop.com
     git config user.name "Azure DevOps Build User"
-    git add order-iom-project-archetype/pom.xml
+    git add $ARCHETYPE_PATH/pom.xml
     git commit -m "[skip ci] set next snapshot version"
     git push
-  workingDirectory: 'order-iom-project-archetype'
+  workingDirectory: '$(ARCHETYPE_PATH)'
   displayName: "Git - push changes to pom.xml"
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   enabled: false
@@ -265,6 +267,6 @@ steps:
   condition: and(failed(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: nexus-staging:drop
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - rollback failed release in sonatype nexus"
