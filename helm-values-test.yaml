@@ -171,8 +171,8 @@ resources:
     memory: 2048Mi
 
 imagePullSecrets:
-  - intershop-pull-secret
-  - devops-pull-secret
+  - name: intershop-pull-secret
+  - name: devops-pull-secret
   
 nameOverride: 
 fullnameOverride: 
