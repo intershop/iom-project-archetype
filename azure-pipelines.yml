@@ -148,9 +148,9 @@ steps:
     mavenPomFile: '$(Pipeline.Workspace)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against archetype snapshot"
-  env:
-    PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
-    PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
+  #env:
+  #  PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
+  #  PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
 
 # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
 # The release can be promoted to central in a later step.
