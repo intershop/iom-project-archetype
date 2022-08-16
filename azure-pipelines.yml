@@ -137,9 +137,9 @@ steps:
   condition: eq(variables.IS_RELEASE_BUILD, 'false')
   inputs:
     goals: clean verify
+    mavenPomFile: '$(Pipeline.Workspace)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against archetype snapshot"
-  workingDirectory: $(Pipeline.Workspace)/$(ARCHETYPE_PATH)
   env:
     PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
     PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
@@ -150,7 +150,7 @@ steps:
   condition: eq(variables.IS_RELEASE_BUILD, 'true')
   inputs:
     goals: clean deploy
-    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
+    mavenPomFile: '$(Pipeline.Workspace)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run deploy goal against archetype release"
   env:
