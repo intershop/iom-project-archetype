@@ -46,11 +46,11 @@ variables:
 
 steps:
   
-  - task: JavaToolInstaller@0
-    inputs:
-      versionSpec: '$(JDK_MAJOR_VERSION)'
-      jdkArchitectureOption: 'x64'
-      jdkSourceOption: 'PreInstalled'
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '$(JDK_MAJOR_VERSION)'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
 
 - task: HelmInstaller@1
   displayName: "Prepare - install Helm"
