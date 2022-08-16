@@ -225,6 +225,13 @@ steps:
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
       --timeout 900s
       
+- task: Kubernetes@1
+  displayName: "Kubernetes - Login"
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
+    command: login
+  
 - script: |
     kubectl get all -n $IOM_AKS_NAMESPACE
 
@@ -245,6 +252,13 @@ steps:
       --timeout 300s 
       $(HELM_RELEASE_NAME)
 
+- task: Kubernetes@1
+  displayName: "Kubernetes - Login"
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
+    command: login
+  
 - script: |
     echo "##[debug] cleanup IOM and namespace $IOM_AKS_NAMESPACE"
     # wait for pv to disappear before deleting the namespace, otherwise the pv cannot be deleted
