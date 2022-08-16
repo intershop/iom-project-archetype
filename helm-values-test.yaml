@@ -171,7 +171,9 @@ resources:
     memory: 2048Mi
 
 imagePullSecrets:
-  - name: dbaccount-pull-secret
+  - intershop-pull-secret
+  - devops-pull-secret
+  
 nameOverride: 
 fullnameOverride: 
 

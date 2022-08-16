@@ -122,12 +122,22 @@ steps:
     arguments: namespace $(IOM_AKS_NAMESPACE)
   
 - task: KubernetesManifest@0
-  displayName: Create pull secret
+  displayName: Create pull secret for docker.tools.intershop.com
   inputs: 
     action: createSecret
     secretType: dockerRegistry
-    secretName: dbaccount-pull-secret
+    secretName: intershop-pull-secret
     dockerRegistryEndpoint: $(IOM_DOCKERHUB_CONNECTION)
+    kubernetesServiceConnection: $(IOM_AKS_SERVICE_ENDPOINT)
+    namespace: $(IOM_AKS_NAMESPACE)
+      
+- task: KubernetesManifest@0
+  displayName: Create pull secret for iomdevopsacr.azurecr.io
+  inputs: 
+    action: createSecret
+    secretType: dockerRegistry
+    secretName: devops-pull-secret
+    dockerRegistryEndpoint: $(IOM_DEVOPS_ACR_CONNECTION)
     kubernetesServiceConnection: $(IOM_AKS_SERVICE_ENDPOINT)
     namespace: $(IOM_AKS_NAMESPACE)
       
@@ -212,7 +222,10 @@ steps:
       --set image.repository=$(IOM_DEVOPS_ACR_HOST)/ci/$(PROJECT_IMAGE_NAME)
       --set image.tag=$(PROJECT_IMAGE_TAG)
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
-      --timeout 3600s 
+      --timeout 900s
+      
+- script: |
+    kubectl get all -n $IOM_AKS_NAMESPACE
 
 # CLEANUP TASKS
 - task: HelmDeploy@0
