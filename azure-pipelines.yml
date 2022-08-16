@@ -124,11 +124,12 @@ steps:
     namespace: $(IOM_AKS_NAMESPACE)
       
 - script: |
-    if mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f $(ARCHETYPE_PATH)/pom.xml | tail -1 | grep -q -- -SNAPSHOT ; then
+    if mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tail -1 | grep -q -- -SNAPSHOT ; then
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]false"
     else
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]true"
     fi
+  workingDirectory: $(Pipeline.Workspace)/$(ARCHETYPE_PATH)
   displayName: "Read variables - SNAPSHOT or Release build"
 
 # for SNAPSHOT builds: run verify goal against archetype
@@ -136,9 +137,9 @@ steps:
   condition: eq(variables.IS_RELEASE_BUILD, 'false')
   inputs:
     goals: clean verify
-    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against archetype snapshot"
+  workingDirectory: $(Pipeline.Workspace)/$(ARCHETYPE_PATH)
   env:
     PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
     PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
