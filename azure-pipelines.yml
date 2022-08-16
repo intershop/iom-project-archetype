@@ -24,8 +24,8 @@ variables:
   
   # IOM Docker Hub
   # contains all release images, that are made public for our customers.
-  IOM_DOCKERHUB_HOST: intershophub
-  IOM_DOCKERHUB_CONNECTION: release-dockerhub
+  IOM_DOCKERHUB_HOST: docker.tools.intershop.com/iom/intershophub
+  IOM_DOCKERHUB_CONNECTION: order-iom-docker.tools.intershop.com
 
   JDK_MAJOR_VERSION: 11
   
