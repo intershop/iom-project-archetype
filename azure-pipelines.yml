@@ -26,6 +26,8 @@ variables:
   # contains all release images, that are made public for our customers.
   IOM_DOCKERHUB_HOST: intershophub
   IOM_DOCKERHUB_CONNECTION: release-dockerhub
+
+  JDK_MAJOR_VERSION: 11
   
   ARCHETYPE_PATH: order-iom-project-archetype
   
@@ -44,6 +46,12 @@ variables:
 
 steps:
   
+  - task: JavaToolInstaller@0
+    inputs:
+      versionSpec: '$(JDK_MAJOR_VERSION)'
+      jdkArchitectureOption: 'x64'
+      jdkSourceOption: 'PreInstalled'
+
 - task: HelmInstaller@1
   displayName: "Prepare - install Helm"
   
