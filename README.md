@@ -63,7 +63,7 @@ __TODO add link__ After adding devenv-4-iom to your project structure, please fo
 # Usage: Integrate into *Azure DevOps Environment* of *Intershop Commerce Platform*
 ## Git Repository
 
-The *Azure DevOps Environment* already provides a Git repository to host your IOM project. It is named *<project-name>-iom*. You have to use this Git repository, when setting up the new IOM project.
+The *Azure DevOps Environment* already provides a Git repository to host your IOM project. It is named *\<project-name\>-iom*. You have to use this Git repository, when setting up the new IOM project.
 
 ## Maven Repository
 
