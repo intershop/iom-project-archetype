@@ -78,7 +78,6 @@ steps:
   
 - task: DownloadSecureFile@1
   name: pgpPrivateKey
-  timeoutInMinutes: 1
   displayName: 'Secrets - download pgp key'
   inputs:
     secureFile: 'order-iom-project-archetype-gpg_private_key_iom.pgp'
@@ -105,7 +104,6 @@ steps:
   displayName: "Docker - login to Dockerhub"
   
 - task: Kubernetes@1
-  timeoutInMinutes: 1
   displayName: "Kubernetes - Login"
   inputs:
     connectionType: Kubernetes Service Connection
@@ -121,7 +119,6 @@ steps:
     arguments: namespace $(IOM_AKS_NAMESPACE)
 
 - task: KubernetesManifest@0
-  timeoutInMinutes: 1
   displayName: Create pull secret for Dockerhub
   inputs: 
     action: createSecret
@@ -132,7 +129,6 @@ steps:
     namespace: $(IOM_AKS_NAMESPACE)
       
 - task: KubernetesManifest@0
-  timeoutInMinutes: 1
   displayName: Create pull secret for Devops ACR
   inputs: 
     action: createSecret
@@ -159,7 +155,6 @@ steps:
     goals: clean verify
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-  timeoutInMinutes: 10
   displayName: "Maven - run verify goal against archetype snapshot"
 
 # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
@@ -170,7 +165,6 @@ steps:
     goals: clean deploy
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-  timeoutInMinutes: 10
   displayName: "Maven - run deploy goal against archetype release"
   env:
     PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
@@ -181,12 +175,11 @@ steps:
     goals: clean verify
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/archetype-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-  timeoutInMinutes: 10
   displayName: "Maven - run verify goal against dependency-helper"
 
 - script: |
     # stop on any error
-    set -ex
+    set -e
 
     docker tag "$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" \
     "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-${BUILD_BUILDID}" 
@@ -207,7 +200,6 @@ steps:
   displayName: download IOM Helm Charts
   
 - task: HelmDeploy@0
-  timeoutInMinutes: 20
   displayName: "Helm - install archetype-test release"
   inputs:
     connectionType: Kubernetes Service Connection
@@ -251,7 +243,7 @@ steps:
     # NOTE: releaseName parameter doesn't work for uninstall command!
     #releaseName: $(HELM_RELEASE_NAME)
     waitForExecution: true
-    valueFile: $(ARCHETYPE_PATH)/helm-values-test.yaml
+    #valueFile: $(ARCHETYPE_PATH)/helm-values-test.yaml
     arguments: >-
       --timeout 300s 
       $(HELM_RELEASE_NAME)
