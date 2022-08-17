@@ -54,12 +54,11 @@ steps:
   displayName: Install JDK $(JDK_MAJOR_VERSION)
 
 - task: HelmInstaller@1
-  timeoutInMinutes: 1
   displayName: "Prepare - install Helm"
   
 - checkout: self
-  path: $(ARCHETYPE_PATH)
   clean: true
+  path: $(ARCHETYPE_PATH)
   displayName: "Checkout - $(ARCHETYPE_PATH)@$(Build.SourceBranchName)"
   timeoutInMinutes: "5"
   persistCredentials: true
@@ -248,6 +247,10 @@ steps:
       --timeout 300s 
       $(HELM_RELEASE_NAME)
 
+- script: |
+    kubectl get all -n $IOM_AKS_NAMESPACE
+  condition: always()
+  
   # the previous login is timed out!
 - task: Kubernetes@1
   displayName: "Kubernetes - Login"
