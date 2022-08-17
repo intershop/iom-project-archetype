@@ -67,9 +67,7 @@ The *Azure DevOps Environment* already provides a Git repository to host your IO
 
 ## Maven Repository
 
-The URL of the Maven repository, providing the IOM build artifacts, is unique for your project. You have to adapt *pom.xml* in your project and additionally you have to make sure, that you can access the repository locally in order to build your IOM project locally.
-
-In file *pom.xml* the URL of the repository with ID *iom-maven-artifacts* has to be replaced with the URL of the according Maven repository of your *Azure DevOps Environment*.
+The URL of the Maven repository, providing the IOM build artifacts, is unique for your project. You have to adapt *pom.xml* in your project. In file *pom.xml* the URL of the repository with ID *iom-maven-artifacts* has to be replaced with the URL of the according Maven repository of your *Azure DevOps Environment*.
 
 1. Login into Azure DevOps Environment
 2. Open Artifacts in left menu
