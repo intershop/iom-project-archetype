@@ -50,8 +50,11 @@ steps:
     versionSpec: '$(JDK_MAJOR_VERSION)'
     jdkArchitectureOption: 'x64'
     jdkSourceOption: 'PreInstalled'
+  timeoutInMinutes: 1
+  displayName: Install JDK $(JDK_MAJOR_VERSION)
 
 - task: HelmInstaller@1
+  timeoutInMinutes: 1
   displayName: "Prepare - install Helm"
   
 - checkout: self
@@ -72,10 +75,10 @@ steps:
     cacheHitVar: M2_REPO_CACHE_HIT
   timeoutInMinutes: 5
   displayName: "Cache - create/restore local maven cache at $(M2_LOCAL_REPO)"
-  #enabled: false
   
 - task: DownloadSecureFile@1
   name: pgpPrivateKey
+  timeoutInMinutes: 1
   displayName: 'Secrets - download pgp key'
   inputs:
     secureFile: 'order-iom-project-archetype-gpg_private_key_iom.pgp'
@@ -117,13 +120,9 @@ steps:
     command: create
     arguments: namespace $(IOM_AKS_NAMESPACE)
 
-- script: |
-    set -ex
-    kubectl get all -n $IOM_AKS_NAMESPACE
-  displayName: call kubectl
-  
 - task: KubernetesManifest@0
-  displayName: Create pull secret for docker.tools.intershop.com
+  timeoutInMinutes: 1
+  displayName: Create pull secret for Dockerhub
   inputs: 
     action: createSecret
     secretType: dockerRegistry
@@ -133,7 +132,8 @@ steps:
     namespace: $(IOM_AKS_NAMESPACE)
       
 - task: KubernetesManifest@0
-  displayName: Create pull secret for iomdevopsacr.azurecr.io
+  timeoutInMinutes: 1
+  displayName: Create pull secret for Devops ACR
   inputs: 
     action: createSecret
     secretType: dockerRegistry
@@ -149,25 +149,28 @@ steps:
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]true"
     fi
   workingDirectory: $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)
+  timeoutInMinutes: 1
   displayName: "Read variables - SNAPSHOT or Release build"
 
 # for SNAPSHOT builds: run verify goal against archetype
 - task: Maven@3
-  condition: eq(variables.IS_RELEASE_BUILD, 'false')
+  condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'false'))
   inputs:
     goals: clean verify
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  timeoutInMinutes: 10
   displayName: "Maven - run verify goal against archetype snapshot"
 
 # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
 # The release can be promoted to central in a later step.
 - task: Maven@3
-  condition: eq(variables.IS_RELEASE_BUILD, 'true')
+  condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: clean deploy
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  timeoutInMinutes: 10
   displayName: "Maven - run deploy goal against archetype release"
   env:
     PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
@@ -178,6 +181,7 @@ steps:
     goals: clean verify
     mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/archetype-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+  timeoutInMinutes: 10
   displayName: "Maven - run verify goal against dependency-helper"
 
 - script: |
@@ -185,24 +189,25 @@ steps:
     set -ex
 
     docker tag "$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" \
-    "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-$(Build.BuildId)" 
-    docker push "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-$(Build.BuildId)" 
+    "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-${BUILD_BUILDID}" 
+    docker push "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-${BUILD_BUILDID}" 
     # set variables
-    echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)-$(Build.BuildId)"
+    echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)-${BUILD_BUILDID}"
     echo "##vso[task.setvariable variable=PROJECT_IMAGE_NAME;]"$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE)"
 
   timeoutInMinutes: "10"
   displayName: "Docker - tag images and push to ACR"
 
 - script: |
-    set -ex
+    set -e
     
     helm repo add intershop $IOM_HELM_URL
     helm repo update
   timeoutInMinutes: 1
-  displayName: get IOM Helm Charts
+  displayName: download IOM Helm Charts
   
 - task: HelmDeploy@0
+  timeoutInMinutes: 20
   displayName: "Helm - install archetype-test release"
   inputs:
     connectionType: Kubernetes Service Connection
@@ -251,8 +256,11 @@ steps:
       --timeout 300s 
       $(HELM_RELEASE_NAME)
 
+  # the previous login is timed out!
 - task: Kubernetes@1
   displayName: "Kubernetes - Login"
+  condition: always()
+  timeoutInMinutes: 1
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
@@ -268,14 +276,13 @@ steps:
     kubectl delete namespace "$IOM_AKS_NAMESPACE" || true
   timeoutInMinutes: 5
   displayName: "Cleanup - wait for PV deletion, delete namespace"
-  #enabled: false
   condition: always()
 
 - task: Maven@3
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: nexus-staging:release
-    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - stage successful release"
 
@@ -283,7 +290,7 @@ steps:
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: org.codehaus.mojo:versions-maven-plugin:2.7:set -DgenerateBackupPoms=false -DnextSnapshot
-    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - set next snapshot version"
   enabled: false
@@ -291,7 +298,7 @@ steps:
 - script: |
     git config user.email pborchert@intershop.com
     git config user.name "Azure DevOps Build User"
-    git add $ARCHETYPE_PATH/pom.xml
+    git add pom.xml
     git commit -m "[skip ci] set next snapshot version"
     git push
   workingDirectory: '$(ARCHETYPE_PATH)'
@@ -303,6 +310,6 @@ steps:
   condition: and(failed(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: nexus-staging:drop
-    mavenPomFile: '$(ARCHETYPE_PATH)/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - rollback failed release in sonatype nexus"
