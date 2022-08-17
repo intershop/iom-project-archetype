@@ -218,18 +218,6 @@ steps:
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
       --timeout 900s
       
-- task: Kubernetes@1
-  displayName: "Kubernetes - Login"
-  condition: always()
-  inputs:
-    connectionType: Kubernetes Service Connection
-    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
-    command: login
-  
-- script: |
-    kubectl get all -n $IOM_AKS_NAMESPACE
-  condition: always()
-
 # CLEANUP TASKS
 - task: HelmDeploy@0
   displayName: "Cleanup - uninstall archetype-test release"
@@ -242,15 +230,10 @@ steps:
     # NOTE: releaseName parameter doesn't work for uninstall command!
     #releaseName: $(HELM_RELEASE_NAME)
     waitForExecution: true
-    #valueFile: $(ARCHETYPE_PATH)/helm-values-test.yaml
     arguments: >-
       --timeout 300s 
       $(HELM_RELEASE_NAME)
 
-- script: |
-    kubectl get all -n $IOM_AKS_NAMESPACE
-  condition: always()
-  
   # the previous login is timed out!
 - task: Kubernetes@1
   displayName: "Kubernetes - Login"
@@ -260,6 +243,12 @@ steps:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
     command: login
+
+  # Should show, that the cluster is deleted
+- script: |
+    kubectl get all -n $IOM_AKS_NAMESPACE
+  condition: always()
+  displayName: Show status of cluster
   
 - script: |
     echo "##[debug] cleanup IOM and namespace $IOM_AKS_NAMESPACE"
