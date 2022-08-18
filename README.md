@@ -67,14 +67,14 @@ The *Azure DevOps Environment* already provides a Git repository to host your IO
 
 ## Maven Repository
 
-The URL of the Maven repository, providing the IOM build artifacts, is unique for your project. You have to adapt *pom.xml* in your project. In file *pom.xml* the URL of the repository with ID *iom-maven-artifacts* has to be replaced with the URL of the according Maven repository of your *Azure DevOps Environment*.
+The URL of the Maven repository, providing the IOM build artifacts, is unique for your project. You have to adapt *pom.xml* of your project. In file *pom.xml* the URL of the repository with ID *iom-maven-artifacts* has to be replaced with the URL of the according Maven repository of your *Azure DevOps Environment*.
 
 1. Login into Azure DevOps Environment
 2. Open Artifacts in left menu
 3. Select feed *iom-maven-artifacts*
 4. Click *Connect to Feed*
 5. Select *Maven*
-6. Copy the URL from *pom.xml*, shown on this page, and overwrite the according value in *pom.xml* of your newly created project.
+6. Copy the URL from *pom.xml*, shown on this page, and replace the according value in *pom.xml* of your newly created project.
 
 # Usage: Typical developer tasks
 **Note:** Basic knowledge about maven build lifecycle is expected at this point.
