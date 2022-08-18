@@ -31,7 +31,7 @@
     <repositories>
         <repository>
             <id>iom-maven-artifacts</id>
-            <url>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/iom-maven-artifacts/maven/v1</url>
+            <url>${mavenRepoURL}</url>
             <releases>
                 <enabled>true</enabled>
             </releases>

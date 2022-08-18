@@ -17,6 +17,9 @@
         <requiredProperty key="version">
             <defaultValue>1.0.0-SNAPSHOT</defaultValue>
         </requiredProperty>
+        <requiredProperty key="mavenRepoURL">
+            <defaultValue>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/iom-maven-artifacts/maven/v1</defaultValue>
+        </requiredProperty>
     </requiredProperties>
     <fileSets>
         <fileSet filtered="true" encoding="UTF-8">
