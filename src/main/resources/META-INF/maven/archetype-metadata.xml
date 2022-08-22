@@ -9,13 +9,16 @@
             <defaultValue>${artifactId}</defaultValue>
         </requiredProperty>
         <requiredProperty key="platformVersion">
-            <defaultValue>4.1.0</defaultValue>
+            <defaultValue>4.1.3</defaultValue>
         </requiredProperty>
         <requiredProperty key="intershopDockerRepo">
-            <defaultValue>intershophub/</defaultValue>
+            <defaultValue>docker.tools.intershop.com/iom/intershophub/</defaultValue>
         </requiredProperty>
         <requiredProperty key="version">
             <defaultValue>1.0.0-SNAPSHOT</defaultValue>
+        </requiredProperty>
+        <requiredProperty key="mavenRepoURL">
+            <defaultValue>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/iom-maven-artifacts/maven/v1</defaultValue>
         </requiredProperty>
     </requiredProperties>
     <fileSets>
@@ -35,6 +38,7 @@
                 <!--<include>.gitattributes</include>
                 <include>.gitignore</include>-->
                 <include>*.sh</include>
+                <include>*.yml</include>
             </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">

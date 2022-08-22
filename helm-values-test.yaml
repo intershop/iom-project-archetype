@@ -6,7 +6,7 @@ replicaCount: 1
 downtime: true
 
 image:
-  repository: blueprint-project-iom
+  repository: archetype-project-iom
   # Overrides the image tag whose default is the chart version.
   tag: "3.1.0.0"
   pullPolicy: IfNotPresent
@@ -41,8 +41,8 @@ dbaccount:
   # searchPath: "testcases"
   searchPath:
   image:
-    repository: intershophub/iom-dbaccount
-    tag:        1.4.0
+    repository: docker.tools.intershop.com/iom/intershophub/iom-dbaccount
+    tag:        1.5.0
     pullPolicy: IfNotPresent
   resources: {}
   
@@ -134,7 +134,7 @@ log:
   access:
     enabled:       true
   metadata:
-    tenant:        blueprint-test
+    tenant:        archetype-test
     environment:   ci
 
 # project related settings
@@ -155,7 +155,7 @@ persistence:
   annotations:
   # To be used in simple environments (e.g. demos) to persist data on local host.
   # if set, storageClass will be ignored.
-  #hostPath: blueprint-project-pv
+  #hostPath: archetype-project-pv
 
 
 resources:
@@ -171,7 +171,9 @@ resources:
     memory: 2048Mi
 
 imagePullSecrets:
-  - name: dbaccount-pull-secret
+  - name: intershop-pull-secret
+  - name: devops-pull-secret
+  
 nameOverride: 
 fullnameOverride: 
 

@@ -7,28 +7,30 @@ pool: 'ubuntu-20.4-DS2_v2-adopt-adoptium-jdk'
 variables:
   M2_LOCAL_REPO: $(Pipeline.Workspace)/local-maven-repo
   MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
-  #IOM_DOCKERHUB_HOST: intershophub
-  #IOM_REPO_NAME: "intershophub/"
 
-  # Helm Repo URL
-  IOM_HELM_CHART_REPO_URL: git://Products/order-iom-helm
-  IOM_HELM_CHART_BRANCH: develop
-  IOM_HELM_CHART_PATH: helm
+  # IOM Helm Chart
+  IOM_HELM_VERSION: 2.1.0
+  IOM_HELM_URL: https://intershop.github.io/helm-charts
   HELM_RELEASE_NAME: archetype-test-$(Build.BuildId)
 
   # ACR & AKS
-  IOM_CI_ACR_HOST: iomci.azurecr.io
-  IOM_CI_ACR_CONNECTION: order-iomci-ISH-ENG-IOM
+  IOM_DEVOPS_ACR_HOST: iomdevopsacr.azurecr.io
+  IOM_DEVOPS_ACR_CONNECTION: order-iomDevopsACR-ISH-ENG-IOM
 
   IOM_AKS_SERVICE_ENDPOINT: order-CiAksAutoScaledConnection-ISH-ENG-IOM
   IOM_AKS_NAMESPACE: $(HELM_RELEASE_NAME)
   
   # IOM Docker Hub
   # contains all release images, that are made public for our customers.
-  IOM_DOCKERHUB_HOST: intershophub
-  IOM_DOCKERHUB_CONNECTION: release-dockerhub
-  
+  IOM_DOCKERHUB_HOST: docker.tools.intershop.com/iom/intershophub
+  IOM_DOCKERHUB_CONNECTION: order-iom-docker.tools.intershop.com
 
+  # JDK to be used by Maven + Project build
+  JDK_MAJOR_VERSION: 11
+
+  # directory name with archetype sources
+  ARCHETYPE_PATH: order-iom-project-archetype
+  
   # wrap environment variables for build_image.sh
   PROJECT_IMAGE_TAG_FILE: $(Pipeline.Workspace)/image-tag.txt
   PROJECT_IMAGE_NAME_FILE: $(Pipeline.Workspace)/image-name.txt
@@ -38,40 +40,34 @@ variables:
   IMAGE_DOCKER_OPTS: >-
     --get-image-name=$(PROJECT_IMAGE_NAME_FILE)
     --get-image-tag=$(PROJECT_IMAGE_TAG_FILE)
-  IMAGE_VERSION: 1.0.0-SNAPSHOT.$(Build.BuildId)
 
   IS_RELEASE_BUILD:
 
 steps:
-- script: |
-    # stop on any error
-    set -e
-
-    echo '##[debug] install tools'
-    sudo apt update
-    sudo apt install -y maven unzip
-  timeoutInMinutes: "3"
-  displayName: "Prepare - install tools"
   
+- task: JavaToolInstaller@0
+  inputs:
+    versionSpec: '$(JDK_MAJOR_VERSION)'
+    jdkArchitectureOption: 'x64'
+    jdkSourceOption: 'PreInstalled'
+  timeoutInMinutes: 1
+  displayName: Install JDK $(JDK_MAJOR_VERSION)
+
 - task: HelmInstaller@1
   displayName: "Prepare - install Helm"
   
 - checkout: self
-  path: s/order-iom-project-archetype
-  displayName: "Checkout - order-iom-project-archetype@$(Build.SourceBranchName)"
+  clean: true
+  path: $(ARCHETYPE_PATH)
+  displayName: "Checkout - $(ARCHETYPE_PATH)@$(Build.SourceBranchName)"
   timeoutInMinutes: "5"
   persistCredentials: true
   
-- checkout: ${{variables.IOM_HELM_CHART_REPO_URL}}@${{variables.IOM_HELM_CHART_BRANCH}}
-  path: s/$(IOM_HELM_CHART_PATH)
-  displayName: "Checkout - order-iom-helm@$(IOM_HELM_CHART_BRANCH)"
-  timeoutInMinutes: "5"
-
 - task: Cache@2
   inputs:
     # according to https://docs.microsoft.com/en-us/azure/devops/pipelines/process/variables?view=azure-devops&tabs=yaml%2Cbatch
     # this variable expansion should not work, but it's the only way I got to work.
-    key: '"mvn_ipa" | order-iom-project-archetype/pom.xml | order-iom-project-archetype/src/test/resources/projects/basic/archetype.properties'
+    key: '"mvn_ipa" | $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml | $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/src/test/resources/projects/basic/archetype.properties'
     restoreKeys: |
       mvn_ipa
     path: "$(M2_LOCAL_REPO)"
@@ -87,7 +83,7 @@ steps:
 
 - task: MavenAuthenticate@0
   inputs:
-    artifactsFeeds: order-iom-externallibs, order-iom-snapshots, order-iom-releases
+    artifactsFeeds: iom-maven-artifacts
     mavenServiceConnections: order-iom-sonatype-ossrh
   timeoutInMinutes: 1
   displayName: "Maven - authenticate"
@@ -95,9 +91,9 @@ steps:
 - task: Docker@2
   inputs:
     command: login
-    containerRegistry: $(IOM_CI_ACR_CONNECTION)
+    containerRegistry: $(IOM_DEVOPS_ACR_CONNECTION)
   timeoutInMinutes: 1
-  displayName: "Docker - login to CI ACR"
+  displayName: "Docker - login to DevOps ACR"
   
 - task: Docker@2
   inputs:
@@ -108,8 +104,6 @@ steps:
   
 - task: Kubernetes@1
   displayName: "Kubernetes - Login"
-  condition: always()
-  enabled: true
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
@@ -117,51 +111,58 @@ steps:
   
 - task: Kubernetes@1
   displayName: "Kubernetes - Create Namespace"
-  condition: always()
-  enabled: true
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
     command: create
     arguments: namespace $(IOM_AKS_NAMESPACE)
-  
+
 - task: KubernetesManifest@0
-  displayName: Create pull secret
+  displayName: Create pull secret for Dockerhub
   inputs: 
     action: createSecret
     secretType: dockerRegistry
-    secretName: dbaccount-pull-secret
+    secretName: intershop-pull-secret
     dockerRegistryEndpoint: $(IOM_DOCKERHUB_CONNECTION)
     kubernetesServiceConnection: $(IOM_AKS_SERVICE_ENDPOINT)
     namespace: $(IOM_AKS_NAMESPACE)
       
+- task: KubernetesManifest@0
+  displayName: Create pull secret for Devops ACR
+  inputs: 
+    action: createSecret
+    secretType: dockerRegistry
+    secretName: devops-pull-secret
+    dockerRegistryEndpoint: $(IOM_DEVOPS_ACR_CONNECTION)
+    kubernetesServiceConnection: $(IOM_AKS_SERVICE_ENDPOINT)
+    namespace: $(IOM_AKS_NAMESPACE)
+      
 - script: |
-    if mvn help:evaluate -Dexpression=project.version -q -DforceStdout -f order-iom-project-archetype/pom.xml | tail -1 | grep -q -- -SNAPSHOT ; then
+    if mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tail -1 | grep -q -- -SNAPSHOT ; then
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]false"
     else
       echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]true"
     fi
+  workingDirectory: $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)
+  timeoutInMinutes: 1
   displayName: "Read variables - SNAPSHOT or Release build"
 
 # for SNAPSHOT builds: run verify goal against archetype
 - task: Maven@3
-  condition: eq(variables.IS_RELEASE_BUILD, 'false')
+  condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'false'))
   inputs:
     goals: clean verify
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against archetype snapshot"
-  env:
-    PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
-    PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
 
 # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
 # The release can be promoted to central in a later step.
 - task: Maven@3
-  condition: eq(variables.IS_RELEASE_BUILD, 'true')
+  condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: clean deploy
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run deploy goal against archetype release"
   env:
@@ -171,7 +172,7 @@ steps:
 - task: Maven@3
   inputs:
     goals: clean verify
-    mavenPomFile: 'order-iom-project-archetype/target/test-classes/projects/basic/project/blueprint-test/dependency-helper/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/archetype-test/dependency-helper/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - run verify goal against dependency-helper"
 
@@ -180,37 +181,46 @@ steps:
     set -e
 
     docker tag "$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" \
-    "$IOM_CI_ACR_HOST/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
-    docker push "$IOM_CI_ACR_HOST/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)" 
+    "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-${BUILD_BUILDID}" 
+    docker push "$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE):$(cat $PROJECT_IMAGE_TAG_FILE)-${BUILD_BUILDID}" 
     # set variables
-    echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)"
-    echo "##vso[task.setvariable variable=PROJECT_IMAGE_NAME;]$(cat $PROJECT_IMAGE_NAME_FILE)"
+    echo "##vso[task.setvariable variable=PROJECT_IMAGE_TAG;]$(cat $PROJECT_IMAGE_TAG_FILE)-${BUILD_BUILDID}"
+    echo "##vso[task.setvariable variable=PROJECT_IMAGE_NAME;]$IOM_DEVOPS_ACR_HOST/ci/$(cat $PROJECT_IMAGE_NAME_FILE)"
 
   timeoutInMinutes: "10"
   displayName: "Docker - tag images and push to ACR"
 
+- script: |
+    set -e
+    
+    helm repo add intershop $IOM_HELM_URL
+    helm repo update
+  timeoutInMinutes: 1
+  displayName: download IOM Helm Charts
+  
 - task: HelmDeploy@0
-  displayName: "Helm - install blueprint-test release"
+  displayName: "Helm - install archetype-test release"
   inputs:
     connectionType: Kubernetes Service Connection
     kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
     namespace: $(IOM_AKS_NAMESPACE)
     releaseName: $(HELM_RELEASE_NAME)
     command: install
-    chartType: FilePath
-    chartPath: $(IOM_HELM_CHART_PATH)
+    chartType: Name
+    chartName: intershop/iom
     waitForExecution: true
-    valueFile: order-iom-project-archetype/helm-values-test.yaml
+    valueFile: $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/helm-values-test.yaml
     arguments: >-
+      --version $(IOM_HELM_VERSION)
       --create-namespace 
-      --set image.repository=$(IOM_CI_ACR_HOST)/$(PROJECT_IMAGE_NAME)
+      --set image.repository=$(PROJECT_IMAGE_NAME)
       --set image.tag=$(PROJECT_IMAGE_TAG)
       --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci 
-      --timeout 3600s 
-
+      --timeout 900s
+      
 # CLEANUP TASKS
 - task: HelmDeploy@0
-  displayName: "Cleanup - uninstall blueprint-test release"
+  displayName: "Cleanup - uninstall archetype-test release"
   condition: always()
   inputs:
     connectionType: Kubernetes Service Connection
@@ -220,11 +230,26 @@ steps:
     # NOTE: releaseName parameter doesn't work for uninstall command!
     #releaseName: $(HELM_RELEASE_NAME)
     waitForExecution: true
-    valueFile: order-iom-project-archetype/helm-values-test.yaml
     arguments: >-
       --timeout 300s 
       $(HELM_RELEASE_NAME)
 
+  # the previous login is timed out!
+- task: Kubernetes@1
+  displayName: "Kubernetes - Login"
+  condition: always()
+  timeoutInMinutes: 1
+  inputs:
+    connectionType: Kubernetes Service Connection
+    kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
+    command: login
+
+  # Should show, that the cluster is deleted
+- script: |
+    kubectl get all -n $IOM_AKS_NAMESPACE
+  condition: always()
+  displayName: Show status of cluster
+  
 - script: |
     echo "##[debug] cleanup IOM and namespace $IOM_AKS_NAMESPACE"
     # wait for pv to disappear before deleting the namespace, otherwise the pv cannot be deleted
@@ -233,17 +258,15 @@ steps:
       sleep 10
     done
     kubectl delete namespace "$IOM_AKS_NAMESPACE" || true
-  continueOnError: true
   timeoutInMinutes: 5
   displayName: "Cleanup - wait for PV deletion, delete namespace"
-  #enabled: false
   condition: always()
 
 - task: Maven@3
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: nexus-staging:release
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - stage successful release"
 
@@ -251,7 +274,7 @@ steps:
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: org.codehaus.mojo:versions-maven-plugin:2.7:set -DgenerateBackupPoms=false -DnextSnapshot
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - set next snapshot version"
   enabled: false
@@ -259,10 +282,10 @@ steps:
 - script: |
     git config user.email pborchert@intershop.com
     git config user.name "Azure DevOps Build User"
-    git add order-iom-project-archetype/pom.xml
+    git add pom.xml
     git commit -m "[skip ci] set next snapshot version"
     git push
-  workingDirectory: 'order-iom-project-archetype'
+  workingDirectory: '$(ARCHETYPE_PATH)'
   displayName: "Git - push changes to pom.xml"
   condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
   enabled: false
@@ -271,6 +294,6 @@ steps:
   condition: and(failed(), eq(variables.IS_RELEASE_BUILD, 'true'))
   inputs:
     goals: nexus-staging:drop
-    mavenPomFile: 'order-iom-project-archetype/pom.xml'
+    mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
     mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
   displayName: "Maven - rollback failed release in sonatype nexus"

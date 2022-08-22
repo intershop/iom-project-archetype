@@ -8,6 +8,24 @@ In order to enable implementation partners and customers to quickly ramp up new 
 4. Including some prepared Java classes that have to be used to extend IOM functionality according to the cookbooks
 
 # Usage: Create an empty project from the archetype
+
+## Get Information from *Azure DevOps Environment* of *Intershop Commerce Platform*
+
+### Git Repository
+
+The *Azure DevOps Environment* already provides a Git repository to host your IOM project. It is named *\<project-name\>-iom*. You have to use this Git repository, when setting up the new IOM project.
+
+### Maven Repository URL
+
+The URL of the Maven repository, providing the IOM build artifacts, is unique for your project. You have to pass this URL for property *mavenRepoURL* when creating the project from archetype.
+
+1. Login into Azure DevOps Environment
+2. Open Artifacts in left menu
+3. Select feed *iom-maven-artifacts*
+4. Click *Connect to Feed*
+5. Select *Maven*
+6. Copy the URL from *pom.xml*, shown on this page, to pass it as value for property *mavenRepoURL*.
+
 ## Generate maven artifact
 
 In order to create a new project structure from the archetype you have to define a set of variables that will be used during the creation.
@@ -15,7 +33,8 @@ In order to create a new project structure from the archetype you have to define
 |Name|Example|Description
 |---|---|---|
 |platformVersion|4.1.0|Initial IOM version for the project. Should be the latest release.|
-|intershopDockerRepo|intershophub/|Docker registry for the standard IOM images - e.g. a proxy repo / mirror of dockerhub. This parameter needs a trailing slash.|
+|intershopDockerRepo|docker.tools.intershop.com/iom/intershophub/|Docker registry for the standard IOM images - e.g. a proxy repo / mirror of dockerhub. This parameter needs a trailing slash.|
+|mavenRepoURL|https://pkgs.dev.azure.com/intershop-com/Products/_packaging/iom-maven-artifacts/maven/v1|URL of Maven Repository *iom-maven-artifacts* as provided by *Azure DevOps Environment* |
 |version|1.0.0-SNAPSHOT|Initial version of the project package|
 |groupId|com.intershop.oms.blueprint|Maven groupId for the created project package.|
 |artifactId|blueprint-project|Maven artifactId for the created project package.|
@@ -80,3 +99,4 @@ iom-project-archetype is only used once in a project lifecycle - hence there are
 |3.7        |1.0.1                        |
 |4.0        |2.0.0                        |
 |4.1        |2.1.0                        |
+|4.1        |2.2.0                        |

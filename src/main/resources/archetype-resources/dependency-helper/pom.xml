@@ -17,8 +17,8 @@ $symbol_escape = '\' )
 
     <repositories>
         <repository>
-            <id>order-iom-releases</id>
-            <url>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/order-iom-releases/maven/v1</url>
+            <id>iom-maven-artifacts</id>
+            <url>${mavenRepoURL}</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
@@ -125,3 +125,4 @@ $symbol_escape = '\' )
         </dependency>
     </dependencies>
 </project>
+  
