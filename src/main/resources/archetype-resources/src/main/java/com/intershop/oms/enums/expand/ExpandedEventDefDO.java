@@ -1,14 +1,10 @@
 package com.intershop.oms.enums.expand;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-
-import bakery.persistence.annotation.PersistedEnumerationTable;
+import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.event.EventDefDO;
 import bakery.persistence.expand.EventDefDOEnumInterface;
 
-@PersistedEnumerationTable(EventDefDO.class)
+@ExpandedEnum(EventDefDO.class)
 public enum ExpandedEventDefDO implements EventDefDOEnumInterface
 {
     // start with 1000 to avoid conflicts with EventDefDO
@@ -34,21 +30,9 @@ public enum ExpandedEventDefDO implements EventDefDOEnumInterface
      * @return the ID of the event.
      */
     @Override
-    @Id
     public Integer getId()
     {
         return id;
-    }
-
-    /**
-     * Sets the ID of the event.
-     * 
-     * @return
-     */
-    @SuppressWarnings("unused")
-    private void setId(Integer id)
-    {
-        this.id = id;
     }
 
     /**
@@ -57,20 +41,9 @@ public enum ExpandedEventDefDO implements EventDefDOEnumInterface
      * @return the description of the event.
      */
     @Override
-    @Column(name = "`description`")
     public String getDescription()
     {
         return this.description;
-    }
-
-    /**
-     * Sets the description of the event.
-     * 
-     * @return
-     */
-    public void setDescription(String description)
-    {
-        this.description = description;
     }
 
     /**
@@ -79,13 +52,11 @@ public enum ExpandedEventDefDO implements EventDefDOEnumInterface
      * @return the JNDI-name of the event.
      */
     @Override
-    @Transient
     public String getName()
     {
         return this.getJndiName();
     }
 
-    @Transient
     public String getJndiName()
     {
         return String.format(this.jndiName, bakery.util.DeploymentConfig.APP_VERSION);
