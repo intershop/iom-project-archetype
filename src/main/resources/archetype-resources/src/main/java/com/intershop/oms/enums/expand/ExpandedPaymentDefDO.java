@@ -1,14 +1,10 @@
 package com.intershop.oms.enums.expand;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-
-import bakery.persistence.annotation.PersistedEnumerationTable;
+import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.common.PaymentDefDO;
 import bakery.persistence.expand.PaymentDefDOEnumInterface;
 
-@PersistedEnumerationTable(PaymentDefDO.class)
+@ExpandedEnum(PaymentDefDO.class)
 public enum ExpandedPaymentDefDO implements PaymentDefDOEnumInterface
 {
 
@@ -35,50 +31,42 @@ public enum ExpandedPaymentDefDO implements PaymentDefDOEnumInterface
     }
 
     @Override
-    @Id
-    @Column(name = "`id`")
     public Integer getId()
     {
         return this.id;
     }
 
     @Override
-    @Column(name = "`name`", length = 30, nullable = false)
     public String getName()
     {
         return this.name;
     }
 
     @Override
-    @Column(name = "`description`", length = 50, nullable = false)
     public String getDescription()
     {
         return this.description;
     }
 
     @Override
-    @Transient
     public PaymentDefDOEnumInterface getPaymentGroup()
     {
         return (this.paymentGroup != null ? this.paymentGroup : this);
     }
 
     @Override
-    @Transient
     public String getPayment()
     {
         return this.payment;
     }
 
     @Override
-    @Column(name = "`paymentGroupRef`")
     public Integer getPaymentGroupRef()
     {
         return this.paymentGroupRef;
     }
 
     @Override
-    @Transient
     public String getFieldName()
     {
         return this.name();

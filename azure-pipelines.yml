@@ -9,7 +9,7 @@ variables:
   MAVEN_OPTS: '-Dmaven.repo.local=$(M2_LOCAL_REPO)'
 
   # IOM Helm Chart
-  IOM_HELM_VERSION: 2.1.0
+  IOM_HELM_VERSION: 2.2.0
   IOM_HELM_URL: https://intershop.github.io/helm-charts
   HELM_RELEASE_NAME: archetype-test-$(Build.BuildId)
 
@@ -26,7 +26,7 @@ variables:
   IOM_DOCKERHUB_CONNECTION: order-iom-docker.tools.intershop.com
 
   # JDK to be used by Maven + Project build
-  JDK_MAJOR_VERSION: 11
+  JDK_MAJOR_VERSION: 17
 
   # directory name with archetype sources
   ARCHETYPE_PATH: order-iom-project-archetype

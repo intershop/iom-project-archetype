@@ -1,16 +1,13 @@
 package com.intershop.oms.enums.expand;
 
-import javax.persistence.Id;
-import javax.persistence.Transient;
-
-import bakery.persistence.annotation.PersistedEnumerationTable;
+import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.job.Job;
 import bakery.persistence.dataobject.job.JobDefDO;
 import bakery.persistence.expand.JobDefDOEnumInterface;
 import bakery.util.StringUtils;
 import bakery.util.ejb.EJBHelper;
 
-@PersistedEnumerationTable(JobDefDO.class)
+@ExpandedEnum(JobDefDO.class)
 public enum ExpandedJobDefDO implements JobDefDOEnumInterface
 {
     /**
@@ -32,19 +29,9 @@ public enum ExpandedJobDefDO implements JobDefDOEnumInterface
      * Id des Jobs
      */
     @Override
-    @Id
     public Integer getId()
     {
         return this.id;
-    }
-
-    /**
-     * private setter for the needs of hibernate
-     */
-    @SuppressWarnings("unused")
-    private void setId(Integer id)
-    {
-        this.id = id;
     }
 
     @Override
@@ -54,17 +41,8 @@ public enum ExpandedJobDefDO implements JobDefDOEnumInterface
     }
 
     /**
-     * private dummy setter for the needs of hibernate
-     */
-    @SuppressWarnings("unused")
-    private void setName(String name)
-    {
-    }
-
-    /**
      * @return Liefert eine Bean-Instanz zu <i>dieser</i> JobDefDO-Konstante
      */
-    @Transient
     @Override
     public Job getInstance()
     {
@@ -73,7 +51,6 @@ public enum ExpandedJobDefDO implements JobDefDOEnumInterface
         return expectedBean;
     }
 
-    @Transient
     @Override
     public String getJndiName()
     {

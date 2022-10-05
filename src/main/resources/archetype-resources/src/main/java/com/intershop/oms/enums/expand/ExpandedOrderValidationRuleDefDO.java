@@ -1,14 +1,10 @@
 package com.intershop.oms.enums.expand;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-
-import bakery.persistence.annotation.PersistedEnumerationTable;
+import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.common.OrderValidationRuleDefDO;
 import bakery.persistence.expand.OrderValidationRuleDefDOEnumInterface;
 
-@PersistedEnumerationTable(OrderValidationRuleDefDO.class)
+@ExpandedEnum(OrderValidationRuleDefDO.class)
 public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDOEnumInterface
 {
 
@@ -37,54 +33,27 @@ public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDO
      * Id der Pruefungsart
      */
     @Override
-    @Id
     public Integer getId()
     {
         return this.id;
     }
 
     /**
-     * Id der Pruefungsart
-     */
-    protected void setId(Integer id)
-    {
-        this.id = id;
-    }
-
-    /**
      * Namen der Pruefungsregel
      */
     @Override
-    @Column(name = "`name`", length = 50, nullable = false)
     public String getName()
     {
         return this.name;
     }
 
     /**
-     * Namen der Pruefungsregel
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    /**
      * Ranking (Reihenfolge) der Pruefung
      */
     @Override
-    @Column(name = "`rank`", nullable = false)
     public int getRank()
     {
         return this.rank;
-    }
-
-    /**
-     * Ranking (Reihenfolge) der Pruefung
-     */
-    public void setRank(int rank)
-    {
-        this.rank = rank;
     }
 
     /**
@@ -93,25 +62,12 @@ public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDO
      * @return <b>true</b> oder <b>false</b>
      */
     @Override
-    @Column(name = "`mandatory`", nullable = false)
     public boolean isMandatory()
     {
         return this.mandatory;
     }
 
-    /**
-     * Gibt an ob dieser Parameter abgeschaltet werden darf.
-     *
-     * @param mandatory
-     *            <b>true</b> oder <b>false</b>
-     */
-    public void setMandatory(boolean mandatory)
-    {
-        this.mandatory = mandatory;
-    }
-
     @Override
-    @Transient
     public String getJndiName()
     {
         return this.jndiName;

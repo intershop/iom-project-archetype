@@ -1,11 +1,11 @@
 package com.intershop.oms.enums.expand;
 
-import java.util.EnumSet;
-
+import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.process.ProcessTaskDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 
+@ExpandedEnum(ProcessTaskDefDO.class)
 public enum ExpandedProcessTaskDefDO implements EnumInterface
 {
     /**
@@ -45,23 +45,4 @@ public enum ExpandedProcessTaskDefDO implements EnumInterface
         return this.jndiName;
     }
 
-    /**
-     * get list of expanded enums
-     *
-     * @return
-     */
-    public final EnumSet<ExpandedProcessTaskDefDO> getExpandedEnums()
-    {
-        return EnumSet.allOf(ExpandedProcessTaskDefDO.class);
-    }
-
-    /**
-     * get list of all enums
-     *
-     * @return
-     */
-    public final EnumSet<ProcessTaskDefDO> getAllEnums()
-    {
-        return EnumSet.allOf(ProcessTaskDefDO.class);
-    }
 }

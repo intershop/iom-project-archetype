@@ -1,13 +1,10 @@
 package com.intershop.oms.enums.expand;
 
-import javax.persistence.Column;
-import javax.persistence.Transient;
-
-import bakery.persistence.annotation.PersistedEnumerationTable;
+import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.common.NumberRangeFormatterDefDO;
 import bakery.persistence.expand.NumberRangeFormatterEnumInterface;
 
-@PersistedEnumerationTable(NumberRangeFormatterDefDO.class)
+@ExpandedEnum(NumberRangeFormatterDefDO.class)
 public enum ExpandedNumberRangeFormatterDefDO implements NumberRangeFormatterEnumInterface
 {
 
@@ -33,21 +30,18 @@ public enum ExpandedNumberRangeFormatterDefDO implements NumberRangeFormatterEnu
     }
 
     @Override
-    @Transient
     public String getName()
     {
         return this.getJndiName();
     }
 
     @Override
-    @Transient
     public String getJndiName()
     {
         return jndiName;
     }
 
     @Override
-    @Column(name = "`description`")
     public String getDescription()
     {
         return description;

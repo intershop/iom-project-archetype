@@ -1,15 +1,11 @@
 package com.intershop.oms.enums.expand;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Transient;
-
-import bakery.persistence.annotation.PersistedEnumerationTable;
+import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.persistence.dataobject.transformer.TransformerBeanDefDO;
 import bakery.util.StringUtils;
 
-@PersistedEnumerationTable(TransformerBeanDefDO.class)
+@ExpandedEnum(TransformerBeanDefDO.class)
 public enum ExpandedTransformerBeanDefDO implements EnumInterface
 {
 
@@ -28,21 +24,18 @@ public enum ExpandedTransformerBeanDefDO implements EnumInterface
     }
 
     @Override
-    @Id
     public Integer getId()
     {
         return this.id;
     }
 
     @Override
-    @Column(name = "`name`")
     public String getName()
     {
         return StringUtils.constantToHungarianNotation(this.name(), false);
     }
 
     @Override
-    @Transient
     public String getJndiName()
     {
         return this.jndiName;
