@@ -99,4 +99,5 @@ iom-project-archetype is only used once in a project lifecycle - hence there are
 |3.7        |1.0.1                        |
 |4.0        |2.0.0                        |
 |4.1        |2.1.0                        |
-|4.1        |2.2.0                        |
+|4.2        |2.2.0                        |
+|4.4        |2.3.0                        |
