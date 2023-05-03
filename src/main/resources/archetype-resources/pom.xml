@@ -397,6 +397,7 @@
                                     <environmentVariables>
                                         <IMAGE_BASE_NAME>${image.base.name}</IMAGE_BASE_NAME>
                                         <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
+                                        <PROJECT_DESCRIPTION>${project.description}</PROJECT_DESCRIPTION>
                                         <IMAGE_TAG>${image.version}</IMAGE_TAG>
                                         <IOM_IMAGE_NAME>iom</IOM_IMAGE_NAME>
                                         <IOM_VERSION>${platform.version}</IOM_VERSION>
