@@ -253,13 +253,14 @@ steps:
   
 - script: |
     echo "##[debug] cleanup IOM and namespace $IOM_AKS_NAMESPACE"
+    set -x
     # wait for pv to disappear before deleting the namespace, otherwise the pv cannot be deleted
     PV=$(kubectl get pv | grep " $IOM_AKS_NAMESPACE/" | { read ID REST; echo $ID; })
     while kubectl get pv | grep -q "$PV"; do
       sleep 10
     done
     kubectl delete namespace "$IOM_AKS_NAMESPACE" || true
-  timeoutInMinutes: 5
+  timeoutInMinutes: 
   displayName: "Cleanup - wait for PV deletion, delete namespace"
   condition: always()
 
