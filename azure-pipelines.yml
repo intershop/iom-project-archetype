@@ -260,7 +260,7 @@ steps:
       sleep 10
     done
     kubectl delete namespace "$IOM_AKS_NAMESPACE" || true
-  timeoutInMinutes: 
+  timeoutInMinutes: 5
   displayName: "Cleanup - wait for PV deletion, delete namespace"
   condition: always()
 
