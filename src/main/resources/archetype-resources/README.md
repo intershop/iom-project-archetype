@@ -22,10 +22,9 @@ further information, e.g.:
 [*devenv-4-iom*](https://github.com/intershop/devenv-4-iom) is a software project, maintained by Intershop, that helps IOM developers to run
 IOM locally and to execute and test project-code and -configurations within this IOM installation.
 
-As already mentioned in section *IOM Project Archetype* above, *devenv-4-iom* is already integrated into the project. But this does not mean,
-that *devenv-4-iom* is already able to run on your machine. Please read the
-[installation instructions](https://github.com/intershop/devenv-4-iom/blob/main/doc/00_installation.md) and make sure, that all preconditions
-for *devenv-4-iom* are fulfilled to run on your machine.
+*devenv-4-iom* is already integrated into the current project. But this does not mean, that *devenv-4-iom* is already able to run on your
+machine. Please read the [installation instructions](https://github.com/intershop/devenv-4-iom/blob/main/doc/00_installation.md) and make
+sure, that all preconditions for *devenv-4-iom* are fulfilled to run on your machine.
 
 *devenv-4-iom* is updated on a regular basis. You need to check for these updates. Please follow the instructions given in
 [documentation of *IOM Project Archetype*](https://github.com/intershop/iom-project-archetype#integrate-devenv-4-iom) on update of *devenv-4-iom*.
