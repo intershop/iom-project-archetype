@@ -48,5 +48,5 @@ to understand the customization-concepts and demonstrates solutions for common r
 *IOM Blueprint Project* is not directly related to the current project, but it's highly recommended to get through the
 [documentation](https://support.intershop.com/kb/30U296) of *IOM Blueprint Project* in order to understand basic IOM concepts.
 Good starting points are [Guide - IOM How to Start](https://support.intershop.com/kb/30097C) and
-(Concept - The Intershop Order Management Blueprint Project)[https://support.intershop.com/kb/30U296].
+[Concept - The Intershop Order Management Blueprint Project](https://support.intershop.com/kb/30U296).
 
