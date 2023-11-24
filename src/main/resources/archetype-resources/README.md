@@ -3,9 +3,9 @@
 ## IOM Project Archetype
 
 This project was created by using [*IOM Project Archetype*](https://github.com/intershop/iom-project-archetype). *IOM Project Archetype*
-is a software, maintained by Intershop, that allows easy setup of IOM projects.
+is software, maintained by Intershop, that allows easy setup of IOM projects.
 
-*IOM Project Archetype* is updated on a regular basis. You need to check for these updates. It is highly recommended, that you are applying
+*IOM Project Archetype* is updated on a regular basis. You need to check for these updates. It is highly recommended to apply
 the changes of *IOM Project Archetype* to your project too.
 
 Please read the [documentation](https://github.com/intershop/iom-project-archetype/blob/main/README.md) of *IOM Project Archetype* for
@@ -22,16 +22,16 @@ further information, e.g.:
 [*devenv-4-iom*](https://github.com/intershop/devenv-4-iom) is a software project, maintained by Intershop, that helps IOM developers to run
 IOM locally and to execute and test project-code and -configurations within this IOM installation.
 
-*devenv-4-iom* is already integrated into the current project. But this does not mean, that *devenv-4-iom* is already able to run on your
+*devenv-4-iom* is already integrated into the current project. But this does not mean that *devenv-4-iom* is already able to run on your
 machine. Please read the [installation instructions](https://github.com/intershop/devenv-4-iom/blob/main/doc/00_installation.md) and make
-sure, that all preconditions for *devenv-4-iom* are fulfilled to run on your machine.
+sure that all preconditions for *devenv-4-iom* are fulfilled to run on your machine.
 
 *devenv-4-iom* is updated on a regular basis. You need to check for these updates. Please follow the instructions given in
-[documentation of *IOM Project Archetype*](https://github.com/intershop/iom-project-archetype#integrate-devenv-4-iom) on update of *devenv-4-iom*.
+[documentation of *IOM Project Archetype*](https://github.com/intershop/iom-project-archetype#integrate-devenv-4-iom) for updating *devenv-4-iom*.
 
-It is highly recommended to get through the [First Steps](https://github.com/intershop/devenv-4-iom/blob/main/doc/01_first_steps.md) chapter of
-*devenv-4-iom's* documentation. This chapter should give you a first overview on usage of *devenv-4-iom*. Please read to full documentation,
-to get information about:
+It is highly recommended to read the [First Steps](https://github.com/intershop/devenv-4-iom/blob/main/doc/01_first_steps.md) chapter of
+*devenv-4-iom's* documentation. This chapter should give you a first overview of the usage of *devenv-4-iom*. Please read the full documentation,
+to get information about it:
 
 - [Configuration](https://github.com/intershop/devenv-4-iom/blob/main/doc/02_configuration.md),
 - [Integration into DevOps environment](https://github.com/intershop/devenv-4-iom/blob/main/doc/03_devops_integration.md),
@@ -42,10 +42,10 @@ to get information about:
 
 ## IOM Blueprint Project
 
-[*IOM Blueprint Project*](https://github.com/intershop/iom-blueprint-project) is a software project, maintaned by Intershop, that helps IOM developers
-to understand the customization-concepts and demonstrates solutions for common requirements.
+[*IOM Blueprint Project*](https://github.com/intershop/iom-blueprint-project) is a software project, maintained by Intershop, that helps IOM developers
+to understand the customization concepts and demonstrates solutions for common requirements.
 
-*IOM Blueprint Project* is not directly related to the current project, but it's highly recommended to get through the
+*IOM Blueprint Project* is not directly related to the current project, but it is highly recommended to read the
 [documentation](https://support.intershop.com/kb/30U296) of *IOM Blueprint Project* in order to understand basic IOM concepts.
 Good starting points are [Guide - IOM How to Start](https://support.intershop.com/kb/30097C) and
 [Concept - The Intershop Order Management Blueprint Project](https://support.intershop.com/kb/30U296).
