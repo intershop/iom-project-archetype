@@ -9,7 +9,7 @@
             <defaultValue>${artifactId}</defaultValue>
         </requiredProperty>
         <requiredProperty key="platformVersion">
-            <defaultValue>4.5.0</defaultValue>
+            <defaultValue>4.7.3</defaultValue>
         </requiredProperty>
         <requiredProperty key="intershopDockerRepo">
             <defaultValue>docker.tools.intershop.com/iom/intershophub/</defaultValue>
@@ -39,6 +39,7 @@
                 <include>.gitignore</include>-->
                 <include>*.sh</include>
                 <include>*.yml</include>
+                <include>*.md</include>
             </includes>
         </fileSet>
         <fileSet filtered="true" encoding="UTF-8">
