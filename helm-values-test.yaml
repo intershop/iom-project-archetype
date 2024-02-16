@@ -45,6 +45,7 @@ oms:
 jboss:
   xaPoolsizeMin: "50"
   xaPoolsizeMax: "125"
+  nodePrefix: archetype-test
 
 # IOM logging related settings
 log:
