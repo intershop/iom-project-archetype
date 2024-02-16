@@ -28,14 +28,6 @@
         <org.mockito.version>4.6.1</org.mockito.version>
         <net.bytebuddy.version>1.12.10</net.bytebuddy.version>
         <testframework.version>7.1.0</testframework.version>
-        <!-- defines the mirror to be used for Ubuntu distribution/ports
-             depending on the hardware architecture. This was necessary,
-             since most mirror servers do not support all required hardware
-             architectures, making it nearly impossible to define only one
-             mirror, that has to fit all architectures.
-             URL has to end with / -->
-        <ubuntu.mirror.x64>http://azure.archive.ubuntu.com/ubuntu/</ubuntu.mirror.x64>
-        <ubuntu.mirror.arm>http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports/</ubuntu.mirror.arm>
     </properties>
 
     <repositories>
