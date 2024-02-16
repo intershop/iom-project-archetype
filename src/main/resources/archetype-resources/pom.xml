@@ -28,6 +28,7 @@
         <org.mockito.version>4.6.1</org.mockito.version>
         <net.bytebuddy.version>1.12.10</net.bytebuddy.version>
         <testframework.version>7.1.0</testframework.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <repositories>
@@ -86,7 +87,6 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <!--<scope>test</scope>-->
         </dependency>
 
         <!-- external libs -->
@@ -274,7 +274,6 @@
                 <configuration>
                     <verbose>false</verbose>
                     <debug>true</debug>
-                    <optimize>true</optimize>
                     <showDeprecation>true</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <meminitial>256</meminitial>
