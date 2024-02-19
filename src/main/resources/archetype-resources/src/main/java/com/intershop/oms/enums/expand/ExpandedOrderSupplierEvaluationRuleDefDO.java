@@ -13,10 +13,8 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
      * The name must be unique across both classes.
      * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
-
-    EXAMPLE(-9999, "java:global/example-app/TBD", null)
     ;
-
+    
     private Integer id;
     private String name;
     private String description;

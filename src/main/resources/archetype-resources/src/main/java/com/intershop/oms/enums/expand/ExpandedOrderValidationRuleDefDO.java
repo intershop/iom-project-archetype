@@ -15,7 +15,7 @@ public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDO
      * database).
      */
 
-    VALIDATE_PROPERTIES(-9999, "ValidateMandatoryPropertiesPTBean", "java:global/example-app/ValidateMandatoryPropertiesPTBean!bakery.logic.service.order.task.ValidateOrderPT", 999, false)
+    VALIDATE_PROPERTIES(-9999, "ValidateMandatoryPropertiesPTBean", "java:global/example-app/ValidateMandatoryPropertiesPTBean!bakery.logic.service.order.task.ValidateOrderPT", 999, false, "")
     ;
 
     private Integer id;
