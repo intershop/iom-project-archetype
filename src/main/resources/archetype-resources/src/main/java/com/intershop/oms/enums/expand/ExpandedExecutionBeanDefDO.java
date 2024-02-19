@@ -1,4 +1,4 @@
-package com.intershop.oms.enums.expand;
+package com.intershop.oms.enums.expand; 
 
 import java.util.ArrayList;
 import java.util.List;
