@@ -9,16 +9,18 @@ public enum ExpandedPaymentDefDO implements PaymentDefDOEnumInterface
 {
 
     /**
-     * Minimum ID for custom entries: 1000
+     * Start with 10000 to avoid conflict with PaymentDefDO.
+     * The name must be unique across both classes.
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
-    TEST(-999, "AfterPay", "AfterPay", null, "AfterPay")
+
+    TEST(-9999, "AfterPay", "AfterPay", null, "AfterPay")
     ;
 
     private Integer id;
     private String name;
     private String description;
     private PaymentDefDOEnumInterface paymentGroup;
-    private Integer paymentGroupRef;
     private String payment;
 
     private ExpandedPaymentDefDO(Integer id, String name, String description, PaymentDefDO paymentGroup, String payment)
@@ -60,16 +62,19 @@ public enum ExpandedPaymentDefDO implements PaymentDefDOEnumInterface
         return this.payment;
     }
 
+    /**
+    * @return the id of the payment method group
+    */
     @Override
     public Integer getPaymentGroupRef()
     {
-        return this.paymentGroupRef;
+	    return ( paymentGroup == null ? null : paymentGroup.getId() );
     }
 
     @Override
     public String getFieldName()
     {
-        return this.name();
+	    return this.name();
     }
 
 }

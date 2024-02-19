@@ -1,20 +1,22 @@
 package com.intershop.oms.enums.expand;
 
-import bakery.persistence.annotation.ExpandedEnum;
+import bakery.persistence.annotation.PersistedEnumerationTable;
 import bakery.persistence.dataobject.configuration.connections.ExecutionBeanKeyDefDO;
 import bakery.persistence.dataobject.configuration.connections.ParameterTypeDefDO;
 import bakery.persistence.expand.ExecutionBeanKeyDefDOEnumInterface;
 
-@ExpandedEnum(ExecutionBeanKeyDefDO.class)
+@PersistedEnumerationTable(ExecutionBeanKeyDefDO.class)
 public enum ExpandedExecutionBeanKeyDefDO implements ExecutionBeanKeyDefDOEnumInterface
 {
 
     /**
-     * Minimum ID for custom entries: 10000
+     * Start with 10000 to avoid conflict with ExecutionBeanKeyDefDO.
+     * The name must be unique across both classes.
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
-    /*
-    EXAMPLE_SHOPCUSTOMERMAILSENDERBEAN_SHOP_EMAIL_ADDRESS( -123, ExpandedExecutionBeanDefDO.EXAMPLE.getId(), "shopEmailAddress", ParameterTypeDefDO.EMAIL, Flag.MANDATORY, null )   
-    */
+
+	// CUSTOM_WISH(-9999, ExpandedExecutionBeanDefDO.CUSTOM_ORDER_MESSAGE_TRANSMITTER.getId(), "customWish", ParameterTypeDefDO.UNSPECIFIED, false, null );
+    // EXAMPLE_SHOPCUSTOMERMAILSENDERBEAN_SHOP_EMAIL_ADDRESS(Integer.valueOf(10001), ExpandedExecutionBeanDefDO.CUSTOM_ORDER_MESSAGE_TRANSMITTER.getId(), "shopEmailAddress", ParameterTypeDefDO.EMAIL, ExecutionBeanKeyDefDO.Flag.OPTIONAL, null);
     ;
 
     private Integer id;
@@ -40,6 +42,7 @@ public enum ExpandedExecutionBeanKeyDefDO implements ExecutionBeanKeyDefDOEnumIn
     {
         return this.id;
     }
+
 
     @Override
     public Integer getExecutionBeanDefRef()
@@ -72,13 +75,8 @@ public enum ExpandedExecutionBeanKeyDefDO implements ExecutionBeanKeyDefDOEnumIn
     }
 
     /**
-     * <p>
-     * Default parameterValue zum parameterKey.
-     * </p>
-     * <p>
-     * Maximale Anzahl erlaubter Zeichen:
-     * {@value ExecutionBeanKeyDefDO#VALUE_LENGTH}.
-     * </p>
+     * Default parameter value of parameterKey.
+     * Max accepted length {@value ExecutionBeanKeyDefDO#VALUE_LENGTH}.
      */
     @Override
     public String getDefaultValue()

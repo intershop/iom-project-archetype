@@ -9,38 +9,39 @@ public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDO
 {
 
     /**
-     * Minimum ID for custom entries: 1000 length restriction for name: 50
+     * Start with 10000 to avoid conflict with OrderValidationRuleDefDO. The
+     * name must be unique across both classes. Values with negative id are
+     * meant as syntax example and are ignored (won't get persisted within the
+     * database).
      */
+
     VALIDATE_PROPERTIES(-9999, "ValidateMandatoryPropertiesPTBean", "java:global/example-app/ValidateMandatoryPropertiesPTBean!bakery.logic.service.order.task.ValidateOrderPT", 999, false)
     ;
-    
+
     private Integer id;
     private String name;
     private String jndiName;
     private int rank;
     private boolean mandatory;
+    private String description;
 
-    private ExpandedOrderValidationRuleDefDO(Integer id, String name, String jndiName, int rank, boolean mandatory)
+    private ExpandedOrderValidationRuleDefDO(Integer id, String name, String jndiName, int rank, boolean mandatory,
+                    String description)
     {
         this.id = id;
         this.name = name;
         this.jndiName = jndiName;
         this.rank = rank;
         this.mandatory = mandatory;
+        this.description = description;
     }
 
-    /**
-     * Id der Pruefungsart
-     */
     @Override
     public Integer getId()
     {
         return this.id;
     }
 
-    /**
-     * Namen der Pruefungsregel
-     */
     @Override
     public String getName()
     {
@@ -48,7 +49,7 @@ public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDO
     }
 
     /**
-     * Ranking (Reihenfolge) der Pruefung
+     * Sorted priority the rule should be check in.
      */
     @Override
     public int getRank()
@@ -57,9 +58,7 @@ public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDO
     }
 
     /**
-     * Gibt an ob dieser Parameter abgeschaltet werden darf.
-     *
-     * @return <b>true</b> oder <b>false</b>
+     * Whether the rule is mandatory and must not be disabled.
      */
     @Override
     public boolean isMandatory()
@@ -70,7 +69,6 @@ public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDO
     @Override
     public String getJndiName()
     {
-        return this.jndiName;
+        return String.format(this.jndiName, bakery.util.DeploymentConfig.APP_VERSION);
     }
-
 }

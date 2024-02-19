@@ -9,9 +9,14 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
 {
 
     /**
-     * Minimum ID for custom entries: 1000
+     * Start with 10000 to avoid conflict with OrderSupplierEvaluationRuleDefDO.
+     * The name must be unique across both classes.
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
-;
+
+    EXAMPLE(-9999, "java:global/example-app/TBD", null)
+    ;
+
     private Integer id;
     private String name;
     private String description;
@@ -19,8 +24,7 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
     private int rank;
     private boolean mandatory;
 
-    private ExpandedOrderSupplierEvaluationRuleDefDO(Integer id, String name, String description, String jndiName,
-                    int rank, boolean mandatory)
+    private ExpandedOrderSupplierEvaluationRuleDefDO(Integer id, String name, String description, String jndiName, int rank, boolean mandatory)
     {
         this.id = id;
         this.name = name;
@@ -30,18 +34,12 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
         this.mandatory = mandatory;
     }
 
-    /**
-     * Id der Pruefungsart
-     */
     @Override
     public Integer getId()
     {
         return this.id;
     }
 
-    /**
-     * Namen der Pruefungsregel
-     */
     @Override
     public String getName()
     {
@@ -49,7 +47,7 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
     }
 
     /**
-     * Ranking (Reihenfolge) der Pruefung
+     * Sorted priority the rule should be check in.
      */
     @Override
     public int getRank()
@@ -58,9 +56,7 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
     }
 
     /**
-     * Gibt an ob dieser Parameter abgeschaltet werden darf.
-     *
-     * @return <b>true</b> oder <b>false</b>
+     * @return Whether the rule must not be disabled or not.
      */
     @Override
     public boolean isMandatory()
@@ -74,9 +70,6 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
         return this.jndiName;
     }
 
-    /**
-     * Beschreibung der Pruefungsregel
-     */
     @Override
     public String getDescription()
     {

@@ -11,9 +11,12 @@ import bakery.util.ejb.EJBHelper;
 public enum ExpandedJobDefDO implements JobDefDOEnumInterface
 {
     /**
-     * Minimum ID for custom entries: 1000
+     * Start with 10000 to avoid conflict with JobDefDO.
+     * The name must be unique across both classes.
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
-    PAYPAL_CHECK_REFUND_JOB(-999, "java:global/example-app/PayPalCheckRefundJob!bakery.persistence.dataobject.job.Job")
+
+    PAYPAL_CHECK_REFUND_JOB(-9999, "java:global/example-app/PayPalCheckRefundJob!bakery.persistence.dataobject.job.Job")
     ;
 
     private String jndiName;
@@ -25,9 +28,6 @@ public enum ExpandedJobDefDO implements JobDefDOEnumInterface
         this.jndiName = jndiName;
     }
 
-    /**
-     * Id des Jobs
-     */
     @Override
     public Integer getId()
     {
@@ -40,9 +40,6 @@ public enum ExpandedJobDefDO implements JobDefDOEnumInterface
         return StringUtils.constantToHungarianNotation(this.name(), StringUtils.FLAG_FIRST_LOWER);
     }
 
-    /**
-     * @return Liefert eine Bean-Instanz zu <i>dieser</i> JobDefDO-Konstante
-     */
     @Override
     public Job getInstance()
     {

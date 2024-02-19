@@ -8,21 +8,23 @@ import bakery.util.StringUtils;
 @ExpandedEnum(SalesPriceCalculatorBeanDefDO.class)
 public enum ExpandedSalesPriceCalculatorBeanDefDO implements EnumInterface
 {
+
     /**
-     * PLEASE START AFTER EXAMPLE WITH ID 1000 and go up THATS IMPORTANT !!!
+     * Start with 10000 to avoid conflict with SalesPriceCalculatorBeanDefDO.
+     * The name must be unique across both classes. Values with negative id are
+     * meant as syntax example and are ignored (won't get persisted within the
+     * database).
      */
-    EXAMPLE(-999, "java:global/blueprint-app/blueprint-ejb/ExampleCalculatorBean!bakery.logic.service.util.SalesPriceCalculator")
-    ;
+
+    EXAMPLE(-9999, "java:global/example-app/ExampleCalculatorBean!bakery.logic.service.util.SalesPriceCalculator");
 
     private Integer id;
     private String jndiName;
 
     private ExpandedSalesPriceCalculatorBeanDefDO(Integer id, String jndiName)
     {
-
         this.id = id;
         this.jndiName = jndiName;
-
     }
 
     @Override

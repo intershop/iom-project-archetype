@@ -3,13 +3,13 @@ package com.intershop.oms.ps.rest.logging.database;
 import java.io.IOException;
 
 import jakarta.annotation.Priority;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import jakarta.ws.rs.Priorities;
 import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.client.ClientResponseContext;
 import jakarta.ws.rs.client.ClientResponseFilter;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

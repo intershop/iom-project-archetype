@@ -10,9 +10,12 @@ public enum ExpandedTransformerBeanDefDO implements EnumInterface
 {
 
     /**
-     * Minimum ID for custom entries: 1000
+     * Start with 10000 to avoid conflict with TransformerBeanDefDO.
+     * The name must be unique across both classes.
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
-    ICM_TO_IOM_TRANSFORMER(-999, "java:global/example-app/ICMToIOMTransformer!bakery.logic.job.transformation.Transformer");
+    
+    ICM_TO_IOM_TRANSFORMER(-9999, "java:global/example-app/ICMToIOMTransformer!bakery.logic.job.transformation.Transformer");
 
     private Integer id;
     private String jndiName;
