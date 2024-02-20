@@ -58,7 +58,7 @@ public class LoggingIOStreamHandler
         responseContext.setEntityStream(new ByteArrayInputStream(bos.toByteArray()));
         return responseContent;
     }
-    
+
     public static String readEntity(HttpResponse response) throws IOException
     {
         InputStream inputStream = response.getEntity().getContent();

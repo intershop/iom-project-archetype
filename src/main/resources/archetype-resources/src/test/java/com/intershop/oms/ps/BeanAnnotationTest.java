@@ -25,7 +25,7 @@ public class BeanAnnotationTest
     @Test
     public void test() throws Exception
     {
-        Reflections reflectionsFramework = new Reflections("com.intershop.oms.ps", Scanners.SubTypes.filterResultsBy(s -> true));
+        Reflections reflectionsFramework = new Reflections("com.intershop.oms.ps",  Scanners.SubTypes.filterResultsBy(s -> true));
         // you can add custom java packages like this:
         Reflections reflectionsProject = new Reflections("com.intershop.oms.example", Scanners.SubTypes.filterResultsBy(s -> true));
 

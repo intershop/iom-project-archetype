@@ -75,7 +75,7 @@ public class MaskedHeaders<K, V> extends MultivaluedHashMap<K, V>
 
         return mv;
     }
-    
+
     public static MaskedHeaders<String, String> of(Header[] headers)
     {
         MaskedHeaders<String, String> mv = new MaskedHeaders<>();
