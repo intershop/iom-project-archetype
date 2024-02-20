@@ -1,8 +1,13 @@
 package com.intershop.oms.enums.expand;
 
+import java.util.EnumSet;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.common.OrderSupplierEvaluationRuleDefDO;
 import bakery.persistence.expand.OrderSupplierEvaluationRuleDefDOEnumInterface;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 
 @ExpandedEnum(OrderSupplierEvaluationRuleDefDO.class)
 public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEvaluationRuleDefDOEnumInterface
@@ -13,8 +18,9 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
      * The name must be unique across both classes.
      * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
+    EXAMPLE(Integer.valueOf(-9999), "SupplierHasStockCheckPTBean", "Filters for suppliers that have stock to deliver.", "java:global/example-project/SupplierHasStockCheckPTBean!bakery.logic.service.order.task.OrderSupplierCheckPT", 1000, false)
     ;
-    
+
     private Integer id;
     private String name;
     private String description;
@@ -22,7 +28,8 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
     private int rank;
     private boolean mandatory;
 
-    private ExpandedOrderSupplierEvaluationRuleDefDO(Integer id, String name, String description, String jndiName, int rank, boolean mandatory)
+    private ExpandedOrderSupplierEvaluationRuleDefDO(Integer id, String name, String description, String jndiName,
+            int rank, boolean mandatory)
     {
         this.id = id;
         this.name = name;
@@ -33,45 +40,82 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
     }
 
     @Override
+    @Id
     public Integer getId()
     {
-        return this.id;
+        return id;
+    }
+
+    protected void setId(Integer id)
+    {
+        this.id = id;
     }
 
     @Override
+    @Column(name = "name", length = 50, nullable = false)
     public String getName()
     {
-        return this.name;
+        return name;
     }
 
-    /**
-     * Sorted priority the rule should be check in.
-     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
     @Override
+    @Column(name = "rank", nullable = false)
     public int getRank()
     {
-        return this.rank;
+        return rank;
     }
 
-    /**
-     * @return Whether the rule must not be disabled or not.
-     */
+    public void setRank(int rank)
+    {
+        this.rank = rank;
+    }
+
     @Override
+    @Column(name = "mandatory", nullable = false)
     public boolean isMandatory()
     {
-        return this.mandatory;
+        return mandatory;
+    }
+
+    public void setMandatory(boolean mandatory)
+    {
+        this.mandatory = mandatory;
     }
 
     @Override
+    @Transient
     public String getJndiName()
     {
-        return this.jndiName;
+        return String.format(this.jndiName, bakery.util.DeploymentConfig.APP_VERSION);
+    }
+
+    @Transient
+    public final EnumSet<ExpandedOrderSupplierEvaluationRuleDefDO> getExpandedEnums()
+    {
+        return EnumSet.allOf(ExpandedOrderSupplierEvaluationRuleDefDO.class);
+    }
+
+    @Transient
+    public final EnumSet<OrderSupplierEvaluationRuleDefDO> getAllEnums()
+    {
+        return EnumSet.allOf(OrderSupplierEvaluationRuleDefDO.class);
     }
 
     @Override
+    @Column(name = "description", length = 100, nullable = false)
     public String getDescription()
     {
-        return this.description;
+        return description;
     }
 
+    public void setDescription(String description)
+    {
+        this.description = description;
+    }
+    
 }
