@@ -147,6 +147,8 @@ jobs:
   - script: |
       set -e
       kubectl create namespace "$IOM_AKS_NAMESPACE"
+      # $HOME/.docker/config.json holds credentials for all registries logged in above
+      # (IOM_DEVOPS_ACR_CONNECTION and IOM_DOCKERHUB_CONNECTION), so one secret covers both.
       kubectl create secret generic iomdevops-pull-secret \
         --from-file=.dockerconfigjson="$HOME/.docker/config.json" \
         --type=kubernetes.io/dockerconfigjson \
