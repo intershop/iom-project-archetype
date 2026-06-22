@@ -17,7 +17,7 @@ variables:
   IOM_DEVOPS_ACR_HOST: iomdevopsacr.azurecr.io
   IOM_DEVOPS_ACR_CONNECTION: order-iomDevopsACR-ISH-ENG-IOM
 
-  IOM_AKS_SERVICE_ENDPOINT: order-CiAksAutoScaledConnection-ISH-ENG-IOM
+  IOM_AKS_SERVICE_ENDPOINT: order-ci-aks-autoscaled-ISH-ENG-IOM
   IOM_AKS_NAMESPACE: $(HELM_RELEASE_NAME)
 
   # IOM Docker Hub
