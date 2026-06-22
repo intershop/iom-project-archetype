@@ -13,17 +13,25 @@ variables:
   IOM_HELM_URL: https://intershop.github.io/helm-charts
   HELM_RELEASE_NAME: archetype-test-$(Build.BuildId)
 
-  # ACR & AKS
+  # ACR
   IOM_DEVOPS_ACR_HOST: iomdevopsacr.azurecr.io
   IOM_DEVOPS_ACR_CONNECTION: order-iomDevopsACR-ISH-ENG-IOM
-
-  IOM_AKS_SERVICE_ENDPOINT: order-ci-aks-autoscaled-ISH-ENG-IOM
-  IOM_AKS_NAMESPACE: $(HELM_RELEASE_NAME)
 
   # IOM Docker Hub
   # contains all release images, that are made public for our customers.
   IOM_DOCKERHUB_HOST: docker.tools.intershop.com/iom/intershophub
   IOM_DOCKERHUB_CONNECTION: order-iom-docker.tools.intershop.com
+
+  # AKS
+  AZURE_TENANT_ID: 13a9f4be-a9d5-4987-bdf2-f31cc074034f
+  AKS_SUBSCRIPTION_ID: 19e427d6-b6b0-4dee-acf3-5d062107a010
+  AKS_NAME: iom-ci-aks-autoscaled
+  AKS_RESOURCE_GROUP: iom-ci
+  KUBELOGIN_DOWNLOAD_URL: https://github.com/Azure/kubelogin/releases/download/v0.0.32/kubelogin-linux-amd64.zip
+  # Pull secret has to exist in default namespace.
+  # It has to be created manually in advance.
+  PULL_SECRET: iomdevops-pull-secret
+  IOM_AKS_NAMESPACE: $(HELM_RELEASE_NAME)
 
   # JDK to be used by Maven + Project build
   JDK_MAJOR_VERSION: 17
@@ -111,33 +119,36 @@ jobs:
     timeoutInMinutes: 1
     displayName: "Docker - login to Dockerhub"
 
-  - task: Kubernetes@1
+  - script: |
+      set -e
+
+      curl -LO "$KUBELOGIN_DOWNLOAD_URL"
+      unzip $(basename "$KUBELOGIN_DOWNLOAD_URL")
+      echo "##vso[task.setvariable variable=PATH;]$PATH:$(pwd)/$(dirname $(find . -name kubelogin))"
+    timeoutInMinutes: 3
+    displayName: "Install kubelogin"
+
+  - script: |
+      set -e
+
+      rm -fr $HOME/.kube
+      az login --service-principal -u $AZURE_SP_CLIENT_ID -p $AZURE_SP_CLIENT_SECRET -t $AZURE_TENANT_ID
+      az aks get-credentials -g "$AKS_RESOURCE_GROUP" -n "$AKS_NAME" --subscription "$AKS_SUBSCRIPTION_ID"
+      kubelogin convert-kubeconfig -l spn
+
+      echo "##vso[task.setvariable variable=AAD_SERVICE_PRINCIPAL_CLIENT_ID;]$AZURE_SP_CLIENT_ID"
+      echo "##vso[task.setvariable variable=AAD_SERVICE_PRINCIPAL_CLIENT_SECRET;]$AZURE_SP_CLIENT_SECRET"
+    env:
+      AZURE_SP_CLIENT_ID: $(AZURE_SP_CLIENT_ID)
+      AZURE_SP_CLIENT_SECRET: $(AZURE_SP_CLIENT_SECRET)
+    timeoutInMinutes: 3
+    displayName: "Login to AKS"
+
+  - script: |
+      set -e
+      kubectl create namespace "$IOM_AKS_NAMESPACE"
+    timeoutInMinutes: 1
     displayName: "Kubernetes - Create Namespace"
-    inputs:
-      connectionType: Kubernetes Service Connection
-      kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
-      command: create
-      arguments: namespace $(IOM_AKS_NAMESPACE)
-
-  - task: KubernetesManifest@1
-    displayName: Create pull secret for Dockerhub
-    inputs:
-      action: createSecret
-      secretType: dockerRegistry
-      secretName: intershop-pull-secret
-      dockerRegistryEndpoint: $(IOM_DOCKERHUB_CONNECTION)
-      kubernetesServiceConnection: $(IOM_AKS_SERVICE_ENDPOINT)
-      namespace: $(IOM_AKS_NAMESPACE)
-
-  - task: KubernetesManifest@1
-    displayName: Create pull secret for Devops ACR
-    inputs:
-      action: createSecret
-      secretType: dockerRegistry
-      secretName: devops-pull-secret
-      dockerRegistryEndpoint: $(IOM_DEVOPS_ACR_CONNECTION)
-      kubernetesServiceConnection: $(IOM_AKS_SERVICE_ENDPOINT)
-      namespace: $(IOM_AKS_NAMESPACE)
 
   - script: |
       if mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tail -1 | grep -q -- -SNAPSHOT ; then
@@ -200,51 +211,29 @@ jobs:
     timeoutInMinutes: 1
     displayName: download IOM Helm Charts
 
-  - task: HelmDeploy@0
+  - script: |
+      set -e
+
+      helm install $(HELM_RELEASE_NAME) intershop/iom \
+        --version $(IOM_HELM_VERSION) \
+        --namespace $(IOM_AKS_NAMESPACE) \
+        --values $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/helm-values-test.yaml \
+        --set image.repository=$(PROJECT_IMAGE_NAME) \
+        --set image.tag=$(PROJECT_IMAGE_TAG) \
+        --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci \
+        --timeout 900s \
+        --wait
+    timeoutInMinutes: 20
     displayName: "Helm - install archetype-test release"
-    inputs:
-      connectionType: Kubernetes Service Connection
-      kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
-      namespace: $(IOM_AKS_NAMESPACE)
-      releaseName: $(HELM_RELEASE_NAME)
-      command: install
-      chartType: Name
-      chartName: intershop/iom
-      waitForExecution: true
-      valueFile: $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/helm-values-test.yaml
-      arguments: >-
-        --version $(IOM_HELM_VERSION)
-        --create-namespace
-        --set image.repository=$(PROJECT_IMAGE_NAME)
-        --set image.tag=$(PROJECT_IMAGE_TAG)
-        --set ingress.hosts[0].host=ipb.$(Build.BuildId).ci
-        --timeout 900s
 
   # CLEANUP TASKS
-  - task: HelmDeploy@0
+  - script: |
+      helm uninstall $(HELM_RELEASE_NAME) \
+        --namespace $(IOM_AKS_NAMESPACE) \
+        --timeout 300s || true
+    condition: always()
+    timeoutInMinutes: 10
     displayName: "Cleanup - uninstall archetype-test release"
-    condition: always()
-    inputs:
-      connectionType: Kubernetes Service Connection
-      kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
-      namespace: $(IOM_AKS_NAMESPACE)
-      command: uninstall
-      # NOTE: releaseName parameter doesn't work for uninstall command!
-      #releaseName: $(HELM_RELEASE_NAME)
-      waitForExecution: true
-      arguments: >-
-        --timeout 300s
-        $(HELM_RELEASE_NAME)
-
-    # the previous login is timed out!
-  - task: Kubernetes@1
-    displayName: "Kubernetes - Login"
-    condition: always()
-    timeoutInMinutes: 1
-    inputs:
-      connectionType: Kubernetes Service Connection
-      kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
-      command: login
 
     # Should show, that the cluster is deleted
   - script: |
