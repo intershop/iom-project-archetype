@@ -112,13 +112,6 @@ jobs:
     displayName: "Docker - login to Dockerhub"
 
   - task: Kubernetes@1
-    displayName: "Kubernetes - Login"
-    inputs:
-      connectionType: Kubernetes Service Connection
-      kubernetesServiceEndpoint: $(IOM_AKS_SERVICE_ENDPOINT)
-      command: login
-
-  - task: Kubernetes@1
     displayName: "Kubernetes - Create Namespace"
     inputs:
       connectionType: Kubernetes Service Connection
