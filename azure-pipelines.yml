@@ -147,12 +147,12 @@ jobs:
   - script: |
       set -e
       kubectl create namespace "$IOM_AKS_NAMESPACE"
-      # $HOME/.docker/config.json holds credentials for all registries logged in above
-      # (IOM_DEVOPS_ACR_CONNECTION and IOM_DOCKERHUB_CONNECTION), so one secret covers both.
-      kubectl create secret generic iomdevops-pull-secret \
-        --from-file=.dockerconfigjson="$HOME/.docker/config.json" \
-        --type=kubernetes.io/dockerconfigjson \
-        --namespace="$IOM_AKS_NAMESPACE"
+      # iomdevops-pull-secret is maintained centrally in the default namespace and
+      # covers all required registries (DevOps ACR + Docker Hub). Copy it into the
+      # CI namespace so the Helm chart can use it as an imagePullSecret.
+      kubectl get secret iomdevops-pull-secret --namespace=default -o yaml \
+        | sed "s/namespace: default/namespace: $IOM_AKS_NAMESPACE/" \
+        | kubectl apply --namespace="$IOM_AKS_NAMESPACE" -f -
     timeoutInMinutes: 1
     displayName: "Kubernetes - Create Namespace and Pull Secret"
 
