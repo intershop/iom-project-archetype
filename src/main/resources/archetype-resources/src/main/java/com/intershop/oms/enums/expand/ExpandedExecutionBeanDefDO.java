@@ -1,4 +1,4 @@
-package com.intershop.oms.enums.expand; 
+package com.intershop.oms.enums.expand;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -16,17 +16,26 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
-@ExpandedEnum(ExecutionBeanDefDO.class)
+@ExpandedEnum( ExecutionBeanDefDO.class )
 public enum ExpandedExecutionBeanDefDO implements ExecutionBeanDefDOEnumInterface
 {
-
     /**
-     * Start with 10000 to avoid conflict with ExecutionBeanDefDO.
+     * Minimum ID for custom entries: 1000 length, restriction for name: 50
      * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the db).
      */
-    EXAMPLE(-9999, "java:global/example-app/PayPalMessageTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null)
-    ;
+    EXAMPLE(Integer.valueOf(1000), "java:global/ci-project-app/OrderTransmitter", null),
+    CUSTOM_RETURN_LABEL(Integer.valueOf(10000), "java:global/ci-project-app/CustomDocumentCreationBean!bakery.logic.service.document.DocumentCreationService", null),
+    CUSTOM_ORDER_MESSAGE_TRANSMITTER(Integer.valueOf(10001), "java:global/ci-project-app/CustomOrderMessageTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_ORDER_DISPATCH_TRANSMITTER(Integer.valueOf(10002), "java:global/ci-project-app/CustomOrderDispatchTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_ORDER_RETURN_TRANSMITTER(Integer.valueOf(10003), "java:global/ci-project-app/CustomOrderReturnTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_ORDER_PAYMENT_TRANSMITTER(Integer.valueOf(10004), "java:global/ci-project-app/CustomOrderPaymentTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_ORDER_RESPONSE_TRANSMITTER(Integer.valueOf(10005), "java:global/ci-project-app/CustomOrderResponseTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_ORDER_RMA_TRANSMITTER(Integer.valueOf(10006), "java:global/ci-project-app/CustomOrderRMATransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_ORDER_DOCUMENT_TRANSMITTER(Integer.valueOf(10007), "java:global/ci-project-app/CustomOrderDocumentTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_MAIL_TRANSMITTER(Integer.valueOf(10008), "java:global/ci-project-app/CustomMailTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null),
+    CUSTOM_PAYMENT_MESSAGE_TRANSMITTER(10009, "java:global/ci-project-app/CustomPaymentMessageTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null);
+ ;
 
     private Integer id;
     private String jndiName;
@@ -101,5 +110,4 @@ public enum ExpandedExecutionBeanDefDO implements ExecutionBeanDefDOEnumInterfac
 
         return executionBeanKeyList;
     }
-    
 }

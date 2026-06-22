@@ -23,22 +23,33 @@
         <image.docker.opts>--docker-opts="--no-cache"</image.docker.opts>
         <ubuntu.mirror.x64>http://azure.archive.ubuntu.com/ubuntu/</ubuntu.mirror.x64>
         <maven.javadoc.skip>true</maven.javadoc.skip>
-        <wildfly.version>30.0.1.Final</wildfly.version>
-        <org.junit.version>5.9.2</org.junit.version>
+        <wildfly.version>40.0.0.Final</wildfly.version>
+        <org.junit.version>6.1.0</org.junit.version>
         <org.mockito.version>4.6.1</org.mockito.version>
         <net.bytebuddy.version>1.12.10</net.bytebuddy.version>
-        <testframework.version>7.1.0</testframework.version>
+        <testframework.version>8.0.0-SNAPSHOT</testframework.version>
+        <ubuntu.mirror.arm>http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports/</ubuntu.mirror.arm>
     </properties>
 
     <repositories>
         <repository>
-            <id>iom-maven-artifacts</id>
-            <url>${mavenRepoURL}</url>
+            <id>order-iom-releases</id>
+            <url>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/order-iom-releases/maven/v1</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
             <snapshots>
                 <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>order-iom-snapshots</id>
+            <url>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/order-iom-snapshots/maven/v1</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
             </snapshots>
         </repository>
     </repositories>
@@ -67,38 +78,15 @@
         
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-core-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-client</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jackson2-provider</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
 
         <!-- external libs -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.12.0</version>
+            <scope>provided</scope>
         </dependency>
         
         <dependency>
@@ -144,6 +132,25 @@
             <version>${platform.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.intershop.oms</groupId>
+            <artifactId>process-common</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.intershop</groupId>
+            <artifactId>oms.utils</artifactId>
+            <scope>provided</scope>
+            <version>${platform.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>bakery.schemas</groupId>
+            <artifactId>bakery.schemas-communication</artifactId>
+            <version>${platform.version}</version>
+        </dependency>
+
         <!-- TEST dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -158,7 +165,14 @@
             <version>${org.junit.version}</version>
             <scope>test</scope>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${org.junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
@@ -176,13 +190,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.9</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
             <groupId>com.intershop.oms</groupId>
             <artifactId>iom-test-framework</artifactId>
             <version>${testframework.version}</version>
@@ -192,7 +199,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.1</version>
+            <version>42.7.11</version>
             <scope>test</scope>
         </dependency>
 
@@ -205,37 +212,37 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>3.3.2</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.2.5</version>
+                    <version>3.5.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.4.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.12.1</version>
+                    <version>3.15.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.8.0</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.vdubus</groupId>
@@ -245,47 +252,52 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.6.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>4.0.0-M13</version>
+                    <version>4.0.0-M16</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.6.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.11</version>
+                    <version>0.8.14</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.5.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                    <version>2.21.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -359,7 +371,7 @@
                     <showWarnings>true</showWarnings>
                     <meminitial>256</meminitial>
                     <maxmem>2048</maxmem>
-                    <release>17</release>
+                    <release>21</release>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
@@ -371,6 +383,7 @@
                         <descriptor>src/assembly/bin.xml</descriptor>
                     </descriptors>
                     <appendAssemblyId>false</appendAssemblyId>
+                    <tarLongFileMode>gnu</tarLongFileMode>
                 </configuration>
                 <executions>
                     <execution>
@@ -416,7 +429,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.8.6</version>
+                                    <version>3.9.0</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -521,7 +534,7 @@
                                         in order to allow property expansion at runtime. When using <arguments> instead 
                                         you can't expand multiple CLI switches from a single property. -->
                                     <commandlineArgs>${project.build.directory}/p2d/project2docker/build.sh
-                                        ${image.docker.opts}</commandlineArgs>
+                                        -v ${image.docker.opts}</commandlineArgs>
                                     <environmentVariables>
                                         <IMAGE_BASE_NAME>${image.base.name}</IMAGE_BASE_NAME>
                                         <PROJECT_VERSION>${project.version}</PROJECT_VERSION>
@@ -532,6 +545,7 @@
                                         <IOM_REPO_NAME>${intershop.docker.repo}</IOM_REPO_NAME>
                                         <PROJECT_DIR>${project.build.directory}/p2d/p2d-dl/</PROJECT_DIR>
                                         <UBUNTU_MIRROR_X64>${ubuntu.mirror.x64}</UBUNTU_MIRROR_X64>
+                                        <UBUNTU_MIRROR_ARM>${ubuntu.mirror.arm}</UBUNTU_MIRROR_ARM>
                                     </environmentVariables>
                                     <workingDirectory>${basedir}</workingDirectory>
                                 </configuration>

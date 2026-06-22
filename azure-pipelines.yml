@@ -9,18 +9,13 @@ variables:
   # mitigation for https://issues.sonatype.org/browse/NEXUS-27902
   JDK_JAVA_OPTIONS: '--add-opens java.base/java.util=ALL-UNNAMED'
   # IOM Helm Chart
-  IOM_HELM_VERSION: 3.0.0
+  IOM_HELM_VERSION: 3.1.1
   IOM_HELM_URL: https://intershop.github.io/helm-charts
   HELM_RELEASE_NAME: archetype-test-$(Build.BuildId)
 
   # ACR
   IOM_DEVOPS_ACR_HOST: iomdevopsacr.azurecr.io
   IOM_DEVOPS_ACR_CONNECTION: order-iomDevopsACR-ISH-ENG-IOM
-
-  # IOM Docker Hub
-  # contains all release images, that are made public for our customers.
-  IOM_DOCKERHUB_HOST: docker.tools.intershop.com/iom/intershophub
-  IOM_DOCKERHUB_CONNECTION: order-iom-docker.tools.intershop.com
 
   # AKS
   AZURE_TENANT_ID: 13a9f4be-a9d5-4987-bdf2-f31cc074034f
@@ -34,7 +29,7 @@ variables:
   IOM_AKS_NAMESPACE: $(HELM_RELEASE_NAME)
 
   # JDK to be used by Maven + Project build
-  JDK_MAJOR_VERSION: 17
+  JDK_MAJOR_VERSION: 21
 
   # directory name with archetype sources
   ARCHETYPE_PATH: order-iom-project-archetype
@@ -100,7 +95,7 @@ jobs:
 
   - task: MavenAuthenticate@0
     inputs:
-      artifactsFeeds: iom-maven-artifacts
+      artifactsFeeds: order-iom-releases,order-iom-snapshots
       mavenServiceConnections: order-iom-sonatype-ossrh
     timeoutInMinutes: 1
     displayName: "Maven - authenticate"
@@ -111,13 +106,6 @@ jobs:
       containerRegistry: $(IOM_DEVOPS_ACR_CONNECTION)
     timeoutInMinutes: 1
     displayName: "Docker - login to DevOps ACR"
-
-  - task: Docker@2
-    inputs:
-      command: login
-      containerRegistry: $(IOM_DOCKERHUB_CONNECTION)
-    timeoutInMinutes: 1
-    displayName: "Docker - login to Dockerhub"
 
   - script: |
       set -e

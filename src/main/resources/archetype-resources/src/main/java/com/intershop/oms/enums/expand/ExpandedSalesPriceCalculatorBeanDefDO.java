@@ -2,76 +2,69 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
-import bakery.persistence.annotation.ExpandedEnum;
-import bakery.persistence.dataobject.configuration.salesprice.SalesPriceCalculatorBeanDefDO;
-import bakery.persistence.dataobject.transformer.EnumInterface;
-import bakery.util.DeploymentConfig;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
-@ExpandedEnum(SalesPriceCalculatorBeanDefDO.class)
-public enum ExpandedSalesPriceCalculatorBeanDefDO implements EnumInterface {
+import bakery.persistence.annotation.ExpandedEnum;
+import bakery.persistence.dataobject.configuration.salesprice.SalesPriceCalculatorBeanDefDO;
+import bakery.persistence.dataobject.transformer.EnumInterface;
+import bakery.util.DeploymentConfig;
 
-    /**
-     * Start with 10000 to avoid conflict with SalesPriceCalculatorBeanDefDO.
-     * The name must be unique across both classes. Values with negative id are
-     * meant as syntax example and are ignored (won't get persisted within the
-     * database).
-     */
 
-    EXAMPLE(-9999, "java:global/example-app/ExampleCalculatorBean!bakery.logic.service.util.SalesPriceCalculator");
+@ExpandedEnum( SalesPriceCalculatorBeanDefDO.class )
+public enum ExpandedSalesPriceCalculatorBeanDefDO implements EnumInterface
+{
+	// start with 1000 to avoid conflicts with SalesPriceCalculatorBeanDefDO
+	// the name must be unique across both classes
+	// values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+	EXAMPLE( Integer.valueOf( -999 ), "java:global/ci-project-app/ExampleSalesPriceCalculator" ),
+	CUSTOM_GROSS_CALCULATION( Integer.valueOf( 1023 ), "java:global/ci-project-app/SalesPriceCalculatorB2B!bakery.logic.service.util.SalesPriceCalculator" );
 
-    private Integer id;
-    private String jndiName;
 
-    private ExpandedSalesPriceCalculatorBeanDefDO(Integer id, String jndiName)
-    {
-        this.id = id;
-        this.jndiName = String.format(jndiName, DeploymentConfig.APP_VERSION);
-    }
+	private Integer id;
+	private String jndiName;
 
-    @Override
-    @Id
-    public Integer getId(){
-        
-        return this.id;
-    }
+	private ExpandedSalesPriceCalculatorBeanDefDO( Integer id, String jndiName ) {
 
-    @Override
-    @Column(name = "description")
-    public String getName()
-    {
-        return this.name();
-    }
+		this.id = id;
+		this.jndiName = String.format( jndiName, DeploymentConfig.APP_VERSION );
 
-    @Override
-    @Transient
-    public String getJndiName()
-    {
-        return this.jndiName;
-    }
+	}
 
-    /**
-     * get list of expanded enums
-     * 
-     * @return
-     */
-    @Transient
-    public final EnumSet<ExpandedSalesPriceCalculatorBeanDefDO> getExpandedEnums()
-    {
-        return EnumSet.allOf(ExpandedSalesPriceCalculatorBeanDefDO.class);
-    }
+	@Override
+	@Id
+	public Integer getId() {
+		return this.id;
+	}
 
-    /**
-     * get list of all enums
-     * 
-     * @return
-     */
-    @Transient
-    public final EnumSet<SalesPriceCalculatorBeanDefDO> getAllEnums()
-    {
-        return EnumSet.allOf(SalesPriceCalculatorBeanDefDO.class);
-    }
-    
+	@Override
+	@Column( name = "description" )
+	public String getName() {
+		return this.name();
+	}
+
+	@Override
+	@Transient
+	public String getJndiName() {
+		return this.jndiName;
+	}
+
+	/**
+	 * get list of expanded enums
+	 * @return
+	 */
+	@Transient
+	public final EnumSet<ExpandedSalesPriceCalculatorBeanDefDO> getExpandedEnums(){
+		return EnumSet.allOf( ExpandedSalesPriceCalculatorBeanDefDO.class );
+	}
+
+	/**
+	 * get list of all enums
+	 * @return
+	 */
+	@Transient
+	public final EnumSet<SalesPriceCalculatorBeanDefDO> getAllEnums(){
+		return EnumSet.allOf( SalesPriceCalculatorBeanDefDO.class );
+	}
 }

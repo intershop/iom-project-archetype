@@ -1,110 +1,59 @@
 package com.intershop.oms.ps.ordervalidation;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.ejb.TransactionAttribute;
-import jakarta.ejb.TransactionAttributeType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bakery.logic.service.configuration.PaymentProviderLogicService;
-import bakery.logic.service.configuration.ShopLogicService;
-import bakery.logic.service.exception.MissingFieldException;
+import bakery.logic.service.exception.IncorrectValueException;
 import bakery.logic.service.order.task.ValidateOrderPT;
 import bakery.logic.valueobject.ProcessContainer;
+import bakery.persistence.dataobject.order.OrderAddressDO;
 import bakery.persistence.dataobject.order.OrderDO;
-import bakery.persistence.dataobject.order.OrderPosDO;
-import bakery.persistence.util.ErrorTextFormatter;
-import bakery.util.exception.DatabaseException;
-import bakery.util.exception.ModifiedObjectException;
+import bakery.util.NamedId;
 import bakery.util.exception.NoObjectException;
-import bakery.util.exception.TechnicalException;
 import bakery.util.exception.ValidationException;
 
 @Stateless
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class ValidateMandatoryPropertiesPTBean implements ValidateOrderPT
 {
-    @EJB(lookup = PaymentProviderLogicService.LOGIC_PAYMENTPROVIDERLOGICBEAN)
-    private PaymentProviderLogicService paymentProviderLogicService;
-
-    @EJB(lookup = ShopLogicService.LOGIC_SHOPLOGICBEAN)
-    private ShopLogicService shopLogicService;
-
-    private Logger log = LoggerFactory.getLogger(ValidateMandatoryPropertiesPTBean.class);
-
-    public static final Map<String, String> MANDATORY_POSITION_PROPERTIES;
-    public static final Map<String, String> MANDATORY_ORDER_PROPERTIES;
-
-    static
-    {
-        MANDATORY_POSITION_PROPERTIES = new HashMap<>();
-        MANDATORY_ORDER_PROPERTIES = new HashMap<>();
-
-    }
+    private static Logger logger = LoggerFactory.getLogger(ValidateMandatoryPropertiesPTBean.class);
 
     @Override
-    public ProcessContainer execute(ProcessContainer processContainer)
-                    throws ValidationException, NoObjectException, DatabaseException, ModifiedObjectException
+    public ProcessContainer execute(ProcessContainer container) throws ValidationException, NoObjectException
     {
-        OrderDO orderDO = processContainer.getOrderDO();
+        /*
+         * get order from process container
+         */
+        OrderDO orderDO = container.getOrderDO();
 
-        if (null == orderDO)
+        logger.info("ValidateMandatoryPropertiesPTBean - startet for order: {}", container.getObjectId());
+
+        if (orderDO != null)
         {
-            log.error("can't find order object in process container");
-            throw new TechnicalException(OrderDO.class, "OrderDO in processcontainer is null");
-        }
-
-        ValidationException validationException = new ValidationException(orderDO);
-
-        for (Entry<String, String> propertyGroupKey : MANDATORY_ORDER_PROPERTIES.entrySet())
-        {
-            if (isBlank(orderDO.getPropertyValue(propertyGroupKey.getKey(), propertyGroupKey.getValue())))
+            OrderAddressDO orderAddressDO = orderDO.getBillingAddress();
+            if (orderAddressDO != null)
             {
-                MissingFieldException mfe = new MissingFieldException("GROUP: [" + propertyGroupKey.getKey()
-                                + "] KEY: [" + propertyGroupKey.getValue() + "]");
-                validationException.getExceptionList().add(mfe);
-            }
-        }
+                boolean valid = true;
+                // validate order billing address here
 
-        for (OrderPosDO orderPos : orderDO.getOrderPosDOList())
-        {
-            ValidationException positionValidationException = new ValidationException(orderPos);
-            for (Entry<String, String> propertyGroupKey : MANDATORY_POSITION_PROPERTIES.entrySet())
-            {
-                if (isBlank(orderPos.getPropertyValue(propertyGroupKey.getKey(), propertyGroupKey.getValue())))
+                if (!valid)
                 {
-                    MissingFieldException mfe = new MissingFieldException("GROUP: [" + propertyGroupKey.getKey()
-                                    + "] KEY: [" + propertyGroupKey.getValue() + "]");
-                    positionValidationException.getExceptionList().add(mfe);
+                    throw new ValidationException(orderAddressDO, new IncorrectValueException("id", orderAddressDO.getId().toString(), ""));
                 }
             }
-
-            if (positionValidationException.hasExceptions())
+            else
             {
-                validationException.getExceptionList().add(positionValidationException);
+                throw new NoObjectException(OrderAddressDO.class, new NamedId("OrderBillingAddress"));
             }
-
-            // add other properties here
-
         }
-
-        if (validationException.hasExceptions())
+        else
         {
-            log.error("Order is missing mandatory properties: " + orderDO.getShopOrderNo());
-            orderDO.addErrorText(ErrorTextFormatter.formattingErrorText(validationException));
-            throw validationException;
+            throw new NoObjectException(OrderDO.class, new NamedId("OrderDO"));
         }
 
-        return processContainer;
+        logger.info("ValidateMandatoryPropertiesPTBean - finished for order: {}", container.getObjectId());
+
+        return container;
     }
-
-
 }

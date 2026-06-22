@@ -2,35 +2,32 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.order.OrderExportConfigBeanDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@ExpandedEnum(OrderExportConfigBeanDefDO.class)
+
+@ExpandedEnum( OrderExportConfigBeanDefDO.class )
 public enum ExpandedOrderExportConfigBeanDefDO implements EnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with OrderExportConfigBeanDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-
-    EXAMPLE(-9999, "java:global/example-app/example-ejb/ExampleOrderExportConfigBean!bakery.logic.job.transformation.Transformer")
-    ;
+    // start with 1000 to avoid conflicts with OrderExportConfigBeanDefDO
+    // the description  must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE( Integer.valueOf( -999 ), "java:global/ci-project-app/ExampleOrderExportConfigBean!bakery.logic.job.transformation.Transformer" );
 
     private Integer id;
     private String jndiName;
 
-    private ExpandedOrderExportConfigBeanDefDO(Integer id, String jndiName)
+    private ExpandedOrderExportConfigBeanDefDO( Integer id, String jndiName )
     {
         this.id = id;
-        this.jndiName = String.format(jndiName, DeploymentConfig.APP_VERSION);
+        this.jndiName = String.format( jndiName, DeploymentConfig.APP_VERSION );
     }
 
     @Override
@@ -41,10 +38,10 @@ public enum ExpandedOrderExportConfigBeanDefDO implements EnumInterface
     }
 
     @Override
-    @Column(name = "description")
+    @Column( name = "description" )
     public String getName()
     {
-        return StringUtils.constantToHungarianNotation(name(), StringUtils.FLAG_FIRST_LOWER);
+        return StringUtils.constantToHungarianNotation( name(), StringUtils.FLAG_FIRST_LOWER );
     }
 
     @Override
@@ -61,7 +58,7 @@ public enum ExpandedOrderExportConfigBeanDefDO implements EnumInterface
     @Transient
     public final EnumSet<ExpandedOrderExportConfigBeanDefDO> getExpandedEnums()
     {
-        return EnumSet.allOf(ExpandedOrderExportConfigBeanDefDO.class);
+        return EnumSet.allOf( ExpandedOrderExportConfigBeanDefDO.class );
     }
 
     /**
@@ -71,7 +68,6 @@ public enum ExpandedOrderExportConfigBeanDefDO implements EnumInterface
     @Transient
     public final EnumSet<OrderExportConfigBeanDefDO> getAllEnums()
     {
-        return EnumSet.allOf(OrderExportConfigBeanDefDO.class);
+        return EnumSet.allOf( OrderExportConfigBeanDefDO.class );
     }
-
 }

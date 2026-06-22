@@ -2,28 +2,28 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.connections.DecisionBeanDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@ExpandedEnum(DecisionBeanDefDO.class)
+@ExpandedEnum( DecisionBeanDefDO.class )
 public enum ExpandedDecisionBeanDefDO implements EnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with DecisionBeanDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-
-    EXAMPLE1(-9999, "java:global/example-app/InvoicingDecisionBean"),
-    EXAMPLE2(-9998, "java:global/example-app/TBD")
-    ;
+    // start with 10000 to avoid conflict with DecisionBeanDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE( Integer.valueOf( -999 ), "java:global/ci-project-app/ExampleDecisionBean!bakery.logic.job.transformation.Transformer" ),
+    INVOICE_DECISION_BEAN( 10000, "java:global/ci-project-app/InvoicingDecisionBean" ),
+    CUSTOM_PAYMENT_DECISION_BEAN( 10003, "java:global/ci-project-app/CustomPaymentDecisionBean" ),
+    APPROVAL_DECISION_BEAN( 10004, "java:global/ci-project-app/ApprovalDecisionBean" ),
+    MAIL_APPROVAL_DECISION_BEAN( 10005, "java:global/ci-project-app/MailApprovalDecisionBean" ),
+    ORDER_LIMIT_DECISION_BEAN( 10006, "java:global/ci-project-app/OrderLimitDecisionBean" );
 
     private Integer id;
     private String jndiName;
@@ -74,5 +74,4 @@ public enum ExpandedDecisionBeanDefDO implements EnumInterface
     {
         return EnumSet.allOf( DecisionBeanDefDO.class );
     }
-
 }

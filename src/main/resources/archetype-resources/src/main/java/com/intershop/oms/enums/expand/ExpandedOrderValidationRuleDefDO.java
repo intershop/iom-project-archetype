@@ -2,27 +2,27 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
-import bakery.persistence.annotation.ExpandedEnum;
-import bakery.persistence.dataobject.configuration.common.OrderValidationRuleDefDO;
-import bakery.persistence.expand.OrderValidationRuleDefDOEnumInterface;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
-@ExpandedEnum(OrderValidationRuleDefDO.class)
+import bakery.persistence.annotation.ExpandedEnum;
+import bakery.persistence.dataobject.configuration.common.OrderValidationRuleDefDO;
+import bakery.persistence.expand.OrderValidationRuleDefDOEnumInterface;
+
+@ExpandedEnum( OrderValidationRuleDefDO.class )
 public enum ExpandedOrderValidationRuleDefDO implements OrderValidationRuleDefDOEnumInterface
 {
-
     /**
-     * Start with 10000 to avoid conflict with OrderValidationRuleDefDO. The
-     * name must be unique across both classes. Values with negative id are
-     * meant as syntax example and are ignored (won't get persisted within the
-     * database).
+     * Minimum ID for custom entries: 1000 length, restriction for name: 50
+     * The name must be unique across both classes.
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the db).
      */
-
-    VALIDATE_PROPERTIES(-9999, "ValidateMandatoryPropertiesPTBean", "java:global/example-app/ValidateMandatoryPropertiesPTBean!bakery.logic.service.order.task.ValidateOrderPT", 999, false, "")
+    EXAMPLE( Integer.valueOf( -999 ), "Test-Rule", "java:global/ci-project-app/ExampleOrderValidationRuleDefDO!bakery.logic.service.order.task.ValidateOrderPT", 1001, Boolean.FALSE.booleanValue(), "" ),
+    PROPERTY_FAIL(Integer.valueOf(10000), "CustomOrderPropertyValidationPTBean", "java:global/ci-project-app/CustomOrderPropertyValidationPTBean!bakery.logic.service.order.task.ValidateOrderPT", 1002, false, "Validation fails if a custom property group|key = fail|fail on order-level is given."),
+    CUSTOMER_PROPERTIES(Integer.valueOf(10001), "AddDefaultPropertiesForNewCustomersPTBean", "java:global/ci-project-app/AddDefaultPropertiesForNewCustomersPTBean!bakery.logic.service.order.task.ValidateOrderPT", 1003, false, "Add custom properties to existing customers if not existing yet.")
     ;
-    
+
     private Integer id;
     private String name;
     private String jndiName;

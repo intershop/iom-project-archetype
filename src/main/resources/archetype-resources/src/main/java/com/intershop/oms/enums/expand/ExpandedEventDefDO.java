@@ -10,13 +10,11 @@ import jakarta.persistence.Transient;
 @ExpandedEnum(EventDefDO.class)
 public enum ExpandedEventDefDO implements EventDefDOEnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with EventDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-    CUSTOM_MAIL_EVENT_MANAGER(-9999, "CUSTOM_MAIL_EVENT_MANAGER_BEAN", "java:global/example-app/CustomMailEventManagerBean");
+    // start with 1000 to avoid conflicts with EventDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the DB)
+    EXAMPLE(Integer.valueOf(-999), "Example Event", "example.event.key"),
+    CUSTOM_ORDER_EVENT_MANAGER(1000, "CUSTOM_ORDER_EVENT_MANAGER", "java:global/ci-project-app/CustomOrderEventManagerBean");
 
     private Integer id;
     private String description;
@@ -29,6 +27,11 @@ public enum ExpandedEventDefDO implements EventDefDOEnumInterface
         this.jndiName = jndiName;
     }
 
+    /**
+     * Returns the ID of the event.
+     *
+     * @return the ID of the event.
+     */
     @Override
     @Id
     public Integer getId()
@@ -36,11 +39,21 @@ public enum ExpandedEventDefDO implements EventDefDOEnumInterface
         return id;
     }
 
+    /**
+     * Sets the ID of the event.
+     *
+     * @return
+     */
     protected void setId(Integer id)
     {
         this.id = id;
     }
 
+    /**
+     * Returns the description of the event.
+     *
+     * @return the description of the event.
+     */
     @Override
     @Column(name = "`description`")
     public String getDescription()
@@ -48,12 +61,19 @@ public enum ExpandedEventDefDO implements EventDefDOEnumInterface
         return description;
     }
 
+    /**
+     * Sets the description of the event.
+     *
+     * @return
+     */
     public void setDescription(String description)
     {
         this.description = description;
     }
 
     /**
+     * Returns the JNDI-name of the event.
+     *
      * @return the JNDI-name of the event.
      */
     @Override
@@ -68,6 +88,4 @@ public enum ExpandedEventDefDO implements EventDefDOEnumInterface
     {
         return String.format(jndiName, bakery.util.DeploymentConfig.APP_VERSION);
     }
-    
 }
-

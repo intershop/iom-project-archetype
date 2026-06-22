@@ -69,7 +69,7 @@
             <!-- we need dummy sources/javadoc for maven central -->
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.4.2</version>
                 <executions>
                     <execution>
                         <id>javadoc-jar</id>

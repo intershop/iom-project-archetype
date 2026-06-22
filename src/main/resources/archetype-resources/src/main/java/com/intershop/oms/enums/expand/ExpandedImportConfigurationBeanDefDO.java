@@ -2,35 +2,34 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.article.configuration.ImportConfigurationBeanDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@ExpandedEnum(ImportConfigurationBeanDefDO.class)
+
+@ExpandedEnum( ImportConfigurationBeanDefDO.class )
 public enum ExpandedImportConfigurationBeanDefDO implements EnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with ImportConfigurationBeanDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-
-    EXAMPLE(-9999, "java:global/example-app/ExampleImportConfigurationBean!bakery.logic.job.transformation.Transformer")
-    ;
+    // start with 1000 to avoid conflicts with ImportConfigurationBeanDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE( Integer.valueOf( -999 ), "java:global/ci-project-app/ExampleImportConfigurationBean!bakery.logic.job.transformation.Transformer" );
 
     private Integer id;
     private String jndiName;
 
-    private ExpandedImportConfigurationBeanDefDO(Integer id, String jndiName)
+    private ExpandedImportConfigurationBeanDefDO( Integer id, String jndiName )
     {
+
         this.id = id;
-        this.jndiName = String.format(jndiName, DeploymentConfig.APP_VERSION);
+        this.jndiName = String.format( jndiName, DeploymentConfig.APP_VERSION );
+
     }
 
     @Override
@@ -41,10 +40,10 @@ public enum ExpandedImportConfigurationBeanDefDO implements EnumInterface
     }
 
     @Override
-    @Column(name = "`description`")
+    @Column( name = "`description`" )
     public String getName()
     {
-        return StringUtils.constantToHungarianNotation(name(), StringUtils.FLAG_FIRST_LOWER);
+        return StringUtils.constantToHungarianNotation( name(), StringUtils.FLAG_FIRST_LOWER );
     }
 
     @Override
@@ -61,7 +60,7 @@ public enum ExpandedImportConfigurationBeanDefDO implements EnumInterface
     @Transient
     public final EnumSet<ExpandedImportConfigurationBeanDefDO> getExpandedEnums()
     {
-        return EnumSet.allOf(ExpandedImportConfigurationBeanDefDO.class);
+        return EnumSet.allOf( ExpandedImportConfigurationBeanDefDO.class );
     }
 
     /**
@@ -71,7 +70,6 @@ public enum ExpandedImportConfigurationBeanDefDO implements EnumInterface
     @Transient
     public final EnumSet<ImportConfigurationBeanDefDO> getAllEnums()
     {
-        return EnumSet.allOf(ImportConfigurationBeanDefDO.class);
+        return EnumSet.allOf( ImportConfigurationBeanDefDO.class );
     }
-    
 }

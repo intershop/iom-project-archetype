@@ -19,11 +19,10 @@ import org.reflections.scanners.Scanners;
 
 // this test class can be used to perform some static "code analysis" to check
 // for missing annotations
-public class BeanAnnotationTest
+class BeanAnnotationTest
 {
-    @SuppressWarnings("static-method")
     @Test
-    public void test() throws Exception
+    void test() throws Exception
     {
         Reflections reflectionsFramework = new Reflections("com.intershop.oms.ps",  Scanners.SubTypes.filterResultsBy(s -> true));
         // you can add custom java packages like this:

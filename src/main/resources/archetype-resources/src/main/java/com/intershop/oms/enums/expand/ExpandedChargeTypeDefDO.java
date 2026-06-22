@@ -1,27 +1,26 @@
 package com.intershop.oms.enums.expand;
 
-import bakery.persistence.annotation.ExpandedEnum;
-import bakery.persistence.dataobject.configuration.common.ChargeTypeDefDO;
-import bakery.persistence.expand.ChargeTypeDefDOEnumInterface;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
+import bakery.persistence.annotation.ExpandedEnum;
+import bakery.persistence.dataobject.configuration.common.ChargeTypeDefDO;
+import bakery.persistence.expand.ChargeTypeDefDOEnumInterface;
+
 @ExpandedEnum(ChargeTypeDefDO.class)
 public enum ExpandedChargeTypeDefDO implements ChargeTypeDefDOEnumInterface
 {
-    /**
-     * Start with 10000 to avoid conflict with DecisionBeanDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-    CONTAINER_SERVICE_CHARGE(Integer.valueOf(-9999), "Container Service Charge", "Container charge", "Container service charges");
+    // start with 1000 to avoid conflicts with ChargeTypeDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+	CONTAINER_SERVICE_CHARGE(Integer.valueOf(1000), "Container Service Charge", "Container Charge", "Container Service Charges");
 
     private Integer id;
     private String name;
     private String chargeType;
     private String description;
-    
+
     private ExpandedChargeTypeDefDO(Integer id, String name, String chargeType, String description)
     {
         this.id = id;
@@ -30,30 +29,48 @@ public enum ExpandedChargeTypeDefDO implements ChargeTypeDefDOEnumInterface
         this.description = description;
     }
 
+    /**
+     * @return Id of the charge type
+     */
     @Override
     @Id
     public Integer getId()
     {
         return this.id;
     }
-    
+
+    /**
+     * @param id
+     *      the Id of the charge type
+     */
     void setId(Integer id)
     {
         this.id = id;
     }
 
+    /**
+     * @return the name of the charge type
+     */
     @Override
     @Column(name="`name`", length = 50, nullable = false)
     public String getName()
     {
         return this.name;
     }
-    
+
+    /**
+     * @param name
+     *      the name of the charge type
+     */
     void setName(String name)
     {
         this.name = name;
     }
 
+    /**
+     * @param description
+     *      the description of the charge type
+     */
     @Override
     @Column(name = "`description`")
     public String getDescription()
@@ -67,13 +84,19 @@ public enum ExpandedChargeTypeDefDO implements ChargeTypeDefDOEnumInterface
         //dummy setter for the needs of hibernate
     }
 
+    /**
+     * @return the type of charge
+     */
     @Override
     @Transient
     public String getChargeType()
     {
         return this.chargeType;
     }
-    
+
+    /**
+     * @return the enum name of the charge type
+     */
     @Override
     @Column(name = "`chargeType`")
     public String getEnumName()
