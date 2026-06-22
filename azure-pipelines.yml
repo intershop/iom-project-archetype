@@ -147,8 +147,12 @@ jobs:
   - script: |
       set -e
       kubectl create namespace "$IOM_AKS_NAMESPACE"
+      kubectl create secret generic iomdevops-pull-secret \
+        --from-file=.dockerconfigjson="$HOME/.docker/config.json" \
+        --type=kubernetes.io/dockerconfigjson \
+        --namespace="$IOM_AKS_NAMESPACE"
     timeoutInMinutes: 1
-    displayName: "Kubernetes - Create Namespace"
+    displayName: "Kubernetes - Create Namespace and Pull Secret"
 
   - script: |
       if mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tail -1 | grep -q -- -SNAPSHOT ; then

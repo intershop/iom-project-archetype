@@ -88,8 +88,7 @@ resources:
     memory: 2048Mi
 
 imagePullSecrets:
-  - name: intershop-pull-secret
-  - name: devops-pull-secret
+  - name: iomdevops-pull-secret
   
 serviceAccount:
   # Specifies whether a service account should be created
