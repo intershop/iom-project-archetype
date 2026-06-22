@@ -226,6 +226,19 @@ jobs:
     timeoutInMinutes: 20
     displayName: "Helm - install archetype-test release"
 
+  - script: |
+      echo "##[section] describe all pods"
+      kubectl get pods -n "$IOM_AKS_NAMESPACE"
+      for POD in $(kubectl get pods -n "$IOM_AKS_NAMESPACE" -o jsonpath='{.items[*].metadata.name}'); do
+        echo "##[section] kubectl describe pod/$POD"
+        kubectl describe pod "$POD" -n "$IOM_AKS_NAMESPACE" || true
+        echo "##[section] kubectl logs pod/$POD"
+        kubectl logs "$POD" -n "$IOM_AKS_NAMESPACE" --all-containers --previous=false || true
+      done
+    condition: failed()
+    timeoutInMinutes: 5
+    displayName: "Diagnostics - describe and log pods on failure"
+
   # CLEANUP TASKS
   - script: |
       helm uninstall $(HELM_RELEASE_NAME) \
