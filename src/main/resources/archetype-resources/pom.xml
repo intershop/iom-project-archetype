@@ -27,7 +27,7 @@
         <org.junit.version>6.1.0</org.junit.version>
         <org.mockito.version>4.6.1</org.mockito.version>
         <net.bytebuddy.version>1.12.10</net.bytebuddy.version>
-        <testframework.version>8.0.0-SNAPSHOT</testframework.version>
+        <testframework.version>8.0.0</testframework.version>
         <ubuntu.mirror.arm>http://ftp.tu-chemnitz.de/pub/linux/ubuntu-ports/</ubuntu.mirror.arm>
     </properties>
 
@@ -303,6 +303,23 @@
         </pluginManagement>
         
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <configuration>
+                    <!-- Keep target/ directory intact so a devenv bind-mount survives mvn clean. -->
+                    <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                    <filesets>
+                        <fileset>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>**/*</include>
+                            </includes>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

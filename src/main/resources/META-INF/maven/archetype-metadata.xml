@@ -9,7 +9,7 @@
             <defaultValue>${artifactId}</defaultValue>
         </requiredProperty>
         <requiredProperty key="platformVersion">
-            <defaultValue>6.0.0-SNAPSHOT</defaultValue>
+            <defaultValue>6.0.0</defaultValue>
         </requiredProperty>
         <requiredProperty key="intershopDockerRepo">
             <defaultValue>docker.io/library/</defaultValue>
