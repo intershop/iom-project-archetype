@@ -220,7 +220,7 @@ The distinction: `archetype-metadata.xml` defaults are for customers generating 
 
 `dbaccount.image.tag`: `2.0.0` → `2.1.0`
 
-`kubectlImageRepository`: add override `ishpwa.azurecr.io/bitnami/kubectl:1.32.1` — the IOM Helm chart defaults to `docker.io/bitnami/kubectl:1.32.1` which is unavailable in the CI AKS environment. The chart docs recommend using the ACR-mirrored image for Intershop-hosted systems.
+`kubectlImageRepository`: add override `registry.k8s.io/kubectl:v1.32.1` — the IOM Helm chart defaults to `docker.io/bitnami/kubectl:1.32.1` which is unavailable in the CI AKS environment. Use the official Kubernetes project image (`registry.k8s.io`) instead: publicly accessible without authentication, no Docker Hub rate limits, works for all customers.
 
 ### 10. `dependency-helper/pom.xml`
 
