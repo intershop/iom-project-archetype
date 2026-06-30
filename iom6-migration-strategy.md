@@ -220,6 +220,10 @@ The distinction: `archetype-metadata.xml` defaults are for customers generating 
 
 `dbaccount.image.tag`: `2.0.0` → `2.1.0`
 
+### 10. `dependency-helper/pom.xml`
+
+**Remove** `com.intershop.oms:order-state-app` — the Order State REST API v1 was removed in IOM 6, and with it the `order-state-app` module no longer exists in the platform. The ci-project still references it (against a 5.x SNAPSHOT), but it does not exist at version 6.0.0 in `iom-maven-artifacts`.
+
 ---
 
 ## General Rule: No SNAPSHOT versions in the archetype
@@ -244,8 +248,9 @@ Current SNAPSHOT scan result: only `version=0.0.1-SNAPSHOT` (archetype.propertie
 
 1. `pom.xml` — versions, dependencies, repositories, clean plugin
 2. `archetype-metadata.xml` + `archetype.properties` defaults
-3. Enum files (21 replacements with archetype placeholder values)
-4. `ps/` Java sources — API compatibility fixes
-5. `azure-pipelines.yml`
+3. `dependency-helper/pom.xml` — remove `order-state-app`
+4. Enum files (21 replacements with archetype placeholder values)
+5. `ps/` Java sources — API compatibility fixes
+6. `azure-pipelines.yml`
 6. `helm-values-test.yaml`
 7. Local build verification via `/dev-local`
