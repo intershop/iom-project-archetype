@@ -220,6 +220,8 @@ The distinction: `archetype-metadata.xml` defaults are for customers generating 
 
 `dbaccount.image.tag`: `2.0.0` → `2.1.0`
 
+`kubectlImageRepository`: add override `ishpwa.azurecr.io/bitnami/kubectl:1.32.1` — the IOM Helm chart defaults to `docker.io/bitnami/kubectl:1.32.1` which is unavailable in the CI AKS environment. The chart docs recommend using the ACR-mirrored image for Intershop-hosted systems.
+
 ### 10. `dependency-helper/pom.xml`
 
 **Remove** `com.intershop.oms:order-state-app` — the Order State REST API v1 was removed in IOM 6, and with it the `order-state-app` module no longer exists in the platform. The ci-project still references it (against a 5.x SNAPSHOT), but it does not exist at version 6.0.0 in `iom-maven-artifacts`.
