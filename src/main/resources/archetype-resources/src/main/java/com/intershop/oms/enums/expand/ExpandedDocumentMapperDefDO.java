@@ -1,7 +1,10 @@
 package com.intershop.oms.enums.expand;
 
 import bakery.persistence.annotation.ExpandedEnum;
+import bakery.persistence.dataobject.Configuration;
 import bakery.persistence.dataobject.configuration.common.DocumentMapperDefDO;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import bakery.persistence.expand.DocumentMapperDefDOEnumInterface;
 import bakery.util.StringUtils;
 import bakery.util.ejb.EJBHelper;
@@ -9,6 +12,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
+@Entity
+@Table(name = "`DocumentMapperDefDO`")
+@Configuration
 @ExpandedEnum(DocumentMapperDefDO.class)
 public enum ExpandedDocumentMapperDefDO implements DocumentMapperDefDOEnumInterface
 {
