@@ -2,24 +2,23 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.common.IdentCodeGenerationBeanDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@ExpandedEnum(IdentCodeGenerationBeanDefDO.class)
+
+@ExpandedEnum( IdentCodeGenerationBeanDefDO.class )
 public enum ExpandedIdentCodeGenerationBeanDefDO implements EnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with IdentCodeGenerationBeanDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
+    // start with 1000 to avoid conflicts with IdentCodeGenerationBeanDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
 
     // FIXME: give an example
     ;
@@ -27,10 +26,10 @@ public enum ExpandedIdentCodeGenerationBeanDefDO implements EnumInterface
     private Integer id;
     private String jndiName;
 
-    private ExpandedIdentCodeGenerationBeanDefDO(Integer id, String jndiName)
+    private ExpandedIdentCodeGenerationBeanDefDO( Integer id, String jndiName )
     {
         this.id = id;
-        this.jndiName = String.format(jndiName, DeploymentConfig.APP_VERSION);
+        this.jndiName = String.format( jndiName, DeploymentConfig.APP_VERSION );
     }
 
     @Override
@@ -41,10 +40,10 @@ public enum ExpandedIdentCodeGenerationBeanDefDO implements EnumInterface
     }
 
     @Override
-    @Column(name = "\"name\"")
+    @Column( name = "\"name\"" )
     public String getName()
     {
-        return StringUtils.constantToHungarianNotation(name(), StringUtils.FLAG_FIRST_LOWER);
+        return StringUtils.constantToHungarianNotation( name(), StringUtils.FLAG_FIRST_LOWER );
     }
 
     @Override
@@ -61,7 +60,7 @@ public enum ExpandedIdentCodeGenerationBeanDefDO implements EnumInterface
     @Transient
     public final EnumSet<ExpandedIdentCodeGenerationBeanDefDO> getExpandedEnums()
     {
-        return EnumSet.allOf(ExpandedIdentCodeGenerationBeanDefDO.class);
+        return EnumSet.allOf( ExpandedIdentCodeGenerationBeanDefDO.class );
     }
 
     /**
@@ -71,7 +70,6 @@ public enum ExpandedIdentCodeGenerationBeanDefDO implements EnumInterface
     @Transient
     public final EnumSet<IdentCodeGenerationBeanDefDO> getAllEnums()
     {
-        return EnumSet.allOf(IdentCodeGenerationBeanDefDO.class);
+        return EnumSet.allOf( IdentCodeGenerationBeanDefDO.class );
     }
-    
 }

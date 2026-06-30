@@ -1,4 +1,4 @@
-package com.intershop.oms.enums.expand; 
+package com.intershop.oms.enums.expand;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -16,16 +16,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
-@ExpandedEnum(ExecutionBeanDefDO.class)
+@ExpandedEnum( ExecutionBeanDefDO.class )
 public enum ExpandedExecutionBeanDefDO implements ExecutionBeanDefDOEnumInterface
 {
-
     /**
-     * Start with 10000 to avoid conflict with ExecutionBeanDefDO.
+     * Minimum ID for custom entries: 1000 length, restriction for name: 50
      * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
+     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the db).
      */
-    EXAMPLE(-9999, "java:global/example-app/PayPalMessageTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null)
+    EXAMPLE( Integer.valueOf( -9999 ), "java:global/example-app/PayPalMessageTransmitterBean!bakery.logic.service.transmission.MessageTransmitter", null )
     ;
 
     private Integer id;
@@ -101,5 +100,4 @@ public enum ExpandedExecutionBeanDefDO implements ExecutionBeanDefDOEnumInterfac
 
         return executionBeanKeyList;
     }
-    
 }

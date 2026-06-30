@@ -2,25 +2,23 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.article.export.ArticleExportConfigBeanDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@ExpandedEnum(ArticleExportConfigBeanDefDO.class)
+@ExpandedEnum( ArticleExportConfigBeanDefDO.class )
 public enum ExpandedArticleExportConfigBeanDefDO implements EnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with ArticleExportConfigBeanDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-    EXAMPLE(-9999, "java:global/example-app/ExampleExportCSVBean");
+    // start with 1000 to avoid conflict with ArticleExportConfigBeanDefDO
+    // the name (here 'EXAMPLE') must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE( Integer.valueOf( -9999 ), "java:global/example-app/ExampleExportCSVBean" );
 
     private Integer id;
     private String jndiName;
@@ -71,5 +69,4 @@ public enum ExpandedArticleExportConfigBeanDefDO implements EnumInterface
     {
         return EnumSet.allOf( ArticleExportConfigBeanDefDO.class );
     }
-    
 }

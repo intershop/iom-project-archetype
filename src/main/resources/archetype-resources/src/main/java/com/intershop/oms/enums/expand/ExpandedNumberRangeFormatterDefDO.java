@@ -2,37 +2,34 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.common.NumberRangeFormatterDefDO;
 import bakery.persistence.expand.NumberRangeFormatterEnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
 @ExpandedEnum(NumberRangeFormatterDefDO.class)
 public enum ExpandedNumberRangeFormatterDefDO implements NumberRangeFormatterEnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with NumberRangeFormatterDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-
-    EXAMPLE(-9999, "EXAMPLE_INVOICENO_GENERATOR", "java:global/example-app/example-ejb/ExampleNumberRangeSequencerBean!bakery.logic.service.configuration.NumberRangeFormatterService")
+    // start with 1000 to avoid conflicts with NumberRangeFormatterDefDO
+    // the description must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE( Integer.valueOf( -9999 ), "EXAMPLE_INVOICENO_GENERATOR", "java:global/example-app/example-ejb/ExampleNumberRangeSequencerBean!bakery.logic.service.configuration.NumberRangeFormatterService" )
     ;
 
     private Integer id;
     private String jndiName;
     private String description;
 
-    private ExpandedNumberRangeFormatterDefDO(Integer id, String description, String jndiName)
+    private ExpandedNumberRangeFormatterDefDO( Integer id, String description, String jndiName )
     {
         this.id = id;
         this.description = description;
-        this.jndiName = String.format(jndiName, DeploymentConfig.APP_VERSION);
+        this.jndiName = String.format( jndiName, DeploymentConfig.APP_VERSION );
     }
 
     @Override
@@ -46,7 +43,7 @@ public enum ExpandedNumberRangeFormatterDefDO implements NumberRangeFormatterEnu
     @Transient
     public String getName()
     {
-        return StringUtils.constantToHungarianNotation(name(), false);
+        return StringUtils.constantToHungarianNotation( name(), false );
     }
 
     @Override
@@ -70,7 +67,7 @@ public enum ExpandedNumberRangeFormatterDefDO implements NumberRangeFormatterEnu
     @Transient
     public final EnumSet<ExpandedNumberRangeFormatterDefDO> getExpandedEnums()
     {
-        return EnumSet.allOf(ExpandedNumberRangeFormatterDefDO.class);
+        return EnumSet.allOf( ExpandedNumberRangeFormatterDefDO.class );
     }
 
     /**
@@ -82,5 +79,4 @@ public enum ExpandedNumberRangeFormatterDefDO implements NumberRangeFormatterEnu
     {
         return EnumSet.allOf(NumberRangeFormatterDefDO.class);
     }
-    
 }

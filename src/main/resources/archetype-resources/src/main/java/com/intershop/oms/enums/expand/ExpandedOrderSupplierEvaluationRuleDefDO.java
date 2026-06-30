@@ -2,23 +2,21 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
-import bakery.persistence.annotation.ExpandedEnum;
-import bakery.persistence.dataobject.configuration.common.OrderSupplierEvaluationRuleDefDO;
-import bakery.persistence.expand.OrderSupplierEvaluationRuleDefDOEnumInterface;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.Transient;
 
-@ExpandedEnum(OrderSupplierEvaluationRuleDefDO.class)
+import bakery.persistence.annotation.ExpandedEnum;
+import bakery.persistence.dataobject.configuration.common.OrderSupplierEvaluationRuleDefDO;
+import bakery.persistence.expand.OrderSupplierEvaluationRuleDefDOEnumInterface;
+
+@ExpandedEnum( OrderSupplierEvaluationRuleDefDO.class )
 public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEvaluationRuleDefDOEnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with OrderSupplierEvaluationRuleDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-    EXAMPLE(Integer.valueOf(-9999), "SupplierHasStockCheckPTBean", "Filters for suppliers that have stock to deliver.", "java:global/example-project/SupplierHasStockCheckPTBean!bakery.logic.service.order.task.OrderSupplierCheckPT", 1000, false)
+    // start with 1000 to avoid conflicts with OrderSupplierEvaluationRuleDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE( Integer.valueOf( -9999 ), "SupplierHasStockCheckPTBean", "Filters for suppliers that have stock to deliver.", "java:global/example-project/SupplierHasStockCheckPTBean!bakery.logic.service.order.task.OrderSupplierCheckPT", 1000, Boolean.FALSE.booleanValue() )
     ;
 
     private Integer id;
@@ -28,8 +26,7 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
     private int rank;
     private boolean mandatory;
 
-    private ExpandedOrderSupplierEvaluationRuleDefDO(Integer id, String name, String description, String jndiName,
-            int rank, boolean mandatory)
+    private ExpandedOrderSupplierEvaluationRuleDefDO( Integer id, String name, String description, String jndiName, int rank, boolean mandatory )
     {
         this.id = id;
         this.name = name;
@@ -39,6 +36,9 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
         this.mandatory = mandatory;
     }
 
+    /**
+     * Id der Pruefungsart
+     */
     @Override
     @Id
     public Integer getId()
@@ -46,43 +46,66 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
         return id;
     }
 
-    protected void setId(Integer id)
+    /**
+     * Id der Pruefungsart
+     */
+    protected void setId( Integer id )
     {
         this.id = id;
     }
 
+    /**
+     * Namen der Pruefungsregel
+     */
     @Override
-    @Column(name = "name", length = 50, nullable = false)
+    @Column( name = "name", length = 50, nullable = false )
     public String getName()
     {
         return name;
     }
 
-    public void setName(String name)
+    /**
+     * Namen der Pruefungsregel
+     */
+    public void setName( String name )
     {
         this.name = name;
     }
 
+    /**
+     * Ranking (Reihenfolge) der Pruefung
+     */
     @Override
-    @Column(name = "rank", nullable = false)
+    @Column( name = "rank", nullable = false )
     public int getRank()
     {
         return rank;
     }
 
-    public void setRank(int rank)
+    /**
+     * Ranking (Reihenfolge) der Pruefung
+     */
+    public void setRank( int rank )
     {
         this.rank = rank;
     }
 
+    /**
+     * Gibt an ob dieser Parameter abgeschaltet werden darf.
+     * @return <b>true</b> oder <b>false</b>
+     */
     @Override
-    @Column(name = "mandatory", nullable = false)
+    @Column( name = "mandatory", nullable = false )
     public boolean isMandatory()
     {
         return mandatory;
     }
 
-    public void setMandatory(boolean mandatory)
+    /**
+     * Gibt an ob dieser Parameter abgeschaltet werden darf.
+     * @param mandatory <b>true</b> oder <b>false</b>
+     */
+    public void setMandatory( boolean mandatory )
     {
         this.mandatory = mandatory;
     }
@@ -91,31 +114,44 @@ public enum ExpandedOrderSupplierEvaluationRuleDefDO implements OrderSupplierEva
     @Transient
     public String getJndiName()
     {
-        return String.format(this.jndiName, bakery.util.DeploymentConfig.APP_VERSION);
+        return String.format( this.jndiName, bakery.util.DeploymentConfig.APP_VERSION );
     }
 
+    /**
+     * get list of expanded enums
+     * @return
+     */
     @Transient
     public final EnumSet<ExpandedOrderSupplierEvaluationRuleDefDO> getExpandedEnums()
     {
-        return EnumSet.allOf(ExpandedOrderSupplierEvaluationRuleDefDO.class);
+        return EnumSet.allOf( ExpandedOrderSupplierEvaluationRuleDefDO.class );
     }
 
+    /**
+     * get list of all enums
+     * @return
+     */
     @Transient
     public final EnumSet<OrderSupplierEvaluationRuleDefDO> getAllEnums()
     {
-        return EnumSet.allOf(OrderSupplierEvaluationRuleDefDO.class);
+        return EnumSet.allOf( OrderSupplierEvaluationRuleDefDO.class );
     }
 
+    /**
+     * Beschreibung der Pruefungsregel
+     */
     @Override
-    @Column(name = "description", length = 100, nullable = false)
+    @Column(name="description", length = 100, nullable = false)
     public String getDescription()
     {
         return description;
     }
 
+    /**
+     * Beschreibung der Pruefungsregel
+     */
     public void setDescription(String description)
     {
         this.description = description;
     }
-    
 }

@@ -2,26 +2,26 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.common.ApprovalTypeDefDO;
 import bakery.persistence.dataobject.configuration.common.ObjectTypeDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@ExpandedEnum(ApprovalTypeDefDO.class)
+
+@ExpandedEnum( ApprovalTypeDefDO.class )
 public enum ExpandedApprovalTypeDefDO implements EnumInterface
 {
-    /**
-     * Start with 10000 to avoid conflict with ApprovalTypeDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-    EXAMPLE(Integer.valueOf(-10000), "", // uses a decision bean instead of jndi
-            "ExampleApproval Description", ObjectTypeDefDO.ORDER)
+    // start with 1000 to avoid conflict with ApprovalTypeDefDO
+    // the name (here 'EXAMPLE') must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE( Integer.valueOf( -10000 ), "", // uses a decision bean instead of jndi
+            "ExampleApproval Description", ObjectTypeDefDO.ORDER )
     ;
 
     private Integer id;
@@ -94,11 +94,10 @@ public enum ExpandedApprovalTypeDefDO implements EnumInterface
         return EnumSet.allOf( ApprovalTypeDefDO.class );
     }
 
-    // persist a reference to the  ObjectType within the database too
+    // persist a reference to the ObjectType within the DB too.
     @Column(name = "`ObjectTypeName`")
     public String getObjectTypeName()
     {
         return this.getObjectTypeDefDO().getName();
     }
-    
 }

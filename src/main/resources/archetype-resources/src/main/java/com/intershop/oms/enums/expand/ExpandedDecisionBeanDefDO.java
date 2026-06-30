@@ -2,27 +2,24 @@ package com.intershop.oms.enums.expand;
 
 import java.util.EnumSet;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.connections.DecisionBeanDefDO;
 import bakery.persistence.dataobject.transformer.EnumInterface;
 import bakery.util.DeploymentConfig;
 import bakery.util.StringUtils;
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
 
-@ExpandedEnum(DecisionBeanDefDO.class)
+@ExpandedEnum( DecisionBeanDefDO.class )
 public enum ExpandedDecisionBeanDefDO implements EnumInterface
 {
-
-    /**
-     * Start with 10000 to avoid conflict with DecisionBeanDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
-
-    EXAMPLE1(-9999, "java:global/example-app/InvoicingDecisionBean"),
-    EXAMPLE2(-9998, "java:global/example-app/TBD")
+    // start with 1000 to avoid conflict with DecisionBeanDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
+    EXAMPLE1( Integer.valueOf( -9999 ), "java:global/example-app/InvoicingDecisionBean" ),
+    EXAMPLE2( Integer.valueOf( -9998 ), "java:global/example-app/TBD" )
     ;
 
     private Integer id;
@@ -74,5 +71,4 @@ public enum ExpandedDecisionBeanDefDO implements EnumInterface
     {
         return EnumSet.allOf( DecisionBeanDefDO.class );
     }
-
 }

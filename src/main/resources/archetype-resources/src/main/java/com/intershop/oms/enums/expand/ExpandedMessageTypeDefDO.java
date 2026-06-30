@@ -3,20 +3,19 @@ package com.intershop.oms.enums.expand;
 import java.util.EnumSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
+
 import bakery.persistence.annotation.ExpandedEnum;
 import bakery.persistence.dataobject.configuration.connections.MessageTypeDefDO;
 import bakery.persistence.expand.MessageTypeDefDOEnumInterface;
-import jakarta.persistence.Column;
-import jakarta.persistence.Transient;
 
 @ExpandedEnum(MessageTypeDefDO.class)
 public enum ExpandedMessageTypeDefDO implements MessageTypeDefDOEnumInterface
 {
-    /**
-     * Start with 10000 to avoid conflict with MessageTypeDefDO.
-     * The name must be unique across both classes.
-     * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
-     */
+    // start with 10000 to avoid conflicts with MessageTypeDefDO
+    // the name must be unique across both classes
+    // values with negative id are meant as syntax example and are ignored (won't get persisted within the db)
     EXAMPLE_SEND_CUSTOMER_MAIL_ORDER( -9999, "Send customer mail - order" )
     ;
 
@@ -53,7 +52,7 @@ public enum ExpandedMessageTypeDefDO implements MessageTypeDefDOEnumInterface
 
     /**
      * get list of expanded enums
-     * 
+     *
      * @return
      */
     @Transient
@@ -61,10 +60,10 @@ public enum ExpandedMessageTypeDefDO implements MessageTypeDefDOEnumInterface
     {
         return EnumSet.allOf(ExpandedMessageTypeDefDO.class);
     }
-    
+
     /**
      * get list of all enums
-     * 
+     *
      * @return
      */
     @Transient
