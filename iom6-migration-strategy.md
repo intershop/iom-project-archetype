@@ -113,30 +113,94 @@ Add configuration to preserve `target/` directory on `mvn clean` (from hotfix/6.
 
 ### 5. Expanded enum files (21 files)
 
-All 21 are IOM 6 platform changes — replace each verbatim from ci-project `hotfix/6.0`. The only adjustment needed is the package declaration, which stays `com.intershop.oms.enums.expand` in the archetype (ci-project uses the same package, no change needed).
+Apply only **semantically meaningful** IOM 6 changes to each file — do not copy cosmetic noise from ci-project `hotfix/6.0`. Specifically:
 
-The nature of the IOM 6 changes in these files: import reordering, `@ExpandedEnum( Class )` spacing, updated example values. The ci-project also has project-specific JNDI strings and positive enum IDs — these must be replaced with the archetype placeholder pattern (`-999` IDs, empty/example JNDI strings) as in the IOM 5 version of each file.
+**Apply:**
+- New or changed imports that are actually required (e.g. a new type used in the file)
+- New or removed fields, methods, or annotations that change the API or behaviour
+- Changes to `@ExpandedEnum` annotation parameters if the referenced class changed
+- Enum constant value/type changes driven by IOM 6 API changes (e.g. `String` → `EnumPayment`)
 
-### 6. `ps/` Java source files — IOM 6 API review
+**Do NOT apply:**
+- Import reordering (if the same imports are present, keep the existing order)
+- Whitespace-only changes (spacing inside annotations, blank lines, indentation)
+- Cosmetic reformatting of existing code that does not change meaning
 
-IOM 6 was an infrastructure update (Java 21, WildFly 40) with one REST API removal: the Order-State v1 API (`OrderSearchPO`, `CustomerOrderDetailsPO`, `OrderAddressPO`, `OrderPosEntryPO`, etc.). None of the archetype `ps/` files reference the removed v1 API.
+**Absolute rule — archetype enum constants must only use negative IDs:**
+An archetype must never define real values. Every enum constant in every `*DefDO.java` must have a negative integer ID (e.g. `-9999`). Negative IDs are recognised by IOM as non-persistent example values and are never written to the database. A positive ID would define a real, potentially conflicting value — that is strictly forbidden in an archetype template.
 
-All other classes used in `ps/` files were confirmed present in IOM 6.0.0 jars:
-`MissingFieldException`, `ErrorTextFormatter`, `PaymentProviderLogicService`, `ShopLogicService`, `MessageLogContext`, `MessageLogManager`, `OrderMessageLogDO` — all exist unchanged.
+This means:
+- Keep existing negative placeholder IDs from the IOM 5 archetype version
+- Never copy positive IDs from ci-project (e.g. `1000`, `1001`, `10000`) — those are real ci-project values
+- JNDI strings must remain example placeholders (e.g. `java:global/example-app/...`), not ci-project-specific values
+- Enum constant names must remain generic examples (e.g. `EXAMPLE`, `TEST`), not ci-project-specific names
 
-The only source-level changes needed are due to WildFly 40 dropping Apache HttpClient 4.x:
+### 6. `ps/` Java source files — platform consolidation + IOM 6 API review
 
-- `rest/logging/LoggingIOStreamHandler.java` — remove the `readEntity(HttpResponse)` overload and its `org.apache.http.*` imports
-- `rest/logging/MaskedHeaders.java` — remove the `of(Header[])` overload and its `org.apache.http.Header` import
+The IOM platform now ships an `iom/rest/` module (`com.intershop.oms.rest.*`) that contains evolved versions of several tools that originated in the archetype's `ps/` layer. The rule is: **use platform tools when available; adapt usage examples in remaining archetype files to reference the platform classes**.
 
-All other `ps/` files (`javax.naming`, `services/configuration/*`, `util/ClientBuilder.java`) compile cleanly against IOM 6 with no changes needed.
+#### Files to DELETE from archetype (replaced by platform)
+
+| Delete | Platform replacement | Package |
+|---|---|---|
+| `rest/DefaultOptionsExceptionHandler.java` | `DefaultOptionsMethodExceptionMapper` | `com.intershop.oms.rest.exceptions` |
+| `rest/filter/BasicAuthSecurityContext.java` | `BasicSecurityContext` | `com.intershop.oms.rest.authentication` |
+| `rest/filter/IOMAuthFilter.java` | `AuthenticationFilter` | `com.intershop.oms.rest.provider` |
+| `rest/filter/CORSFilter.java` | `CORSFilter` | `com.intershop.oms.rest.provider` |
+| `rest/ExceptionHandler.java` | `ExceptionHandler` | `com.intershop.oms.rest.exceptions` |
+| `rest/JacksonObjectMapperProvider.java` | `JacksonContextResolver` | `com.intershop.oms.rest.provider` |
+| `rest/logging/MaskedHeaders.java` | `MaskedHeaders` | `com.intershop.oms.rest.logging` |
+| `rest/logging/LoggingIOStreamHandler.java` | `LoggingIOStreamHandler` | `com.intershop.oms.rest.logging` |
+| `rest/logging/sl4j/SLF4JContainerLoggingHandler.java` | `LoggingHandler` | `com.intershop.oms.rest.logging` |
+| `rest/logging/sl4j/SLF4JWriterInterceptor.java` | `LoggingWriterInterceptor` | `com.intershop.oms.rest.logging` |
+
+Note on `AuthenticationFilter`: the platform class is not `@Provider`-annotated — it must be explicitly registered in `RestServiceApplication` rather than picked up by auto-scan.
+
+#### Files to KEEP in archetype (no platform equivalent)
+
+- `rest/filter/BasicAuthenticationFilter.java` — client-side Basic Auth injection filter
+- `rest/filter/BearerAuthenticationFilter.java` — client-side Bearer token injection filter
+- `rest/filter/ClientCorrelationIdFilter.java` — client-side correlation ID propagation
+- `rest/filter/ContainerCorrelationIdFilter.java` — container-side correlation ID propagation
+- `rest/RestServiceApplication.java` — project's own JAX-RS `Application` class (every project needs its own)
+- `rest/logging/DynamicLoggingFeature.java` — kept, but **update** references from `SLF4JContainerLoggingHandler` → `LoggingHandler`, `SLF4JWriterInterceptor` → `LoggingWriterInterceptor`
+- `rest/logging/sl4j/SLF4JClientLoggingHandler.java` — client-side SLF4J logging (no platform equivalent)
+- `rest/logging/database/DatabaseClientLoggingHandler.java` — client-side DB logging
+- `rest/logging/database/DatabaseContainerLoggingHandler.java` — container-side DB logging; **update** reference from `SLF4JContainerLoggingHandler` → `LoggingHandler` if present
+- `rest/logging/database/DatabaseWriterInterceptor.java` — DB body logging; **update** reference from `SLF4JWriterInterceptor` → `LoggingWriterInterceptor` if present
+- `rest/annotations/Message.java` — `@Message` annotation for DB logging integration
+- `servlet/Heartbeat.java`, `servlet/ImportErrors.java`, `servlet/ImportStatus.java`, `servlet/Testservlet.java`
+- `services/configuration/*` — full custom configuration stack
+- `util/ClientBuilder.java` — **update**: replace `SLF4JWriterInterceptor` → `LoggingWriterInterceptor` (platform; works client-side too); `SLF4JClientLoggingHandler` stays (no platform equivalent)
+- `util/CustomizationUtilityStatic.java`
+- `util/RestAuthenticationBean.java`
+- `ordervalidation/ValidateMandatoryPropertiesPTBean.java`
+
+#### IOM 6 API compatibility
+
+IOM 6 was an infrastructure update (Java 21, WildFly 40) with one REST API removal (Order-State v1 — no overlap with archetype). All IOM API classes used in remaining `ps/` files exist unchanged in IOM 6.0.0.
+
+WildFly 40 dropped Apache HttpClient 4.x — but since `LoggingIOStreamHandler` and `MaskedHeaders` are now replaced by the platform versions (which have no HttpClient dependency), this is resolved by deletion rather than modification.
 
 ### 7. `archetype-metadata.xml` + `archetype.properties`
+
+**`archetype-metadata.xml`** (default values shown to users during project creation):
 
 | Property | Current default | Target |
 |---|---|---|
 | `platformVersion` | `5.0.0` | `6.0.0` |
-| `intershopDockerRepo` | `docker.tools.intershop.com/iom/intershophub/` | `docker.io/library/` |
+| `intershopDockerRepo` | `docker.tools.intershop.com/iom/intershophub/` | **no change** |
+| `mavenRepoURL` | `iom-maven-artifacts` URL | **no change** |
+
+**`archetype.properties`** (used by the Maven archetype integration test — must use Intershop-internal values):
+
+| Property | Current value | Target |
+|---|---|---|
+| `platformVersion` | `5.0.0` | `6.0.0` |
+| `intershopDockerRepo` | `docker.tools.intershop.com/iom/intershophub/` | **no change** — this is the correct registry for CI |
+| `mavenRepoURL` | `iom-maven-artifacts` URL | **no change** — `iom-maven-artifacts` is the correct feed for CI |
+
+The distinction: `archetype-metadata.xml` defaults are for customers generating new projects (they get `docker.io/library/` and their own `order-iom-releases` feed). `archetype.properties` drives the CI integration test inside Intershop's own pipeline, which uses the internal Docker registry and `iom-maven-artifacts` feed.
 
 ### 8. `azure-pipelines.yml`
 
@@ -145,11 +209,11 @@ All other `ps/` files (`javax.naming`, `services/configuration/*`, `util/ClientB
 | `pool` | static `ubuntu-20.4-DS2_v2-adopt-adoptium-jdk` | variable from `azure-devops-build-machines` group |
 | `JDK_MAJOR_VERSION` | `17` | `21` |
 | `IOM_HELM_VERSION` | `3.0.0` | `3.1.1` |
-| `IOM_DOCKERHUB_*` variables | present | remove |
-| Dockerhub login step | present | remove |
+| `IOM_DOCKERHUB_*` variables | present | **no change** — keep |
+| Dockerhub login step | present | **no change** — keep |
 | Kubernetes auth | `Kubernetes@1` service connection | az login + kubelogin |
 | Pull secret creation | `KubernetesManifest@0` | copy `iomdevops-pull-secret` from default namespace |
-| `MavenAuthenticate` feeds | `iom-maven-artifacts` | `order-iom-releases,order-iom-snapshots` |
+| `MavenAuthenticate` feeds | `iom-maven-artifacts` | **no change** — keep |
 | Maven task version | `Maven@3` | `Maven@4` |
 
 ### 9. `helm-values-test.yaml`
@@ -169,7 +233,7 @@ Current SNAPSHOT scan result: only `version=0.0.1-SNAPSHOT` (archetype.propertie
 ## Open Questions
 
 1. ~~**`junit-jupiter-params`**~~ — resolved: not in any archetype release, ci-project-specific, do not add.
-2. ~~**`mavenRepoURL` property**~~ — resolved: keep as customer-facing parameter, update default value from `iom-maven-artifacts` URL to `order-iom-releases` URL.
+2. ~~**`mavenRepoURL` property**~~ — resolved: keep as customer-facing parameter. Both `archetype-metadata.xml` default and `archetype.properties` value stay as `iom-maven-artifacts` — no change needed.
 3. ~~**`ValidateMandatoryPropertiesPTBean.java`**~~ — resolved: all referenced classes exist in IOM 6.0.0, no changes needed beyond the Apache HttpClient removal.
 4. ~~**`services/configuration/*`**~~ — resolved: no API changes, all classes confirmed present in IOM 6.0.0.
 5. ~~**`dbaccount.image.tag`**~~ — resolved: `2.1.0`
