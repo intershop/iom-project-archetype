@@ -214,7 +214,7 @@ The distinction: `archetype-metadata.xml` defaults are for customers generating 
 | Kubernetes auth | `Kubernetes@1` service connection | az login + kubelogin |
 | Pull secret creation | `KubernetesManifest@0` | copy `iomdevops-pull-secret` from default namespace |
 | `MavenAuthenticate` feeds | `iom-maven-artifacts` | **no change** — keep |
-| Maven task version | `Maven@3` | `Maven@4` |
+| Maven task version | `Maven@3` | **no change** — IOM uses Maven 3.9.x (see `mvnw`), keep `Maven@3` |
 
 ### 9. `helm-values-test.yaml`
 

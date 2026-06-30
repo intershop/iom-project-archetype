@@ -167,7 +167,7 @@ jobs:
     displayName: "Read variables - SNAPSHOT or Release build"
 
   # for SNAPSHOT builds: run verify goal against archetype
-  - task: Maven@4
+  - task: Maven@3
     condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'false'))
     inputs:
       goals: clean verify
@@ -177,7 +177,7 @@ jobs:
 
   # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
   # The release can be promoted to central in a later step.
-  - task: Maven@4
+  - task: Maven@3
     condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
     inputs:
       goals: clean deploy
@@ -188,7 +188,7 @@ jobs:
       PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
       PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
 
-  - task: Maven@4
+  - task: Maven@3
     inputs:
       goals: clean verify
       mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/archetype-test/dependency-helper/pom.xml'
@@ -274,7 +274,7 @@ jobs:
     displayName: "Cleanup - wait for PV deletion, delete namespace"
     condition: always()
 
-  - task: Maven@4
+  - task: Maven@3
     condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
     inputs:
       goals: nexus-staging:release
@@ -282,7 +282,7 @@ jobs:
       mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
     displayName: "Maven - stage successful release"
 
-  - task: Maven@4
+  - task: Maven@3
     condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
     inputs:
       goals: org.codehaus.mojo:versions-maven-plugin:2.7:set -DgenerateBackupPoms=false -DnextSnapshot
@@ -302,7 +302,7 @@ jobs:
     condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
     enabled: false
 
-  - task: Maven@4
+  - task: Maven@3
     condition: and(failed(), eq(variables.IS_RELEASE_BUILD, 'true'))
     inputs:
       goals: nexus-staging:drop
