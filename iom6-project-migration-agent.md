@@ -67,7 +67,7 @@ Read `pom.xml`. Apply these changes:
 </dependency>
 ```
 
-**Plugin versions** — update the `<version>` of each plugin in `<pluginManagement>` to the following target versions. Add the entry if absent; do not change plugin `<configuration>` blocks, only the `<version>` tag:
+**Plugin versions** — update the `<version>` of each plugin in `<pluginManagement>` to the following target versions. Add the `<pluginManagement>` entry if absent; **preserve all existing `<configuration>` blocks unchanged** — they represent project-specific customizations:
 
 | Plugin | Target version |
 |---|---|
@@ -89,6 +89,28 @@ Read `pom.xml`. Apply these changes:
 | `maven-install-plugin` | `3.1.4` |
 | `maven-resources-plugin` | `3.5.0` |
 | `versions-maven-plugin` | `2.21.0` |
+
+**`maven-clean-plugin` configuration** — check whether the project's `<build><plugins>` section already contains a `maven-clean-plugin` entry with `<excludeDefaultDirectories>true</excludeDefaultDirectories>`. If it does not, add the following. This configuration is **critical for devenv-4-iom**: it prevents `mvn clean` from deleting the `target/` directory itself (only its contents), so that bind-mounts used by the dev environment remain intact.
+
+```xml
+<plugin>
+    <artifactId>maven-clean-plugin</artifactId>
+    <configuration>
+        <excludeDefaultDirectories>true</excludeDefaultDirectories>
+        <filesets>
+            <fileset>
+                <directory>${project.build.directory}</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <followSymlinks>false</followSymlinks>
+            </fileset>
+        </filesets>
+    </configuration>
+</plugin>
+```
+
+If a `maven-clean-plugin` configuration already exists, read it carefully — it may contain project-specific exclusions. Preserve those and only add `<excludeDefaultDirectories>true</excludeDefaultDirectories>` if it is missing. Record the decision in the protocol.
 
 Commit: `fix: update pom.xml for IOM 6 (Java 21, WildFly 40, platform 6.0.0)`
 

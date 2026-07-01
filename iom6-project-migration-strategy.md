@@ -97,7 +97,32 @@ The pipeline may contain project-specific stages, variable groups, and service c
 | `maven-resources-plugin` | `3.5.0` |
 | `versions-maven-plugin` | `2.21.0` |
 
-These versions are taken from archetype release 3.x (which targets IOM 6.0.0). Only update versions in `<pluginManagement>` — do not change project-specific plugin configurations.
+These versions are taken from archetype release 3.x (which targets IOM 6.0.0).
+
+**Plugin configuration rules:**
+
+- **Preserve** all project-specific plugin `<configuration>` blocks that already exist — they represent intentional project customizations and must not be overwritten.
+- **Add** the following `maven-clean-plugin` configuration if it is not already present in the project's `<build><plugins>` section. This configuration is critical for devenv-4-iom: it prevents `mvn clean` from deleting the `target/` directory itself, only deleting its contents. Without it, bind-mounts used by the dev environment break.
+
+```xml
+<plugin>
+    <artifactId>maven-clean-plugin</artifactId>
+    <configuration>
+        <excludeDefaultDirectories>true</excludeDefaultDirectories>
+        <filesets>
+            <fileset>
+                <directory>${project.build.directory}</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <followSymlinks>false</followSymlinks>
+            </fileset>
+        </filesets>
+    </configuration>
+</plugin>
+```
+
+If the project already has a `maven-clean-plugin` configuration, read it carefully before touching it — it may have project-specific exclusions that must be preserved.
 
 **`testframework.version`** (`iom-test-framework`) must be updated to `8.0.0` because the framework tracks IOM infrastructure changes — version 8.0.0 added Java 21 support and removed the Order State service, making it a required update for IOM 6 compatibility.
 
