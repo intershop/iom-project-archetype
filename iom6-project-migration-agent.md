@@ -139,15 +139,25 @@ Commit: `fix: update expanded enum files for IOM 6 API changes`
 
 ---
 
-## Step 5 — Delete platform-superseded ps/ files
+## Step 5 — Delete archetype-provided files superseded by the platform
 
-A file may only be deleted when **both** conditions are true:
-1. The file itself contains no project-specific logic (still matches the archetype template pattern — class-level annotations, basic delegation, no business logic)
-2. No other file in the project imports or references this class
+The archetype provided certain files that are now superseded by `com.intershop.oms.rest.*` in IOM 6. These files are typically located under the package the project was generated with (often `com.intershop.oms.ps`), but their exact path depends on the package name chosen at generation time.
 
-For each file below, if it exists, apply this procedure:
+First, locate the files by their class names — use `find` rather than assuming a fixed path:
+```
+find src/main/java -name "DefaultOptionsExceptionHandler.java" \
+  -o -name "ExceptionHandler.java" \
+  -o -name "JacksonObjectMapperProvider.java" \
+  -o -name "BasicAuthSecurityContext.java" \
+  -o -name "CORSFilter.java" \
+  -o -name "IOMAuthFilter.java" \
+  -o -name "SLF4JContainerLoggingHandler.java" \
+  -o -name "SLF4JWriterInterceptor.java"
+```
 
-**Check condition 1** — determine the archetype version that generated this project, then compare the file against the original archetype output at that version:
+For each file found, apply this procedure:
+
+**Check condition 1 — is the file unmodified from the archetype original?**
 
 1. Find the archetype version: check the project's `pom.xml` for a `<plugin><artifactId>maven-archetype-plugin</artifactId>` entry, or look at the earliest git commits for an archetype version reference. The version is typically noted as a comment or property (e.g. `archetypeVersion=2.6.0`).
 2. Read the corresponding file from the `iom-project-archetype` repository at that release tag (e.g. `git show 2.6.0:src/main/resources/archetype-resources/src/main/java/.../FileName.java` in the archetype repo, stripping the `${package}` placeholders mentally).
@@ -164,7 +174,9 @@ For each file below, if it exists, apply this procedure:
    - Changed logic within a method body
    - Added or removed imports that reflect new dependencies
 
-**Check condition 2** — grep for any usage of the class in the rest of the project:
+**Check condition 2 — is the class referenced anywhere in the project?**
+
+Search the entire source tree — project-specific callers can be in any package, not only alongside the file being checked:
 ```
 grep -rn "ClassName" src/main/java/
 ```
@@ -176,64 +188,66 @@ grep -rn "ClassName" src/main/java/
 - Other code uses it (condition 2 fails) → do NOT delete; migrate the callers to use the platform equivalent first, then delete; flag for manual review if the migration is non-trivial
 - Both conditions fail → flag for manual review
 
-Files and their platform equivalents:
+Platform equivalents:
 
-| File | Simple class name | Platform replacement |
-|---|---|---|
-| `src/main/java/com/intershop/oms/ps/rest/DefaultOptionsExceptionHandler.java` | `DefaultOptionsExceptionHandler` | `com.intershop.oms.rest.exceptions.DefaultOptionsMethodExceptionMapper` |
-| `src/main/java/com/intershop/oms/ps/rest/ExceptionHandler.java` | `ExceptionHandler` | `com.intershop.oms.rest.exceptions.ExceptionHandler` |
-| `src/main/java/com/intershop/oms/ps/rest/JacksonObjectMapperProvider.java` | `JacksonObjectMapperProvider` | `com.intershop.oms.rest.provider.JacksonContextResolver` |
-| `src/main/java/com/intershop/oms/ps/rest/filter/BasicAuthSecurityContext.java` | `BasicAuthSecurityContext` | `com.intershop.oms.rest.authentication.BasicSecurityContext` |
-| `src/main/java/com/intershop/oms/ps/rest/filter/CORSFilter.java` | `CORSFilter` | `com.intershop.oms.rest.provider.CORSFilter` |
-| `src/main/java/com/intershop/oms/ps/rest/filter/IOMAuthFilter.java` | `IOMAuthFilter` | `com.intershop.oms.rest.provider.AuthenticationFilter` |
-| `src/main/java/com/intershop/oms/ps/rest/logging/sl4j/SLF4JContainerLoggingHandler.java` | `SLF4JContainerLoggingHandler` | `com.intershop.oms.rest.logging.LoggingHandler` |
-| `src/main/java/com/intershop/oms/ps/rest/logging/sl4j/SLF4JWriterInterceptor.java` | `SLF4JWriterInterceptor` | `com.intershop.oms.rest.logging.LoggingWriterInterceptor` |
+| Simple class name | Platform replacement |
+|---|---|
+| `DefaultOptionsExceptionHandler` | `com.intershop.oms.rest.exceptions.DefaultOptionsMethodExceptionMapper` |
+| `ExceptionHandler` | `com.intershop.oms.rest.exceptions.ExceptionHandler` |
+| `JacksonObjectMapperProvider` | `com.intershop.oms.rest.provider.JacksonContextResolver` |
+| `BasicAuthSecurityContext` | `com.intershop.oms.rest.authentication.BasicSecurityContext` |
+| `CORSFilter` | `com.intershop.oms.rest.provider.CORSFilter` |
+| `IOMAuthFilter` | `com.intershop.oms.rest.provider.AuthenticationFilter` |
+| `SLF4JContainerLoggingHandler` | `com.intershop.oms.rest.logging.LoggingHandler` |
+| `SLF4JWriterInterceptor` | `com.intershop.oms.rest.logging.LoggingWriterInterceptor` |
 
 Note: `AuthenticationFilter` from the platform is not `@Provider`-annotated — callers that previously relied on auto-scan must explicitly register it.
 
-Commit: `fix: remove ps/ files now provided by IOM 6 platform`
+Commit: `fix: remove archetype-provided files now superseded by IOM 6 platform`
 
 ---
 
-## Step 6 — Update remaining ps/ files
+## Step 6 — Update archetype-provided files that must be kept
 
-### `ps/rest/logging/DynamicLoggingFeature.java`
+Locate each file by class name using `find src/main/java -name "FileName.java"`. The files may be in any package.
+
+### `DynamicLoggingFeature.java`
 
 Read the file. Replace:
 - All references to `SLF4JContainerLoggingHandler` → `LoggingHandler` (from `com.intershop.oms.rest.logging`)
 - All references to `SLF4JWriterInterceptor` → `LoggingWriterInterceptor` (from `com.intershop.oms.rest.logging`)
-- Update imports accordingly; remove old `ps/rest/logging/sl4j/` imports
+- Update imports accordingly; remove the old `SLF4JContainerLoggingHandler` and `SLF4JWriterInterceptor` imports
 
-### `ps/util/ClientBuilder.java`
+### `ClientBuilder.java`
 
 Read the file. Replace:
 - `SLF4JWriterInterceptor` → `LoggingWriterInterceptor` (from `com.intershop.oms.rest.logging`)
 - Keep `SLF4JClientLoggingHandler` unchanged (no platform equivalent)
 - Update imports accordingly
 
-### `ps/rest/logging/LoggingIOStreamHandler.java` (if still present)
+### `LoggingIOStreamHandler.java` (if still present)
 
 Read the file. Remove any methods that use `org.apache.http.*` types as parameters or return types. Remove the corresponding `import org.apache.http.*` statements. Keep all other methods unchanged.
 
-### `ps/rest/logging/MaskedHeaders.java` (if still present)
+### `MaskedHeaders.java` (if still present)
 
 Read the file. Remove any methods that use `org.apache.http.Header` as a parameter or return type. Remove the `import org.apache.http.Header` statement. Keep all other methods unchanged.
 
-### `ps/rest/RestServiceApplication.java`
+### `RestServiceApplication.java`
 
 Read the file. Remove any references to the deleted classes (step 5). If `IOMAuthFilter` was registered here, add explicit registration of `com.intershop.oms.rest.provider.AuthenticationFilter`.
 
-### All other Java source files — Apache HttpClient scan
+### All Java source files — Apache HttpClient scan
 
-Project-specific Java files can be anywhere under `src/main/java/` with any package name. Run:
+WildFly 40 dropped Apache HttpClient 4.x. This may affect not only the archetype-provided files above but any project-specific file in the entire source tree. Run:
 
 ```
 grep -rn "import org.apache.http" src/main/java/
 ```
 
-For each file that still imports `org.apache.http.*`: read the file, identify the affected methods, and remove or rewrite them. If a method cannot be replaced, flag it for manual review.
+For **every** file found — regardless of package or who wrote it — read the file, identify the affected methods, and remove or rewrite them. If a method cannot be replaced without understanding project-specific business logic, flag it for manual review.
 
-Commit: `fix: update ps/ files to use IOM 6 platform APIs`
+Commit: `fix: update Java sources to use IOM 6 platform APIs`
 
 ---
 

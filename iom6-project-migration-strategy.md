@@ -135,56 +135,68 @@ Files present in the project but not in the archetype template are project-speci
 - Any import or use of `order-state-app` classes (very unlikely but possible)
 - Any import of `org.apache.http.*` (dropped in WildFly 40)
 
-### 5. `ps/` Java source files — platform consolidation
+### 5. Java source files — platform consolidation and API compatibility
 
-#### Files to DELETE (replaced by platform `com.intershop.oms.rest.*`)
+This section applies to **all** Java source files in the project — regardless of package name or directory. Project-specific code can be anywhere under `src/main/java/`.
+
+There are two independent concerns: archetype-provided files that are superseded by the platform (and may need to be deleted or updated), and any project file that uses APIs dropped in IOM 6 / WildFly 40.
+
+#### 5a. Archetype-provided files superseded by the platform
+
+The following archetype-provided files are replaced by `com.intershop.oms.rest.*` in IOM 6. They are typically located under the `ps/` package but their exact path depends on the package name chosen when the project was generated.
 
 A file may only be deleted when both of these conditions are met:
 1. The file itself contains no project-specific logic (still matches the original archetype template)
 2. No other file in the project imports or references this class
 
-Check both conditions before deleting. If callers exist, migrate them to the platform equivalent first. If the file itself was modified, its content must be adapted rather than deleted.
+Check both conditions before deleting. If callers exist — in **any** file anywhere in the project — migrate them to the platform equivalent first. If the file itself was modified, its content must be adapted rather than deleted.
 
-| File | Platform replacement |
+| Archetype-provided file (relative to package root) | Platform replacement |
 |---|---|
-| `ps/rest/DefaultOptionsExceptionHandler.java` | `com.intershop.oms.rest.exceptions.DefaultOptionsMethodExceptionMapper` |
-| `ps/rest/ExceptionHandler.java` | `com.intershop.oms.rest.exceptions.ExceptionHandler` |
-| `ps/rest/JacksonObjectMapperProvider.java` | `com.intershop.oms.rest.provider.JacksonContextResolver` |
-| `ps/rest/filter/BasicAuthSecurityContext.java` | `com.intershop.oms.rest.authentication.BasicSecurityContext` |
-| `ps/rest/filter/CORSFilter.java` | `com.intershop.oms.rest.provider.CORSFilter` |
-| `ps/rest/filter/IOMAuthFilter.java` | `com.intershop.oms.rest.provider.AuthenticationFilter` |
-| `ps/rest/logging/sl4j/SLF4JContainerLoggingHandler.java` | `com.intershop.oms.rest.logging.LoggingHandler` |
-| `ps/rest/logging/sl4j/SLF4JWriterInterceptor.java` | `com.intershop.oms.rest.logging.LoggingWriterInterceptor` |
+| `rest/DefaultOptionsExceptionHandler.java` | `com.intershop.oms.rest.exceptions.DefaultOptionsMethodExceptionMapper` |
+| `rest/ExceptionHandler.java` | `com.intershop.oms.rest.exceptions.ExceptionHandler` |
+| `rest/JacksonObjectMapperProvider.java` | `com.intershop.oms.rest.provider.JacksonContextResolver` |
+| `rest/filter/BasicAuthSecurityContext.java` | `com.intershop.oms.rest.authentication.BasicSecurityContext` |
+| `rest/filter/CORSFilter.java` | `com.intershop.oms.rest.provider.CORSFilter` |
+| `rest/filter/IOMAuthFilter.java` | `com.intershop.oms.rest.provider.AuthenticationFilter` |
+| `rest/logging/sl4j/SLF4JContainerLoggingHandler.java` | `com.intershop.oms.rest.logging.LoggingHandler` |
+| `rest/logging/sl4j/SLF4JWriterInterceptor.java` | `com.intershop.oms.rest.logging.LoggingWriterInterceptor` |
 
 Note: `AuthenticationFilter` from the platform is not `@Provider`-annotated and must be explicitly registered in `RestServiceApplication`.
 
-#### Files to KEEP and UPDATE
+The following archetype-provided files must be kept but updated — again, they may be in any package:
 
-**`ps/rest/logging/DynamicLoggingFeature.java`**
+**`rest/logging/DynamicLoggingFeature.java`**
 - Replace `SLF4JContainerLoggingHandler` → `com.intershop.oms.rest.logging.LoggingHandler`
 - Replace `SLF4JWriterInterceptor` → `com.intershop.oms.rest.logging.LoggingWriterInterceptor`
 - Update imports accordingly
 
-**`ps/util/ClientBuilder.java`**
+**`util/ClientBuilder.java`**
 - Replace `SLF4JWriterInterceptor` → `com.intershop.oms.rest.logging.LoggingWriterInterceptor`
 - Keep `SLF4JClientLoggingHandler` if present (no platform equivalent for client-side SLF4J logging)
 - Update imports accordingly
 
-**`ps/rest/logging/LoggingIOStreamHandler.java`** (if still present and not platform-replaced)
+**`rest/logging/LoggingIOStreamHandler.java`** (if still present and not platform-replaced)
 - Remove any methods using `org.apache.http.*` types (dropped in WildFly 40)
 - Remove imports for `org.apache.http.*`
 
-**`ps/rest/logging/MaskedHeaders.java`** (if still present and not platform-replaced)
+**`rest/logging/MaskedHeaders.java`** (if still present and not platform-replaced)
 - Remove any methods using `org.apache.http.Header` (dropped in WildFly 40)
 - Remove imports for `org.apache.http.Header`
 
-**`ps/rest/RestServiceApplication.java`**
+**`rest/RestServiceApplication.java`**
 - Remove references to any of the deleted classes above
 - If `IOMAuthFilter` was registered here, replace with explicit registration of `com.intershop.oms.rest.provider.AuthenticationFilter`
 
-#### Any other ps/ file with `org.apache.http.*` imports
+#### 5b. Apache HttpClient 4.x — all Java source files
 
-WildFly 40 dropped Apache HttpClient 4.x. Scan all remaining ps/ Java files for `import org.apache.http.` and remove or replace those usages. If a method's only purpose was to use Apache HttpClient types and has no alternative, remove the method.
+WildFly 40 dropped Apache HttpClient 4.x (`org.apache.http.*`). This affects not only the archetype-provided files above but potentially any project-specific Java file. Scan the entire source tree:
+
+```
+grep -rn "import org.apache.http" src/main/java/
+```
+
+For every file found — regardless of where it lives or who wrote it — remove or replace the `org.apache.http.*` usages. If a method's only purpose was to use Apache HttpClient types and has no alternative, remove the method. If a replacement requires understanding project-specific business logic, flag it for manual review.
 
 ### 6. `azure-pipelines.yml`
 
