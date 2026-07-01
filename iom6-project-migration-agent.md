@@ -47,6 +47,20 @@ Read `pom.xml`. Apply these changes:
 - Maven compiler `<release>`: set to `21`
 - `<org.junit.version>`: **do not change** — JUnit is independent of the IOM platform version. Upgrading JUnit 5 → 6 requires test code changes and is a separate follow-up task, not part of the IOM 6 migration. Record in the protocol that this was intentionally left unchanged.
 
+**Transitive effects of `iom-test-framework` 8.0.0 — additional checks:**
+
+*SLF4J logging backend:* Search `pom.xml` for `logback` or `log4j`. If found:
+- Logback: ensure its version is `1.4.x` or newer. If older, update it.
+- Log4j2: ensure the SLF4J bridge artifact is `log4j-slf4j2-impl` (with `2` suffix). If the project uses `log4j-slf4j-impl` (without the `2`), change it. Record the finding in the protocol.
+
+*`jackson-annotations` pin:* Check `<dependencyManagement>` for an explicit `com.fasterxml.jackson.core:jackson-annotations` version. If it is less than `2.21`, update it to `2.21`. If it is `2.21` or absent, no action needed. Record the finding in the protocol.
+
+*Flyway direct API usage in tests:* Run:
+```
+grep -rn "import org.flywaydb" src/test/
+```
+If any results are found, record them in the protocol under "Follow-up tasks" — direct Flyway API usage may require changes due to Flyway 9.5.0 → 12.8.1 (PostgreSQL support moved to a separate module in Flyway 10). Do not attempt an automated fix; flag for manual review.
+
 **Dependencies to remove** (remove the entire `<dependency>` block for each):
 - `resteasy-core-spi`
 - `resteasy-client`

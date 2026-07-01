@@ -140,6 +140,20 @@ If the project already has a `maven-clean-plugin` configuration, read it careful
 
 **`org.junit.version`** must **not** be updated as part of this migration. JUnit is a general-purpose test library independent of the IOM platform version. A project with many tests written against JUnit 5 APIs will continue to work on IOM 6 with JUnit 5. Upgrading JUnit 5 → 6 is a separate task that may require migrating test implementations; it should be scheduled as a follow-up after the IOM 6 migration is complete, using the JUnit migration documentation as a guide.
 
+**Transitive effects of `iom-test-framework` 8.0.0:**
+
+- **SLF4J 2.x** — iom-test-framework 8.0.0 upgrades SLF4J from 1.7.x to 2.0.17. For standard projects that do not declare `slf4j-api` or `slf4j-simple` as direct dependencies (both are removed by this migration), no further action is needed. However, if the project uses an alternative logging backend in its test scope:
+  - **Logback**: must be version `1.4.x` or newer (earlier versions are incompatible with SLF4J 2.x)
+  - **Log4j2**: must use `log4j-slf4j2-impl` (note the `2` suffix) instead of `log4j-slf4j-impl`
+
+  Scan the project's `pom.xml` for `logback` or `log4j` to determine whether this applies.
+
+- **`jackson-annotations` 2.21** — iom-test-framework 8.0.0 upgrades Flyway to 12.8.1, which pulls in Jackson 3.x. Jackson 3.x depends on `com.fasterxml.jackson.core:jackson-annotations:2.21`. WildFly 40's BOM already aligns to this version, so standard projects are not affected. However, if the project's `<dependencyManagement>` explicitly pins `jackson-annotations` to a version older than `2.21`, it must be updated to `2.21` (or the override removed to inherit from the WildFly BOM) — otherwise `ObjectMapper` initialization fails at runtime in tests.
+
+- **Flyway API direct usage** — If project tests call the Flyway Java API directly (not through iom-test-framework's `OMSDbHandler`), the upgrade from Flyway 9.5.0 to 12.8.1 may require changes. Since Flyway 10, database-specific support (including PostgreSQL) was moved to separate modules. Review the [Flyway 10+ release notes](https://documentation.red-gate.com/flyway/release-notes-and-older-versions) for breaking changes. Scan for `import org.flywaydb` in `src/test/` to determine whether this applies.
+
+- **`iom-maven-artifacts` feed** — `iom-test-framework` 8.0.0 is published to the per-project `iom-maven-artifacts` Azure DevOps feed, not to Maven Central. The feed is already configured in the project's `pom.xml` under `<repositories>`. No repository change is required. Developers building locally must have credentials configured in `~/.m2/settings.xml` (a Personal Access Token from the Azure DevOps environment); see the [devenv-4-iom documentation](https://github.com/intershop/devenv-4-iom/blob/main/doc/03_devops_integration.md#get-access-to-iom-maven-repository).
+
 ### 2. `pom.xml` — dependencies
 
 **Remove** (dropped in IOM 6 / WildFly 40):
