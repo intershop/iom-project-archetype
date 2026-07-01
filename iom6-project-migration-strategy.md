@@ -196,7 +196,8 @@ These files exist in every IOM project and were generated from the archetype. Tw
 
 **`ExpandedPaymentDefDO.java`**
 - Add import: `import bakery.payment.v1.EnumPayment;`
-- For **every enum constant** in this file: the last constructor argument changes from `String` to `EnumPayment`. Replace the last string literal with the appropriate `EnumPayment` constant. For project-specific constants, choose the constant that matches the actual payment type. For archetype placeholder constants (negative ID, clearly example values), use `EnumPayment.NO_PAYMENT`.
+- `EnumPayment` is a Java interface whose fields are `String` constants — `EnumPayment.NO_PAYMENT` is a `String` value, not a new type. The `payment` field type, the constructor's last parameter type, and the `getPayment()` return type all stay `String`. **Only the last argument of each enum constant call changes** — replace the raw string literal with the named `EnumPayment` constant.
+- For **every enum constant** in this file: replace the last string literal argument with the appropriate `EnumPayment` constant. For project-specific constants, choose the constant that matches the actual payment type. For archetype placeholder constants (negative ID, clearly example values), use `EnumPayment.NO_PAYMENT`.
 - The name and description strings of placeholder constants (negative IDs) must be obviously generic — e.g. `"whateverName"`, `"whateverDescription"` — not real payment names like `"AfterPay"`. A name like `"AfterPay"` combined with `EnumPayment.NO_PAYMENT` is contradictory and misleads readers.
 
 The remaining 18 archetype-provided enum files require no changes.

@@ -173,7 +173,13 @@ Find this file. Read it. No annotation changes are required — `@ExpandedEnum` 
 
 Find this file. Read it carefully.
 
-The constructor for `ExpandedPaymentDefDO` enum constants changed: the last argument is now `EnumPayment` (a `String` constant from the `EnumPayment` interface) instead of a plain `String`.
+**Important:** `EnumPayment` is a Java interface whose fields are `String` constants — `EnumPayment.NO_PAYMENT` is a `String` value, not a new type. This means:
+- The `payment` field type stays `String`
+- The constructor's last parameter stays `String`
+- `getPayment()` return type stays `String`
+- **Only the last argument of each enum constant call changes** — replace the raw string literal with the named `EnumPayment` constant
+
+Do **not** change the field type or constructor parameter type. Do **not** change the return type of `getPayment()`.
 
 Add import:
 ```java
