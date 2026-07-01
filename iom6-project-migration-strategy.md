@@ -4,6 +4,8 @@
 
 This document captures the reasoning and decisions behind migrating an existing IOM project from IOM 5 to IOM 6. It is the background companion to `iom6-project-migration-agent.md`, which contains the actionable step-by-step instructions for a Claude agent to execute the migration.
 
+The agent produces a migration protocol (`iom6-migration-protocol.md`) in the project root that records every file touched, every decision made, and every item requiring manual follow-up. The protocol is the primary deliverable of the migration process alongside the code changes themselves.
+
 A "customer IOM project" is a project generated from `iom-project-archetype` and subsequently extended by a project team. It is distinct from the archetype itself — the archetype is the template; this document concerns migrating the generated, living project.
 
 The corresponding archetype migration strategy is in `iom6-migration-strategy.md`. The changes needed for a customer project are largely the same, but with different rules around enum constants and the expectation that project-specific code exists alongside the archetype-provided foundation.

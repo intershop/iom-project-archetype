@@ -15,6 +15,7 @@ The project to migrate is in the directory provided by the user. All paths below
 3. **Apply semantic changes only.** Ignore whitespace, import ordering, and brace style differences. A change is semantic if it affects imports, annotations, field types, method signatures, or referenced class names.
 4. **Before deleting an archetype-provided file, read it.** If it contains project-specific logic beyond the archetype template, do not delete it — migrate the project-specific logic to the platform equivalent instead.
 5. **Commit each section separately** with a clear message so the migration is reviewable step by step.
+6. **Maintain a running migration protocol throughout.** For every file touched, every file skipped, and every decision made, record an entry in the protocol (see Step 10 for the format). Do not wait until the end — record each entry as you go.
 
 ---
 
@@ -283,11 +284,53 @@ Commit any fixes with: `fix: resolve build errors from IOM 6 migration`
 
 ---
 
-## Step 10 — Summary
+## Step 10 — Migration Protocol
 
-After a successful build, report:
-- Which files were changed
-- Which ps/ files were deleted
-- Whether any ps/ file was flagged for manual review (project-specific logic detected)
-- Whether any Apache HttpClient usages remain that could not be automatically resolved
-- Build result
+Write a migration protocol document named `iom6-migration-protocol.md` in the project root. This is the authoritative record of what was done and why. It must be detailed enough that a reviewer can understand every decision without reading the code themselves.
+
+Structure the protocol as follows:
+
+---
+
+```markdown
+# IOM 6 Migration Protocol
+
+**Date:** <date>
+**Project:** <project name / artifactId>
+**Archetype version used to generate this project:** <version>
+**Migrated by:** Claude (iom6-project-migration-agent.md)
+
+## Build Result
+
+<BUILD SUCCESS / BUILD FAILURE — include error summary if failure>
+
+## Changes Applied
+
+For each file that was changed, one entry:
+
+### <file path>
+**Action:** <changed / deleted / skipped>
+**Reason:** <why this action was taken>
+**Details:** <what specifically was changed, or why it was skipped, or what the deletion check found>
+
+## Files Flagged for Manual Review
+
+For each file that could not be automatically handled:
+
+### <file path>
+**Issue:** <what was found — modified beyond archetype template / has callers that could not be migrated>
+**Details:** <the specific modifications found, or which files are calling it>
+**Required action:** <what a human needs to do>
+
+## Decisions and Observations
+
+Any notable finding that does not fit the above, e.g.:
+- A file that was expected to exist but was absent
+- An Apache HttpClient usage that could not be automatically resolved
+- An enum constant where `EnumPayment` mapping was uncertain and `NO_PAYMENT` was used as a fallback
+- Any deviation from the standard migration steps and the reason for it
+```
+
+---
+
+Commit the protocol: `docs: add IOM 6 migration protocol`
