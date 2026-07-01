@@ -67,7 +67,28 @@ Read `pom.xml`. Apply these changes:
 </dependency>
 ```
 
-**Plugin versions** — update `<pluginManagement>` entries to match the versions in the IOM 6 archetype release (see `iom6-project-migration-strategy.md` for the target versions). Do not change project-specific plugin configurations, only the `<version>` tags.
+**Plugin versions** — update the `<version>` of each plugin in `<pluginManagement>` to the following target versions. Add the entry if absent; do not change plugin `<configuration>` blocks, only the `<version>` tag:
+
+| Plugin | Target version |
+|---|---|
+| `maven-dependency-plugin` | `3.11.0` |
+| `maven-clean-plugin` | `3.5.0` |
+| `maven-surefire-plugin` | `3.5.6` |
+| `maven-failsafe-plugin` | `3.5.6` |
+| `maven-war-plugin` | `3.5.1` |
+| `maven-compiler-plugin` | `3.15.0` |
+| `maven-assembly-plugin` | `3.8.0` |
+| `velocity-maven-plugin` | `1.1.3` |
+| `maven-enforcer-plugin` | `3.6.3` |
+| `maven-site-plugin` | `4.0.0-M16` |
+| `exec-maven-plugin` | `3.6.3` |
+| `jacoco-maven-plugin` | `0.8.14` |
+| `maven-antrun-plugin` | `3.2.0` |
+| `maven-release-plugin` | `3.3.1` |
+| `maven-deploy-plugin` | `3.1.4` |
+| `maven-install-plugin` | `3.1.4` |
+| `maven-resources-plugin` | `3.5.0` |
+| `versions-maven-plugin` | `2.21.0` |
 
 Commit: `fix: update pom.xml for IOM 6 (Java 21, WildFly 40, platform 6.0.0)`
 

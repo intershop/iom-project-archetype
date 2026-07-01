@@ -73,9 +73,31 @@ The pipeline may contain project-specific stages, variable groups, and service c
 | `testframework.version` | `7.x.x` | `8.0.0` |
 | compiler `<release>` | `17` | `21` |
 | `postgresql` | `42.7.x` | `42.7.11` |
-| Plugin versions | various | align with archetype 3.x.x / ci-project hotfix/6.0 |
 
-The exact plugin versions to target are the same as those applied to the archetype in `iom6-migration-strategy.md` section 1.
+**Maven plugin versions** — update the following in `<pluginManagement>` (add the entry if absent):
+
+| Plugin | Target version |
+|---|---|
+| `maven-dependency-plugin` | `3.11.0` |
+| `maven-clean-plugin` | `3.5.0` |
+| `maven-surefire-plugin` | `3.5.6` |
+| `maven-failsafe-plugin` | `3.5.6` |
+| `maven-war-plugin` | `3.5.1` |
+| `maven-compiler-plugin` | `3.15.0` |
+| `maven-assembly-plugin` | `3.8.0` |
+| `velocity-maven-plugin` | `1.1.3` |
+| `maven-enforcer-plugin` | `3.6.3` |
+| `maven-site-plugin` | `4.0.0-M16` |
+| `exec-maven-plugin` | `3.6.3` |
+| `jacoco-maven-plugin` | `0.8.14` |
+| `maven-antrun-plugin` | `3.2.0` |
+| `maven-release-plugin` | `3.3.1` |
+| `maven-deploy-plugin` | `3.1.4` |
+| `maven-install-plugin` | `3.1.4` |
+| `maven-resources-plugin` | `3.5.0` |
+| `versions-maven-plugin` | `2.21.0` |
+
+These versions are taken from archetype release 3.x (which targets IOM 6.0.0). Only update versions in `<pluginManagement>` — do not change project-specific plugin configurations.
 
 **`testframework.version`** (`iom-test-framework`) must be updated to `8.0.0` because the framework tracks IOM infrastructure changes — version 8.0.0 added Java 21 support and removed the Order State service, making it a required update for IOM 6 compatibility.
 
