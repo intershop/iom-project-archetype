@@ -106,22 +106,20 @@ If the project has no `dependency-helper/` module, skip this step.
 
 ### 4. Expanded enum files
 
+**Pattern rule — all `Expanded*DefDO` files must follow one single pattern:**
+- `@ExpandedEnum(...)` annotation must be present
+- `@Entity`, `@Table`, and `@Configuration` annotations must **not** be present on any of these files
+
 #### Archetype-provided files (21 files)
 
-These files exist in every IOM project and were generated from the archetype. Three of them require semantic API changes in IOM 6:
+These files exist in every IOM project and were generated from the archetype. Two of them require semantic API changes in IOM 6:
 
 **`ExpandedExecutionBeanKeyDefDO.java`**
 - Replace annotation: `@PersistedEnumerationTable(ExecutionBeanKeyDefDO.class)` → `@ExpandedEnum(ExecutionBeanKeyDefDO.class)`
 - Replace import: `bakery.persistence.annotation.PersistedEnumerationTable` → `bakery.persistence.annotation.ExpandedEnum`
 
 **`ExpandedDocumentMapperDefDO.java`**
-- Add three class-level annotations before `@ExpandedEnum`:
-  ```java
-  @Entity
-  @Table(name = "`DocumentMapperDefDO`")
-  @Configuration
-  ```
-- Add imports: `jakarta.persistence.Entity`, `jakarta.persistence.Table`, `bakery.persistence.dataobject.Configuration`
+- No annotation changes required. The `@ExpandedEnum` annotation is already present and sufficient. Do **not** add `@Entity`, `@Table`, or `@Configuration`.
 
 **`ExpandedPaymentDefDO.java`**
 - Add import: `import bakery.payment.v1.EnumPayment;`

@@ -113,6 +113,10 @@ Add configuration to preserve `target/` directory on `mvn clean` (from hotfix/6.
 
 ### 5. Expanded enum files (21 files)
 
+**Pattern rule — all `Expanded*DefDO` files must follow one single pattern:**
+- `@ExpandedEnum(...)` annotation must be present
+- `@Entity`, `@Table`, and `@Configuration` annotations must **not** be present
+
 Apply only **semantically meaningful** IOM 6 changes to each file — do not copy cosmetic noise from ci-project `hotfix/6.0`. Specifically:
 
 **Apply:**
@@ -122,6 +126,7 @@ Apply only **semantically meaningful** IOM 6 changes to each file — do not cop
 - Enum constant value/type changes driven by IOM 6 API changes (e.g. `String` → `EnumPayment`)
 
 **Do NOT apply:**
+- `@Entity`, `@Table`, `@Configuration` annotations — these must not appear on any `Expanded*DefDO` class
 - Import reordering (if the same imports are present, keep the existing order)
 - Whitespace-only changes (spacing inside annotations, blank lines, indentation)
 - Cosmetic reformatting of existing code that does not change meaning

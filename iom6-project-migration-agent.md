@@ -93,6 +93,8 @@ Commit: `fix: remove order-state-app from dependency-helper (removed in IOM 6)`
 
 ## Step 4 — Expanded enum files
 
+**Pattern rule:** Every `Expanded*DefDO` file must have `@ExpandedEnum(...)` and must **not** have `@Entity`, `@Table`, or `@Configuration`. Before making any changes, scan all `Expanded*DefDO.java` files and remove those three annotations (and their imports) wherever found.
+
 ### 4a — `ExpandedExecutionBeanKeyDefDO.java`
 
 Find this file. Read it. Apply:
@@ -103,22 +105,7 @@ Do not change anything else — not the enum constants, not the IDs, not the nam
 
 ### 4b — `ExpandedDocumentMapperDefDO.java`
 
-Find this file. Read it. Add these three annotations immediately before the `@ExpandedEnum` annotation on the class:
-
-```java
-@Entity
-@Table(name = "`DocumentMapperDefDO`")
-@Configuration
-```
-
-Add these imports (in the existing import block, do not reorder existing imports):
-```java
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import bakery.persistence.dataobject.Configuration;
-```
-
-Do not change anything else.
+Find this file. Read it. No annotation changes are required — `@ExpandedEnum` is already present and is the only class-level annotation needed. If `@Entity`, `@Table`, or `@Configuration` are present, remove them and their corresponding imports.
 
 ### 4c — `ExpandedPaymentDefDO.java`
 
