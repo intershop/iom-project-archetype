@@ -99,6 +99,18 @@ The pipeline may contain project-specific stages, variable groups, and service c
 
 These versions are taken from archetype release 3.x (which targets IOM 6.0.0).
 
+**Project-specific plugins not in the table above:**
+
+The project may contain plugins in `<pluginManagement>` or `<build><plugins>` that are not in the archetype and therefore not listed in the table. These plugins are project-specific and are out of scope for the automated migration. For each such plugin found:
+
+- Do not change it
+- Add an entry to the migration protocol under "Follow-up tasks" with:
+  - The plugin `groupId:artifactId`
+  - The current version used in the project
+  - A note that the version should be reviewed and updated as a follow-up to the IOM 6 migration
+
+This gives the project team a complete list of plugins that may benefit from an upgrade, without blocking the migration itself.
+
 **Plugin configuration rules:**
 
 - **Preserve** all project-specific plugin `<configuration>` blocks that already exist — they represent intentional project customizations and must not be overwritten.

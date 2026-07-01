@@ -67,7 +67,12 @@ Read `pom.xml`. Apply these changes:
 </dependency>
 ```
 
-**Plugin versions** — update the `<version>` of each plugin in `<pluginManagement>` to the following target versions. Add the `<pluginManagement>` entry if absent; **preserve all existing `<configuration>` blocks unchanged** — they represent project-specific customizations:
+**Plugin versions** — read the full `<pluginManagement>` and `<build><plugins>` sections. For every plugin found, decide:
+
+- If it is in the table below: update its `<version>` to the target version. Preserve any existing `<configuration>` block unchanged.
+- If it is **not** in the table below: it is a project-specific plugin. Do not change it. Add an entry to the migration protocol under a "Follow-up tasks" section with the plugin `groupId:artifactId`, its current version, and a note that the version should be reviewed as a follow-up to the IOM 6 migration.
+
+Target versions for archetype-provided plugins:
 
 | Plugin | Target version |
 |---|---|
@@ -361,6 +366,14 @@ For each file that could not be automatically handled:
 **Issue:** <what was found — modified beyond archetype template / has callers that could not be migrated>
 **Details:** <the specific modifications found, or which files are calling it>
 **Required action:** <what a human needs to do>
+
+## Follow-up Tasks
+
+Items that are out of scope for this automated migration but should be addressed afterwards:
+
+### <groupId:artifactId>
+**Current version:** <version found in the project>
+**Reason:** Project-specific plugin not covered by the IOM 6 archetype — version was not reviewed as part of this migration.
 
 ## Decisions and Observations
 
