@@ -150,8 +150,18 @@ For each file below, if it exists, apply this procedure:
 
 1. Find the archetype version: check the project's `pom.xml` for a `<plugin><artifactId>maven-archetype-plugin</artifactId>` entry, or look at the earliest git commits for an archetype version reference. The version is typically noted as a comment or property (e.g. `archetypeVersion=2.6.0`).
 2. Read the corresponding file from the `iom-project-archetype` repository at that release tag (e.g. `git show 2.6.0:src/main/resources/archetype-resources/src/main/java/.../FileName.java` in the archetype repo, stripping the `${package}` placeholders mentally).
-3. If the project file matches the archetype original — it was not modified, condition 1 is met.
-4. If the project file differs from the archetype original — it was modified, condition 1 fails.
+3. Compare the two files semantically. The following differences do **not** count as modifications — treat the file as unmodified if only these are present:
+   - Whitespace (indentation, blank lines, trailing spaces)
+   - Import reordering
+   - Method reordering within the class
+   - Comment additions or changes
+   - Brace style or other formatting differences
+4. The following **do** count as modifications — condition 1 fails if any of these are present:
+   - Added, removed, or renamed methods or fields
+   - Changed method signatures, return types, or parameter types
+   - Added, removed, or changed annotations
+   - Changed logic within a method body
+   - Added or removed imports that reflect new dependencies
 
 **Check condition 2** — grep for any usage of the class in the rest of the project:
 ```

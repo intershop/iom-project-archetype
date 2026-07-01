@@ -30,6 +30,20 @@ A file can only be deleted when **both** of the following are true:
 
 **Determining the original archetype content:** The archetype version used to generate the project is recorded in the project's git history — typically the initial commit contains an unmodified archetype output, or the `pom.xml` records the archetype version under `<plugin><artifactId>maven-archetype-plugin</artifactId>`. The authoritative source for any archetype-provided file is the `iom-project-archetype` repository at the corresponding release tag (e.g. tag `2.6.0`). Compare the project file against that tag to determine whether it was modified.
 
+**Definition of "unmodified":** A file is considered unmodified if it is **semantically identical** to the archetype original. The following differences do not count as modifications:
+- Whitespace changes (indentation, blank lines, trailing spaces)
+- Import reordering
+- Method reordering within a class
+- Comment additions or changes
+- Brace style or other formatting differences
+
+The following **do** count as modifications:
+- Added, removed, or renamed methods or fields
+- Changed method signatures, return types, or parameter types
+- Added, removed, or changed annotations
+- Changed logic within a method body
+- Added or removed imports that reflect new dependencies
+
 If either condition fails, deletion is not possible. Instead, the callers must be migrated to use the platform equivalent, and the file itself must either be adapted or left in place if its content was also customized.
 
 ### 4. helm values files are project-specific
