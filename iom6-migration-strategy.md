@@ -124,6 +124,7 @@ Apply only **semantically meaningful** IOM 6 changes to each file — do not cop
 - New or removed fields, methods, or annotations that change the API or behaviour
 - Changes to `@ExpandedEnum` annotation parameters if the referenced class changed
 - Enum constant value/type changes driven by IOM 6 API changes (e.g. `String` → `EnumPayment`)
+- For `ExpandedPaymentDefDO` specifically: name and description strings must be obviously generic placeholders (e.g. `"whateverName"`, `"whateverDescription"`) — not real payment method names like `"AfterPay"`, which would mislead readers into thinking this is a real configured value
 
 **Do NOT apply:**
 - `@Entity`, `@Table`, `@Configuration` annotations — these must not appear on any `Expanded*DefDO` class

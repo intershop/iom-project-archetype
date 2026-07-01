@@ -159,14 +159,18 @@ Find this file. Read it. No annotation changes are required — `@ExpandedEnum` 
 
 Find this file. Read it carefully.
 
-The constructor for `ExpandedPaymentDefDO` enum constants changed: the last argument is now `EnumPayment` instead of `String`.
+The constructor for `ExpandedPaymentDefDO` enum constants changed: the last argument is now `EnumPayment` (a `String` constant from the `EnumPayment` interface) instead of a plain `String`.
 
 Add import:
 ```java
 import bakery.payment.v1.EnumPayment;
 ```
 
-For **each enum constant** in the file: the last string argument (e.g. `"AfterPay"`, `"None"`, `"CreditCard"`) must be replaced with the appropriate `EnumPayment` enum constant. If you cannot determine the correct constant from the string value, use `EnumPayment.NO_PAYMENT` as a safe default. Do not change the IDs, names, or other arguments.
+For **each enum constant** in the file, apply these two rules:
+
+1. **Last argument**: replace the last string literal with the appropriate `EnumPayment` constant. For project-specific constants (positive IDs), choose the constant that matches the actual payment type. If the correct constant cannot be determined, use `EnumPayment.NO_PAYMENT` and record the decision in the protocol.
+
+2. **Name and description of placeholder constants** (negative IDs only): if the name or description is a real-sounding payment name (e.g. `"AfterPay"`), replace it with an obviously generic placeholder such as `"whateverName"` / `"whateverDescription"`. A name like `"AfterPay"` combined with `EnumPayment.NO_PAYMENT` is contradictory and misleads readers. For project-specific constants (positive IDs), preserve the name and description unchanged.
 
 Do not change the other 18 `Expanded*DefDO.java` files — they require no IOM 6 changes.
 
