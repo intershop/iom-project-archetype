@@ -20,9 +20,15 @@ In the archetype template, all enum constants use negative placeholder IDs (e.g.
 
 A project may have added its own Java source files anywhere under `src/main/java/` — not necessarily under the `ps/` package. Project-specific files can have any package name and any directory structure. All Java source files must be scanned for Apache HttpClient 4.x usage (dropped in WildFly 40) and for references to the archetype-provided classes that are now deleted.
 
-### 3. The archetype-provided ps/ files may already have been modified
+### 3. The archetype-provided ps/ files may already have been modified, or used by other project code
 
-Unlike the clean archetype template, the project's copy of the archetype-provided ps/ files may have been locally modified. Deletion of platform-superseded files must only happen after confirming the project has not added project-specific logic to them.
+Unlike the clean archetype template, the project's copy of the archetype-provided ps/ files may have been locally modified. More importantly, other project code (anywhere in `src/main/java/`) may import and use these classes directly.
+
+A file can only be deleted when **both** of the following are true:
+1. The file itself contains no project-specific logic (i.e. it still matches the original archetype template)
+2. No other file in the project imports or references this class
+
+If either condition fails, deletion is not possible. Instead, the callers must be migrated to use the platform equivalent, and the file itself must either be adapted or left in place if its content was also customized.
 
 ### 4. helm values files are project-specific
 
@@ -108,7 +114,11 @@ Files present in the project but not in the archetype template are project-speci
 
 #### Files to DELETE (replaced by platform `com.intershop.oms.rest.*`)
 
-Before deleting, check whether the project has added project-specific logic to each file. If yes, migrate that logic to the platform equivalent rather than deleting outright.
+A file may only be deleted when both of these conditions are met:
+1. The file itself contains no project-specific logic (still matches the original archetype template)
+2. No other file in the project imports or references this class
+
+Check both conditions before deleting. If callers exist, migrate them to the platform equivalent first. If the file itself was modified, its content must be adapted rather than deleted.
 
 | File | Platform replacement |
 |---|---|

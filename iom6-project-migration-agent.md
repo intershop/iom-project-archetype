@@ -140,21 +140,40 @@ Commit: `fix: update expanded enum files for IOM 6 API changes`
 
 ## Step 5 — Delete platform-superseded ps/ files
 
-For each file below, check if it exists. If it does:
-1. Read it
-2. Confirm it contains no project-specific logic (i.e. it matches the archetype template pattern — class-level annotations, basic delegation, no project business logic)
-3. If clean, delete it
-4. If it has project-specific additions, note this and do NOT delete — flag it for manual review
+A file may only be deleted when **both** conditions are true:
+1. The file itself contains no project-specific logic (still matches the archetype template pattern — class-level annotations, basic delegation, no business logic)
+2. No other file in the project imports or references this class
 
-Files to delete:
-- `src/main/java/com/intershop/oms/ps/rest/DefaultOptionsExceptionHandler.java`
-- `src/main/java/com/intershop/oms/ps/rest/ExceptionHandler.java`
-- `src/main/java/com/intershop/oms/ps/rest/JacksonObjectMapperProvider.java`
-- `src/main/java/com/intershop/oms/ps/rest/filter/BasicAuthSecurityContext.java`
-- `src/main/java/com/intershop/oms/ps/rest/filter/CORSFilter.java`
-- `src/main/java/com/intershop/oms/ps/rest/filter/IOMAuthFilter.java`
-- `src/main/java/com/intershop/oms/ps/rest/logging/sl4j/SLF4JContainerLoggingHandler.java`
-- `src/main/java/com/intershop/oms/ps/rest/logging/sl4j/SLF4JWriterInterceptor.java`
+For each file below, if it exists, apply this procedure:
+
+**Check condition 1** — read the file and assess whether it was modified beyond the archetype template.
+
+**Check condition 2** — grep for any usage of the class in the rest of the project:
+```
+grep -rn "ClassName" src/main/java/
+```
+(replace `ClassName` with the simple class name of the file being checked)
+
+**Decision:**
+- Both conditions met → delete the file
+- File was modified (condition 1 fails) → do NOT delete; adapt the file's content to work with IOM 6 instead; flag for manual review
+- Other code uses it (condition 2 fails) → do NOT delete; migrate the callers to use the platform equivalent first, then delete; flag for manual review if the migration is non-trivial
+- Both conditions fail → flag for manual review
+
+Files and their platform equivalents:
+
+| File | Simple class name | Platform replacement |
+|---|---|---|
+| `src/main/java/com/intershop/oms/ps/rest/DefaultOptionsExceptionHandler.java` | `DefaultOptionsExceptionHandler` | `com.intershop.oms.rest.exceptions.DefaultOptionsMethodExceptionMapper` |
+| `src/main/java/com/intershop/oms/ps/rest/ExceptionHandler.java` | `ExceptionHandler` | `com.intershop.oms.rest.exceptions.ExceptionHandler` |
+| `src/main/java/com/intershop/oms/ps/rest/JacksonObjectMapperProvider.java` | `JacksonObjectMapperProvider` | `com.intershop.oms.rest.provider.JacksonContextResolver` |
+| `src/main/java/com/intershop/oms/ps/rest/filter/BasicAuthSecurityContext.java` | `BasicAuthSecurityContext` | `com.intershop.oms.rest.authentication.BasicSecurityContext` |
+| `src/main/java/com/intershop/oms/ps/rest/filter/CORSFilter.java` | `CORSFilter` | `com.intershop.oms.rest.provider.CORSFilter` |
+| `src/main/java/com/intershop/oms/ps/rest/filter/IOMAuthFilter.java` | `IOMAuthFilter` | `com.intershop.oms.rest.provider.AuthenticationFilter` |
+| `src/main/java/com/intershop/oms/ps/rest/logging/sl4j/SLF4JContainerLoggingHandler.java` | `SLF4JContainerLoggingHandler` | `com.intershop.oms.rest.logging.LoggingHandler` |
+| `src/main/java/com/intershop/oms/ps/rest/logging/sl4j/SLF4JWriterInterceptor.java` | `SLF4JWriterInterceptor` | `com.intershop.oms.rest.logging.LoggingWriterInterceptor` |
+
+Note: `AuthenticationFilter` from the platform is not `@Provider`-annotated — callers that previously relied on auto-scan must explicitly register it.
 
 Commit: `fix: remove ps/ files now provided by IOM 6 platform`
 
