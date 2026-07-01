@@ -81,7 +81,7 @@ If any results are found, record them in the protocol under "Follow-up tasks" �
 </dependency>
 ```
 
-**Plugin versions** — read the full `<pluginManagement>` and `<build><plugins>` sections. For every plugin found, decide:
+**Plugin versions** — read the full `<pluginManagement>`, `<build><plugins>`, and `<reporting>` sections. For every plugin found, decide:
 
 - If it is in the table below: update its `<version>` to the target version. Preserve any existing `<configuration>` block unchanged.
 - If it is **not** in the table below: it is a project-specific plugin. Do not change it. Add an entry to the migration protocol under a "Follow-up tasks" section with the plugin `groupId:artifactId`, its current version, and a note that the version should be reviewed as a follow-up to the IOM 6 migration.
@@ -215,6 +215,8 @@ find src/main/java -name "DefaultOptionsExceptionHandler.java" \
 ```
 
 For each file found, apply this procedure:
+
+**Note:** Even for files that are kept (modified or with callers), check whether they import any of the removed dependencies (`resteasy-core-spi`, `resteasy-client`, `slf4j-api`, `jackson-datatype-jsr310`). If they do, remove those imports and any calls that depend on them, since the underlying jars are no longer on the classpath. Record in the protocol.
 
 **Check condition 1 — is the file unmodified from the archetype original?**
 

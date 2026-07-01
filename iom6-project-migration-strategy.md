@@ -111,6 +111,8 @@ The project may contain plugins in `<pluginManagement>` or `<build><plugins>` th
 
 This gives the project team a complete list of plugins that may benefit from an upgrade, without blocking the migration itself.
 
+**Where to look:** Scan `<pluginManagement>`, `<build><plugins>`, and `<reporting>` — plugins in `<reporting>` without a version pin in `<pluginManagement>` should also be added to the plugin table above if they appear there.
+
 **Plugin configuration rules:**
 
 - **Preserve** all project-specific plugin `<configuration>` blocks that already exist — they represent intentional project customizations and must not be overwritten.
@@ -260,6 +262,8 @@ The following archetype-provided files must be kept but updated — again, they 
 **`rest/RestServiceApplication.java`**
 - Remove references to any of the deleted classes above
 - If `IOMAuthFilter` was registered here, replace with explicit registration of `com.intershop.oms.rest.provider.AuthenticationFilter`
+
+**Note on modified files that are kept:** A file may be kept because it was modified or has callers, yet still import a dependency that was removed in this migration (`resteasy-core-spi`, `resteasy-client`, `slf4j-api`, `jackson-datatype-jsr310`). Those imports must be removed even from kept files — the underlying jars are no longer on the classpath and the code will not compile.
 
 #### 5b. Apache HttpClient 4.x — all Java source files
 
