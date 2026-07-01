@@ -13,7 +13,7 @@ The project to migrate is in the directory provided by the user. All paths below
 1. **Never change enum constant IDs, names, or JNDI strings.** These are project-registered values that exist in the database. Only change imports, annotations, and constructor argument types where the IOM 6 API requires it.
 2. **Preserve all project-specific content.** Dependencies, pipeline stages, helm values, SQL scripts — only change what is listed below.
 3. **Apply semantic changes only.** Ignore whitespace, import ordering, and brace style differences. A change is semantic if it affects imports, annotations, field types, method signatures, or referenced class names.
-4. **Before deleting a ps/ file, read it.** If it contains project-specific logic beyond the archetype template, do not delete it — migrate the project-specific logic to the platform equivalent instead.
+4. **Before deleting an archetype-provided file, read it.** If it contains project-specific logic beyond the archetype template, do not delete it — migrate the project-specific logic to the platform equivalent instead.
 5. **Commit each section separately** with a clear message so the migration is reviewable step by step.
 
 ---
@@ -24,7 +24,7 @@ Before making any changes, run:
 
 ```
 find . -name "pom.xml" | head -20
-find . -path "*/ps/**/*.java" | sort
+find . -name "*.java" -path "*/src/main/java/*" | sort
 find . -name "helm-values*.yaml" | sort
 find . -name "azure-pipelines.yml"
 find . -name "Expanded*DefDO.java" | sort
@@ -188,9 +188,10 @@ Read the file. Remove any methods that use `org.apache.http.Header` as a paramet
 
 Read the file. Remove any references to the deleted classes (step 5). If `IOMAuthFilter` was registered here, add explicit registration of `com.intershop.oms.rest.provider.AuthenticationFilter`.
 
-### All other ps/ files — Apache HttpClient scan
+### All other Java source files — Apache HttpClient scan
 
-Run:
+Project-specific Java files can be anywhere under `src/main/java/` with any package name. Run:
+
 ```
 grep -rn "import org.apache.http" src/main/java/
 ```

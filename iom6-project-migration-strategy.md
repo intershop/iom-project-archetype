@@ -16,9 +16,9 @@ The corresponding archetype migration strategy is in `iom6-migration-strategy.md
 
 In the archetype template, all enum constants use negative placeholder IDs (e.g. `-9999`) because the archetype must never define real values. In a customer project, enum constants have real positive IDs that were registered in the database — these must **never be changed**. Only the Java annotations, imports, and constructor argument types need to be updated where IOM 6 changed the API.
 
-### 2. Project-specific ps/ files may exist
+### 2. Project-specific Java source files may exist anywhere
 
-A project may have added its own files under `src/main/java/com/intershop/oms/ps/` alongside the archetype-provided ones. These must be reviewed for Apache HttpClient 4.x usage (dropped in WildFly 40) and for references to the archetype-provided classes that are now deleted.
+A project may have added its own Java source files anywhere under `src/main/java/` — not necessarily under the `ps/` package. Project-specific files can have any package name and any directory structure. All Java source files must be scanned for Apache HttpClient 4.x usage (dropped in WildFly 40) and for references to the archetype-provided classes that are now deleted.
 
 ### 3. The archetype-provided ps/ files may already have been modified
 
@@ -100,7 +100,7 @@ The remaining 18 archetype-provided enum files require no changes.
 
 #### Project-specific enum files
 
-Files present in the project but not in the archetype template are project-specific. These do not need the annotation changes above. However, check them for:
+Files present in the project but not in the archetype template are project-specific additions. They can be in any package, not necessarily under `enums/expand/`. These do not need the annotation changes above. However, scan all Java source files for:
 - Any import or use of `order-state-app` classes (very unlikely but possible)
 - Any import of `org.apache.http.*` (dropped in WildFly 40)
 
