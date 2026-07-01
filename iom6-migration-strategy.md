@@ -139,7 +139,7 @@ This means:
 - Keep existing negative placeholder IDs from the IOM 5 archetype version
 - Never copy positive IDs from ci-project (e.g. `1000`, `1001`, `10000`) — those are real ci-project values
 - JNDI strings must remain example placeholders (e.g. `java:global/example-app/...`), not ci-project-specific values
-- Enum constant names must remain generic examples (e.g. `EXAMPLE`, `TEST`), not ci-project-specific names
+- Enum constant names must remain generic examples (e.g. `EXAMPLE`, `EXAMPLE_PT`), not ci-project-specific names
 
 ### 6. `ps/` Java source files — platform consolidation + IOM 6 API review
 

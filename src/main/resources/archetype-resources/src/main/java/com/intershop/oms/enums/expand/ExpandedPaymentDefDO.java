@@ -20,7 +20,7 @@ public enum ExpandedPaymentDefDO implements PaymentDefDOEnumInterface
      * Values with negative id are meant as syntax example and are ignored (won't get persisted within the database).
      */
 
-    TEST(-9999, "whateverName", "whateverDescription", null, EnumPayment.NO_PAYMENT)
+    EXAMPLE(-9999, "whateverName", "whateverDescription", null, EnumPayment.NO_PAYMENT)
     ;
 
     private Integer id;
