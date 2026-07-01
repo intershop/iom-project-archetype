@@ -146,7 +146,12 @@ A file may only be deleted when **both** conditions are true:
 
 For each file below, if it exists, apply this procedure:
 
-**Check condition 1** — read the file and assess whether it was modified beyond the archetype template.
+**Check condition 1** — determine the archetype version that generated this project, then compare the file against the original archetype output at that version:
+
+1. Find the archetype version: check the project's `pom.xml` for a `<plugin><artifactId>maven-archetype-plugin</artifactId>` entry, or look at the earliest git commits for an archetype version reference. The version is typically noted as a comment or property (e.g. `archetypeVersion=2.6.0`).
+2. Read the corresponding file from the `iom-project-archetype` repository at that release tag (e.g. `git show 2.6.0:src/main/resources/archetype-resources/src/main/java/.../FileName.java` in the archetype repo, stripping the `${package}` placeholders mentally).
+3. If the project file matches the archetype original — it was not modified, condition 1 is met.
+4. If the project file differs from the archetype original — it was modified, condition 1 fails.
 
 **Check condition 2** — grep for any usage of the class in the rest of the project:
 ```

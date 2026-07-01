@@ -25,8 +25,10 @@ A project may have added its own Java source files anywhere under `src/main/java
 Unlike the clean archetype template, the project's copy of the archetype-provided ps/ files may have been locally modified. More importantly, other project code (anywhere in `src/main/java/`) may import and use these classes directly.
 
 A file can only be deleted when **both** of the following are true:
-1. The file itself contains no project-specific logic (i.e. it still matches the original archetype template)
+1. The file itself contains no project-specific logic — meaning its content is identical to what the archetype generated when the project was created
 2. No other file in the project imports or references this class
+
+**Determining the original archetype content:** The archetype version used to generate the project is recorded in the project's git history — typically the initial commit contains an unmodified archetype output, or the `pom.xml` records the archetype version under `<plugin><artifactId>maven-archetype-plugin</artifactId>`. The authoritative source for any archetype-provided file is the `iom-project-archetype` repository at the corresponding release tag (e.g. tag `2.6.0`). Compare the project file against that tag to determine whether it was modified.
 
 If either condition fails, deletion is not possible. Instead, the callers must be migrated to use the platform equivalent, and the file itself must either be adapted or left in place if its content was also customized.
 
