@@ -239,30 +239,26 @@ Commit: `fix: update ps/ files to use IOM 6 platform APIs`
 
 ## Step 7 — `azure-pipelines.yml`
 
-Read the file. Apply:
-- `JDK_MAJOR_VERSION`: change to `21`
-- `IOM_HELM_VERSION`: change to `3.1.1`
-- Maven task version: if any `Maven@4` is present, revert to `Maven@3` (IOM uses Maven 3.9.x)
+Read the file. A standard generated project delegates CI entirely to `ci-job-template.yml` in the `iom-partner-devops` repository and contains no version-pinned JDK, Helm chart, or Maven task references. In that case, **no changes are needed** — record this in the protocol.
 
-Preserve all project-specific content.
+If the project has extended the pipeline with custom stages or jobs, scan those additions for:
+- Hardcoded JDK version `17` → change to `21`
+- `Maven@4` → revert to `Maven@3` (IOM uses Maven 3.9.x)
 
-Commit: `fix: update CI pipeline for IOM 6 (JDK 21, Helm 3.1.1)`
+If changes were made, commit: `fix: update CI pipeline custom stages for IOM 6`
 
 ---
 
 ## Step 8 — Helm values files
 
-Find all `helm-values*.yaml` files:
+Run:
 ```
 find . -name "helm-values*.yaml"
 ```
 
-For each file:
-1. Read it
-2. Add `kubectlImageRepository: "registry.k8s.io/kubectl:v1.32.1"` at the top level if not already present
-3. Find `dbaccount.image.tag` and update to `2.1.0` if currently below that version
+A standard generated project contains **no Helm values files** — Helm deployment is managed centrally by `iom-partner-devops`. If this command finds nothing, record that in the protocol and skip this step.
 
-Commit: `fix: update helm values for IOM 6 (kubectl image, dbaccount tag)`
+If Helm values files are found, they are a project-specific addition outside the standard archetype structure. Record each file in the protocol under "Decisions and Observations" and flag them for manual review — they are out of scope for this automated migration.
 
 ---
 

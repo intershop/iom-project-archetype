@@ -48,9 +48,13 @@ The following **do** count as modifications:
 
 If either condition fails, deletion is not possible. Instead, the callers must be migrated to use the platform equivalent, and the file itself must either be adapted or left in place if its content was also customized.
 
-### 4. helm values files are project-specific
+### 4. Generated projects contain no Helm values files
 
-The project will have multiple `helm-values-*.yaml` files (dev, ci, production, etc.) with real hostnames, database credentials, and resource sizes. Only the infrastructure-level settings need updating (`kubectlImageRepository`, `dbaccount.image.tag`), not the project-specific values.
+`helm-values-test.yaml` lives in the `iom-project-archetype` repository root and is used exclusively by the archetype's own CI pipeline to test the archetype itself — it deploys a generated project into AKS to verify the archetype template works. It is not part of the generated project and does not appear in customer projects.
+
+A generated project's `azure-pipelines.yml` delegates CI entirely to the `ci-job-template.yml` in the `iom-partner-devops` repository. Helm deployment, including any Helm values, is managed centrally by that template — the project only provides a `projectEnvName` parameter and WildFly CLI configuration files under `src/etc/env/<name>/`. There are no `helm-values-*.yaml` files to migrate in a customer project.
+
+If a project does contain Helm values files, they are a project-specific addition outside the standard archetype structure. The migration agent must note their existence in the protocol and flag them for manual review — they are out of scope for this automated migration.
 
 ### 5. azure-pipelines.yml has project-specific customizations
 
@@ -181,19 +185,13 @@ WildFly 40 dropped Apache HttpClient 4.x. Scan all remaining ps/ Java files for 
 
 ### 6. `azure-pipelines.yml`
 
-**Change:**
-- `JDK_MAJOR_VERSION`: `17` → `21`
-- `IOM_HELM_VERSION`: update to `3.1.1` (or the version appropriate for IOM 6.0.0)
-- Maven task: keep `Maven@3` — IOM uses Maven 3.9.x (do not upgrade to `Maven@4`)
+The generated project's `azure-pipelines.yml` delegates CI entirely to `ci-job-template.yml` in the `iom-partner-devops` repository. It contains no version-pinned JDK, Helm, or Maven task references — those are managed centrally by the template. There is therefore **nothing to change** in a standard generated project's pipeline for the IOM 6 migration.
 
-**Preserve all project-specific content** — variable groups, service connections, custom stages, project-specific Maven goals.
+If the project has added custom stages or jobs beyond the standard delegation (which is allowed by the template), scan them for:
+- Hardcoded JDK version references (`17` → `21` if present)
+- Maven task version (`Maven@3` is correct; do not upgrade to `Maven@4`)
 
-### 7. Helm values files
-
-For **each** `helm-values-*.yaml` in the project:
-
-- Add `kubectlImageRepository: "registry.k8s.io/kubectl:v1.32.1"` if not already present. The IOM Helm chart defaults to `docker.io/bitnami/kubectl:1.32.1` which requires Docker Hub authentication; `registry.k8s.io` is the official Kubernetes registry, publicly accessible.
-- Update `dbaccount.image.tag` from `2.0.0` → `2.1.0` if not already at `2.1.0` or higher.
+Preserve all project-specific content.
 
 ---
 
@@ -201,10 +199,9 @@ For **each** `helm-values-*.yaml` in the project:
 
 - Enum constant names, IDs, and JNDI strings — these are project-specific registered values
 - Project-specific dependencies in `pom.xml`
-- Project-specific stages and jobs in `azure-pipelines.yml`
-- Project-specific database names, hostnames, credentials in helm values
 - `src/sql-config/` — SQL migration scripts are project-specific and not affected by IOM 6
 - `src/etc/`, `src/xsl-templates/`, `src/mail-templates/` — project-specific configuration
+- Helm values files — standard generated projects do not contain them (see section 4 above)
 
 ---
 
