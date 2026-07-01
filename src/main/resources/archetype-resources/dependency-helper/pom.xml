@@ -112,12 +112,6 @@ $symbol_escape = '\' )
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>com.intershop.oms</groupId>
-            <artifactId>order-state-app</artifactId>
-            <version>${symbol_dollar}{platform.version}</version>
-            <type>pom</type>
-        </dependency>
-        <dependency>
             <groupId>oms.monitoring</groupId>
             <artifactId>oms.monitoring</artifactId>
             <version>${symbol_dollar}{platform.version}</version>
