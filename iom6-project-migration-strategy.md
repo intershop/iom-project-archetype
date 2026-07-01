@@ -70,13 +70,16 @@ The pipeline may contain project-specific stages, variable groups, and service c
 |---|---|---|
 | `platformVersion` property | `5.x.x` | `6.0.0` |
 | `wildfly.version` | `30.0.1.Final` | `40.0.0.Final` |
-| `org.junit.version` | `5.9.2` | `6.1.0` |
-| `testframework.version` | `7.1.0` | `8.0.0` |
+| `testframework.version` | `7.x.x` | `8.0.0` |
 | compiler `<release>` | `17` | `21` |
 | `postgresql` | `42.7.x` | `42.7.11` |
 | Plugin versions | various | align with archetype 3.x.x / ci-project hotfix/6.0 |
 
 The exact plugin versions to target are the same as those applied to the archetype in `iom6-migration-strategy.md` section 1.
+
+**`testframework.version`** (`iom-test-framework`) must be updated to `8.0.0` because the framework tracks IOM infrastructure changes — version 8.0.0 added Java 21 support and removed the Order State service, making it a required update for IOM 6 compatibility.
+
+**`org.junit.version`** must **not** be updated as part of this migration. JUnit is a general-purpose test library independent of the IOM platform version. A project with many tests written against JUnit 5 APIs will continue to work on IOM 6 with JUnit 5. Upgrading JUnit 5 → 6 is a separate task that may require migrating test implementations; it should be scheduled as a follow-up after the IOM 6 migration is complete, using the JUnit migration documentation as a guide.
 
 ### 2. `pom.xml` — dependencies
 

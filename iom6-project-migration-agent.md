@@ -42,10 +42,10 @@ Read `pom.xml`. Apply these changes:
 **Version properties** — find and update:
 - `<platformVersion>` or `<platform.version>`: set to `6.0.0`
 - `<wildfly.version>`: set to `40.0.0.Final`
-- `<org.junit.version>`: set to `6.1.0`
-- `<testframework.version>`: set to `8.0.0`
+- `<testframework.version>`: set to `8.0.0` — `iom-test-framework` tracks IOM infrastructure changes; 8.0.0 is required for IOM 6 / Java 21 compatibility
 - `<postgresql>` version: set to `42.7.11`
 - Maven compiler `<release>`: set to `21`
+- `<org.junit.version>`: **do not change** — JUnit is independent of the IOM platform version. Upgrading JUnit 5 → 6 requires test code changes and is a separate follow-up task, not part of the IOM 6 migration. Record in the protocol that this was intentionally left unchanged.
 
 **Dependencies to remove** (remove the entire `<dependency>` block for each):
 - `resteasy-core-spi`
