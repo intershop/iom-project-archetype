@@ -23,7 +23,7 @@ The project to migrate is in the directory provided by the user. All paths below
 
 Before making any changes, run:
 
-```
+```bash
 find . -name "pom.xml" | head -20
 find . -name "*.java" -path "*/src/main/java/*" | sort
 find . -name "helm-values*.yaml" | sort
@@ -40,28 +40,35 @@ Understand the structure. Note any files that deviate from the standard archetyp
 Read `pom.xml`. Apply these changes:
 
 **Version properties** — find and update:
+
 - `<platformVersion>` or `<platform.version>`: set to `6.0.0`
 - `<wildfly.version>`: set to `40.0.0.Final`
 - `<testframework.version>`: set to `8.0.0` — `iom-test-framework` tracks IOM infrastructure changes; 8.0.0 is required for IOM 6 / Java 21 compatibility
 - `<postgresql>` version: set to `42.7.11`
 - Maven compiler `<release>`: set to `21`
-- `<org.junit.version>`: **do not change** — JUnit is independent of the IOM platform version. Upgrading JUnit 5 → 6 requires test code changes and is a separate follow-up task, not part of the IOM 6 migration. Record in the protocol that this was intentionally left unchanged.
+- `<org.junit.version>`: **do not change** — JUnit is independent of the IOM platform version. Upgrading JUnit 5 → 6.1.0 requires test code changes and is a separate follow-up task, not part of the IOM 6 migration. If present,  record in the protocol that this was intentionally left unchanged and add it in the  "Untouched items worth updating" paragraph.
+- `<org.mockito.version>`: **do not change** — Upgrading mockito from  4.6.1 to 4.11.0 may require test code changes and is a separate follow-up task, not part of the IOM 6 migration. If mockito is present,  record in the protocol that this was intentionally left unchanged and add it in the  "Untouched items worth updating" paragraph.
+- `<net.bytebuddy.version>`: **do not change** — Upgrading bytebuddy from 1.12 to 1.18.8 may require test code changes and is a separate follow-up task, not part of the IOM 6 migration. If bytebuddy is present,  record in the protocol that this was intentionally left unchanged and add it in the  "Untouched items worth updating" paragraph.
 
 **Transitive effects of `iom-test-framework` 8.0.0 — additional checks:**
 
 *SLF4J logging backend:* Search `pom.xml` for `logback` or `log4j`. If found:
+
 - Logback: ensure its version is `1.4.x` or newer. If older, update it.
 - Log4j2: ensure the SLF4J bridge artifact is `log4j-slf4j2-impl` (with `2` suffix). If the project uses `log4j-slf4j-impl` (without the `2`), change it. Record the finding in the protocol.
 
 *`jackson-annotations` pin:* Check `<dependencyManagement>` for an explicit `com.fasterxml.jackson.core:jackson-annotations` version. If it is less than `2.21`, update it to `2.21`. If it is `2.21` or absent, no action needed. Record the finding in the protocol.
 
 *Flyway direct API usage in tests:* Run:
-```
+
+```bash
 grep -rn "import org.flywaydb" src/test/
 ```
+
 If any results are found, record them in the protocol under "Follow-up tasks" — direct Flyway API usage may require changes due to Flyway 9.5.0 → 12.8.1 (PostgreSQL support moved to a separate module in Flyway 10). Do not attempt an automated fix; flag for manual review.
 
 **Dependencies to remove** (remove the entire `<dependency>` block for each):
+
 - `resteasy-core-spi`
 - `resteasy-client`
 - `slf4j-api` with `<scope>provided</scope>`
@@ -69,9 +76,11 @@ If any results are found, record them in the protocol under "Follow-up tasks" �
 - `jackson-datatype-jsr310`
 
 **Dependencies to change:**
+
 - `commons-lang3`: change `<scope>` to `provided` (add the scope element if absent)
 
 **Dependencies to add** (if not already present):
+
 ```xml
 <dependency>
     <groupId>com.intershop.oms</groupId>
@@ -89,7 +98,7 @@ If any results are found, record them in the protocol under "Follow-up tasks" �
 Target versions for archetype-provided plugins:
 
 | Plugin | Target version |
-|---|---|
+| --- | --- |
 | `maven-dependency-plugin` | `3.11.0` |
 | `maven-clean-plugin` | `3.5.0` |
 | `maven-surefire-plugin` | `3.5.6` |
@@ -159,7 +168,8 @@ Commit: `fix: remove order-state-app from dependency-helper (removed in IOM 6)`
 
 ### 4a — `ExpandedExecutionBeanKeyDefDO.java`
 
-Find this file. Read it. Apply:
+Find this file. If exists: Read it. Apply:
+
 - Replace import `bakery.persistence.annotation.PersistedEnumerationTable` with `bakery.persistence.annotation.ExpandedEnum`
 - Replace class annotation `@PersistedEnumerationTable(ExecutionBeanKeyDefDO.class)` with `@ExpandedEnum(ExecutionBeanKeyDefDO.class)`
 
@@ -167,30 +177,15 @@ Do not change anything else — not the enum constants, not the IDs, not the nam
 
 ### 4b — `ExpandedDocumentMapperDefDO.java`
 
-Find this file. Read it. No annotation changes are required — `@ExpandedEnum` is already present and is the only class-level annotation needed. If `@Entity`, `@Table`, or `@Configuration` are present, remove them and their corresponding imports.
+Find this file. If exists: Read it. No annotation changes are required — `@ExpandedEnum` is already present and is the only class-level annotation needed. If `@Entity`, `@Table`, or `@Configuration` are present, remove them and their corresponding imports.
 
 ### 4c — `ExpandedPaymentDefDO.java`
 
-Find this file. Read it carefully.
+Find this file. If exists: Read it carefully. No annotation changes are required — `@ExpandedEnum` is already present and is the only class-level annotation needed. If `@Entity`, `@Table`, or `@Configuration` are present, remove them and their corresponding imports.
 
-**Important:** `EnumPayment` is a Java interface whose fields are `String` constants — `EnumPayment.NO_PAYMENT` is a `String` value, not a new type. This means:
-- The `payment` field type stays `String`
-- The constructor's last parameter stays `String`
-- `getPayment()` return type stays `String`
-- **Only the last argument of each enum constant call changes** — replace the raw string literal with the named `EnumPayment` constant
+For **each enum constant** in the file, apply this rule:
 
-Do **not** change the field type or constructor parameter type. Do **not** change the return type of `getPayment()`.
-
-Add import:
-```java
-import bakery.payment.v1.EnumPayment;
-```
-
-For **each enum constant** in the file, apply these two rules:
-
-1. **Last argument**: replace the last string literal with the appropriate `EnumPayment` constant. For project-specific constants (positive IDs), choose the constant that matches the actual payment type. If the correct constant cannot be determined, use `EnumPayment.NO_PAYMENT` and record the decision in the protocol.
-
-2. **Name and description of placeholder constants** (negative IDs only): if the name or description is a real-sounding payment name (e.g. `"AfterPay"`), replace it with an obviously generic placeholder such as `"whateverName"` / `"whateverDescription"`. A name like `"AfterPay"` combined with `EnumPayment.NO_PAYMENT` is contradictory and misleads readers. For project-specific constants (positive IDs), preserve the name and description unchanged.
+1. **Name and description of placeholder constants** (negative IDs only): if the name, description or payment is a real-sounding payment name (e.g. `"AfterPay"`), replace it with an obviously generic placeholder such as `"whateverName"` / `"whateverDescription"` / `"whateverPayment"`. A name like `"AfterPay"` combined with `EnumPayment.NO_PAYMENT` is contradictory and misleads readers. For project-specific constants (positive IDs), preserve the attributes unchanged.
 
 Do not change the other 18 `Expanded*DefDO.java` files — they require no IOM 6 changes.
 
@@ -203,7 +198,8 @@ Commit: `fix: update expanded enum files for IOM 6 API changes`
 The archetype provided certain files that are now superseded by `com.intershop.oms.rest.*` in IOM 6. These files are typically located under the package the project was generated with (often `com.intershop.oms.ps`), but their exact path depends on the package name chosen at generation time.
 
 First, locate the files by their class names — use `find` rather than assuming a fixed path:
-```
+
+```bash
 find src/main/java -name "DefaultOptionsExceptionHandler.java" \
   -o -name "ExceptionHandler.java" \
   -o -name "JacksonObjectMapperProvider.java" \
@@ -238,12 +234,15 @@ For each file found, apply this procedure:
 **Check condition 2 — is the class referenced anywhere in the project?**
 
 Search the entire source tree — project-specific callers can be in any package, not only alongside the file being checked:
-```
+
+```bash
 grep -rn "ClassName" src/main/java/
 ```
+
 (replace `ClassName` with the simple class name of the file being checked)
 
 **Decision:**
+
 - Both conditions met → delete the file
 - File was modified (condition 1 fails) → do NOT delete; adapt the file's content to work with IOM 6 instead; flag for manual review
 - Other code uses it (condition 2 fails) → do NOT delete; migrate the callers to use the platform equivalent first, then delete; flag for manual review if the migration is non-trivial
@@ -252,7 +251,7 @@ grep -rn "ClassName" src/main/java/
 Platform equivalents:
 
 | Simple class name | Platform replacement |
-|---|---|
+| --- | --- |
 | `DefaultOptionsExceptionHandler` | `com.intershop.oms.rest.exceptions.DefaultOptionsMethodExceptionMapper` |
 | `ExceptionHandler` | `com.intershop.oms.rest.exceptions.ExceptionHandler` |
 | `JacksonObjectMapperProvider` | `com.intershop.oms.rest.provider.JacksonContextResolver` |
@@ -275,13 +274,19 @@ Locate each file by class name using `find src/main/java -name "FileName.java"`.
 ### `DynamicLoggingFeature.java`
 
 Read the file. Replace:
+
 - All references to `SLF4JContainerLoggingHandler` → `LoggingHandler` (from `com.intershop.oms.rest.logging`)
 - All references to `SLF4JWriterInterceptor` → `LoggingWriterInterceptor` (from `com.intershop.oms.rest.logging`)
 - Update imports accordingly; remove the old `SLF4JContainerLoggingHandler` and `SLF4JWriterInterceptor` imports
+- Update imports accordingly; remove the old `SLF4JContainerLoggingHandler` and `SLF4JWriterInterceptor` imports
+
+Check for furthetr usages of  `SLF4JContainerLoggingHandler` and  `SLF4JWriterInterceptor` in other java classes:
+ - when found, update them using the same replacements as in `DynamicLoggingFeature.java`
 
 ### `ClientBuilder.java`
 
 Read the file. Replace:
+
 - `SLF4JWriterInterceptor` → `LoggingWriterInterceptor` (from `com.intershop.oms.rest.logging`)
 - Keep `SLF4JClientLoggingHandler` unchanged (no platform equivalent)
 - Update imports accordingly
@@ -302,11 +307,11 @@ Read the file. Remove any references to the deleted classes (step 5). If `IOMAut
 
 WildFly 40 dropped Apache HttpClient 4.x. This may affect not only the archetype-provided files above but any project-specific file in the entire source tree. Run:
 
-```
+```bash
 grep -rn "import org.apache.http" src/main/java/
 ```
 
-For **every** file found — regardless of package or who wrote it — read the file, identify the affected methods, and remove or rewrite them. If a method cannot be replaced without understanding project-specific business logic, flag it for manual review.
+For **every** file found — regardless of package or who wrote it — read the file, identify the affected methods, and remove or rewrite them. If a method cannot be replaced without understanding project-specific business logic, flag it for manual review. As for all steps defined in this iom6-project-migration-agent.md file, ensure that all  modifications are recorded in the migration protocol.
 
 Commit: `fix: update Java sources to use IOM 6 platform APIs`
 
@@ -317,6 +322,7 @@ Commit: `fix: update Java sources to use IOM 6 platform APIs`
 Read the file. A standard generated project delegates CI entirely to `ci-job-template.yml` in the `iom-partner-devops` repository and contains no version-pinned JDK, Helm chart, or Maven task references. In that case, **no changes are needed** — record this in the protocol.
 
 If the project has extended the pipeline with custom stages or jobs, scan those additions for:
+
 - Hardcoded JDK version `17` → change to `21`
 - `Maven@4` → revert to `Maven@3` (IOM uses Maven 3.9.x)
 
@@ -327,7 +333,8 @@ If changes were made, commit: `fix: update CI pipeline custom stages for IOM 6`
 ## Step 8 — Helm values files
 
 Run:
-```
+
+```bash
 find . -name "helm-values*.yaml"
 ```
 
@@ -340,11 +347,13 @@ If Helm values files are found, they are a project-specific addition outside the
 ## Step 9 — Build verification
 
 Run:
-```
+
+```bash
 mvn clean install
 ```
 
 If the build fails:
+
 - Compilation errors about missing types → a dependency was not removed or a platform class reference is wrong
 - Compilation errors about `org.apache.http` → Apache HttpClient references remain; find and remove them
 - Any other error → read the error carefully and apply the minimum fix needed
@@ -395,18 +404,27 @@ For each file that could not be automatically handled:
 
 ## Follow-up Tasks
 
-Items that are out of scope for this automated migration but should be addressed afterwards:
+### Project-specific out-of-scope items
+
+Items that are out of scope for this automated migration but should be addressed afterwards.
 
 ### <groupId:artifactId>
 **Current version:** <version found in the project>
 **Reason:** Project-specific plugin not covered by the IOM 6 archetype — version was not reviewed as part of this migration.
+
+### Untouched items worth updating
+
+Include untouched items that are probably worth updating as a follow-up.
+
+### <groupId:artifactId>
+**Current version:** <version found in the project>
+**Target version:** <as used in blueprint project>
 
 ## Decisions and Observations
 
 Any notable finding that does not fit the above, e.g.:
 - A file that was expected to exist but was absent
 - An Apache HttpClient usage that could not be automatically resolved
-- An enum constant where `EnumPayment` mapping was uncertain and `NO_PAYMENT` was used as a fallback
 - Any deviation from the standard migration steps and the reason for it
 ```
 

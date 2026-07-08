@@ -169,7 +169,8 @@ If the project already has a `maven-clean-plugin` configuration, read it careful
 - `commons-lang3`: compile → `provided`
 
 **Add if not already present:**
-- `com.intershop.oms:rest` at `${platform.version}` with `<scope>provided</scope>` — provides the platform logging API (`LoggingHandler`, `LoggingWriterInterceptor`, etc.)
+- `com.intershop.oms:rest` at `${platform.version}` with `<scope>compile</scope>` — provides the platform logging API (`LoggingHandler`, `LoggingWriterInterceptor`, etc.)
+- set its scope to `compile` if not yet done.
 
 **Preserve** all project-specific dependencies. Do not remove any dependency that is not in the list above.
 
