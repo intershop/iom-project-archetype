@@ -377,7 +377,7 @@ If Helm values files are found, they are a project-specific addition outside the
 Run:
 
 ```bash
-mvn clean install
+mvn -U clean install
 ```
 
 If the build fails:
