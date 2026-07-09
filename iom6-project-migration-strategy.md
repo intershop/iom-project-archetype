@@ -166,7 +166,7 @@ If the project already has a `maven-clean-plugin` configuration, read it careful
 - `jackson-datatype-jsr310`
 
 **Change scope:**
-- `commons-lang3`: compile → `provided`
+- `commons-lang3`: compile → `provided`. Note that the legacy `commons-lang` 2.x artifact (`commons-lang:commons-lang`, package `org.apache.commons.lang`) was removed from the parent IOM pom in IOM 6. Project code that imported `org.apache.commons.lang.*` relied on it transitively and will no longer compile. Such code must be migrated to `commons-lang3` (package `org.apache.commons.lang3`) — see section 5c — and if the project did not already declare `commons-lang3` explicitly, it must be **added** with `<scope>provided</scope>` (the platform supplies it at runtime, so it must not be bundled into the war).
 
 **Add if not already present:**
 - `com.intershop.oms:rest` at `${platform.version}` with `<scope>compile</scope>` — provides the platform logging API (`LoggingHandler`, `LoggingWriterInterceptor`, etc.)
@@ -276,6 +276,18 @@ grep -rn "import org.apache.http" src/main/java/
 
 For every file found — regardless of where it lives or who wrote it — remove or replace the `org.apache.http.*` usages. If a method's only purpose was to use Apache HttpClient types and has no alternative, remove the method. If a replacement requires understanding project-specific business logic, flag it for manual review.
 
+#### 5c. Legacy commons-lang 2.x — all Java source files
+
+IOM 6 removed the legacy `commons-lang` 2.x artifact (`commons-lang:commons-lang`, package `org.apache.commons.lang`) from the parent IOM pom. Any project file that imported `org.apache.commons.lang.*` — for example `import org.apache.commons.lang.NotImplementedException` — was resolving that dependency transitively and will no longer compile once the jar leaves the classpath. Scan the entire source tree, including tests:
+
+```
+grep -rn "import org.apache.commons.lang\." src/main/java/ src/test/java/
+```
+
+The trailing `.` after `lang` matches only the 2.x package `org.apache.commons.lang.*` and deliberately excludes `org.apache.commons.lang3.*`, which is the correct IOM 6 package and must not be touched.
+
+For every file found, replace the import prefix `org.apache.commons.lang.` with `org.apache.commons.lang3.`. Most classes moved 1:1 between the two libraries, but a handful were renamed, relocated, or dropped in 3.x — verify each referenced class actually exists in `commons-lang3` and flag the file for manual review rather than guessing when it does not. When at least one match is found, ensure the project declares `commons-lang3` explicitly with `provided` scope (see section 2) — the platform provides it at runtime. If no matches are found, no dependency change is needed.
+
 ### 6. `azure-pipelines.yml`
 
 The generated project's `azure-pipelines.yml` delegates CI entirely to `ci-job-template.yml` in the `iom-partner-devops` repository. It contains no version-pinned JDK, Helm, or Maven task references — those are managed centrally by the template. There is therefore **nothing to change** in a standard generated project's pipeline for the IOM 6 migration.
@@ -310,5 +322,6 @@ A successful build confirms:
 - Compilation succeeds against IOM 6 platform APIs
 - No missing imports from removed dependencies
 - No Apache HttpClient references remain in Java sources
+- No legacy `org.apache.commons.lang` (2.x) imports remain in Java sources
 
 For a full integration verification, the CI pipeline must pass — this exercises Helm deployment, DB migration, and the platform integration.

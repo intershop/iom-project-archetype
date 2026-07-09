@@ -86,7 +86,7 @@ If any results are found, record them in the protocol under "Follow-up tasks" �
     <groupId>com.intershop.oms</groupId>
     <artifactId>rest</artifactId>
     <version>${platform.version}</version>
-    <scope>provided</scope>
+    <scope>compile</scope>
 </dependency>
 ```
 
@@ -312,6 +312,34 @@ grep -rn "import org.apache.http" src/main/java/
 ```
 
 For **every** file found — regardless of package or who wrote it — read the file, identify the affected methods, and remove or rewrite them. If a method cannot be replaced without understanding project-specific business logic, flag it for manual review. As for all steps defined in this iom6-project-migration-agent.md file, ensure that all  modifications are recorded in the migration protocol.
+
+### All Java source files — legacy `commons-lang` (2.x) scan
+
+The legacy `commons-lang` 2.x artifact (`commons-lang:commons-lang`, package `org.apache.commons.lang`) was removed from the parent IOM pom in IOM 6. Project source files may still rely on it transitively — e.g. `import org.apache.commons.lang.NotImplementedException`. Since the jar is no longer on the classpath, these imports will no longer resolve and must be migrated to `commons-lang3` (package `org.apache.commons.lang3`). Run:
+
+```bash
+grep -rn "import org.apache.commons.lang\." src/main/java/ src/test/java/
+```
+
+Note the trailing `.` after `lang` — it matches the 2.x package `org.apache.commons.lang.*` while excluding `org.apache.commons.lang3.*`, which is already correct and must not be touched.
+
+For **every** file found — regardless of package or who wrote it:
+
+1. Replace the import prefix `org.apache.commons.lang.` with `org.apache.commons.lang3.` (e.g. `org.apache.commons.lang.NotImplementedException` → `org.apache.commons.lang3.NotImplementedException`).
+2. Verify the referenced class actually exists in `commons-lang3` — most classes moved 1:1, but a few were renamed, relocated, or removed between 2.x and 3.x. If a class has no direct `commons-lang3` equivalent, do not guess: flag the file for manual review in the protocol instead of applying the rename.
+3. Leave the rest of the file unchanged.
+
+**If (and only if) at least one match was found**, ensure the project pom declares `commons-lang3` explicitly with `provided` scope (the platform supplies it at runtime, so it must not be bundled). Add the following to the project pom's `<dependencies>` if a `commons-lang3` dependency is not already present; if it is present, apply the scope change already described in Step 2 ("Dependencies to change"):
+
+```xml
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+    <scope>provided</scope>
+</dependency>
+```
+
+If no `org.apache.commons.lang.*` imports were found, do not add the dependency. Record the outcome (matches found and migrated, or none found) in the migration protocol.
 
 Commit: `fix: update Java sources to use IOM 6 platform APIs`
 
