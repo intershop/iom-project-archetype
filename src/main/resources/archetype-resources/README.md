@@ -17,6 +17,10 @@ further information, e.g.:
 - [Directory structure of IOM projects](https://github.com/intershop/iom-project-archetype/wiki/Directory-Structure-of-IOM-Projects),
 - [Migrating your project](https://github.com/intershop/iom-project-archetype/wiki/Migration-Guide) to a newer version of *IOM Project Archetype*.
 
+## Prerequisites
+
+- **Maven 3.9.16** — required to build this project (IOM 6.0.0)
+
 ## devenv-4-iom
 
 [*devenv-4-iom*](https://github.com/intershop/devenv-4-iom) is a software project, maintained by Intershop, that helps IOM developers to run
@@ -57,4 +61,3 @@ to understand the customization concepts and demonstrates solutions for common r
 [documentation](https://support.intershop.com/kb/30U296) of *IOM Blueprint Project* in order to understand basic IOM concepts.
 Good starting points are [Guide - IOM How to Start](https://support.intershop.com/kb/30097C) and
 [Concept - The Intershop Order Management Blueprint Project](https://support.intershop.com/kb/30U296).
-
