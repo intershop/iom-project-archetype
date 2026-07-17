@@ -92,7 +92,10 @@ jobs:
 
   - task: MavenAuthenticate@0
     inputs:
-      artifactsFeeds: order-iom-snapshots,order-iom-releases
+      # order-iom-snapshots/order-iom-releases: deploy targets (distributionManagement)
+      # iom-maven-artifacts: source feed for the IOM platform libraries, resolved by the
+      #   archetype integration test and the dependency-helper build
+      artifactsFeeds: order-iom-snapshots,order-iom-releases,iom-maven-artifacts
     timeoutInMinutes: 1
     displayName: "Maven - authenticate"
 
