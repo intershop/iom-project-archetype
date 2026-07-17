@@ -89,7 +89,7 @@
         <dependency>
             <groupId>com.intershop.oms</groupId>
             <artifactId>rest</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
             <version>${platform.version}</version>
         </dependency>
 
