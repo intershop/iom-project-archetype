@@ -153,14 +153,14 @@ jobs:
   # Build and integration-test the archetype. The archetype integration test
   # generates a test project and builds its Docker image, which is consumed by
   # the AKS smoke test further below.
-  - task: Maven@3
+  - task: Maven@4
     inputs:
       goals: clean verify
       mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
       mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
     displayName: "Maven - build and verify archetype"
 
-  - task: Maven@3
+  - task: Maven@4
     inputs:
       goals: clean verify
       mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/target/test-classes/projects/basic/project/archetype-test/dependency-helper/pom.xml'
@@ -211,7 +211,7 @@ jobs:
   #   release    -> order-iom-releases  (distributionManagement/repository)
   # archetype.test.skip avoids re-running the integration test that already ran
   # during the "clean verify" build above.
-  - task: Maven@3
+  - task: Maven@4
     condition: succeeded()
     inputs:
       goals: deploy
