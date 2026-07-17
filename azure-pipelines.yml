@@ -49,8 +49,6 @@ variables:
     --get-image-name=$(PROJECT_IMAGE_NAME_FILE)
     --get-image-tag=$(PROJECT_IMAGE_TAG_FILE)
 
-  IS_RELEASE_BUILD:
-
 jobs:
 - job:
   variables:
@@ -92,16 +90,9 @@ jobs:
     timeoutInMinutes: 5
     displayName: "Cache - create/restore local maven cache at $(M2_LOCAL_REPO)"
 
-  - task: DownloadSecureFile@1
-    name: pgpPrivateKey
-    displayName: 'Secrets - download pgp key'
-    inputs:
-      secureFile: 'order-iom-project-archetype-gpg_private_key_iom.pgp'
-
   - task: MavenAuthenticate@0
     inputs:
-      artifactsFeeds: iom-maven-artifacts
-      mavenServiceConnections: order-iom-sonatype-ossrh
+      artifactsFeeds: order-iom-snapshots,order-iom-releases
     timeoutInMinutes: 1
     displayName: "Maven - authenticate"
 
@@ -156,37 +147,15 @@ jobs:
     timeoutInMinutes: 1
     displayName: "Kubernetes - Create Namespace and Pull Secret"
 
-  - script: |
-      if mvn help:evaluate -Dexpression=project.version -q -DforceStdout | tail -1 | grep -q -- -SNAPSHOT ; then
-        echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]false"
-      else
-        echo "##vso[task.setvariable variable=IS_RELEASE_BUILD;]true"
-      fi
-    workingDirectory: $(Agent.BuildDirectory)/$(ARCHETYPE_PATH)
-    timeoutInMinutes: 1
-    displayName: "Read variables - SNAPSHOT or Release build"
-
-  # for SNAPSHOT builds: run verify goal against archetype
+  # Build and integration-test the archetype. The archetype integration test
+  # generates a test project and builds its Docker image, which is consumed by
+  # the AKS smoke test further below.
   - task: Maven@3
-    condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'false'))
     inputs:
       goals: clean verify
       mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
       mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-    displayName: "Maven - run verify goal against archetype snapshot"
-
-  # for RELEASE builds: run deploy goal to push the archetype to Sonatype STAGING repository.
-  # The release can be promoted to central in a later step.
-  - task: Maven@3
-    condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
-    inputs:
-      goals: clean deploy
-      mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
-      mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-    displayName: "Maven - run deploy goal against archetype release"
-    env:
-      PGP_PASSPHRASE: "literal:$(pgpPassphrase)"
-      PGP_SECRETKEY: "keyfile:$(pgpPrivateKey.secureFilePath)"
+    displayName: "Maven - build and verify archetype"
 
   - task: Maven@3
     inputs:
@@ -232,6 +201,22 @@ jobs:
     timeoutInMinutes: 20
     displayName: "Helm - install archetype-test release"
 
+  # Publish the archetype to the Azure DevOps Artifacts feed only after the
+  # build, archetype integration test and AKS smoke test have all succeeded.
+  # Maven routes the artifact automatically based on the project version:
+  #   *-SNAPSHOT -> order-iom-snapshots (distributionManagement/snapshotRepository)
+  #   release    -> order-iom-releases  (distributionManagement/repository)
+  # archetype.test.skip avoids re-running the integration test that already ran
+  # during the "clean verify" build above.
+  - task: Maven@3
+    condition: succeeded()
+    inputs:
+      goals: deploy
+      options: '-Darchetype.test.skip=true'
+      mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
+      mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
+    displayName: "Maven - deploy archetype to order-iom feed"
+
   - script: |
       echo "##[section] describe all pods"
       kubectl get pods -n "$IOM_AKS_NAMESPACE"
@@ -273,39 +258,3 @@ jobs:
     timeoutInMinutes: 5
     displayName: "Cleanup - wait for PV deletion, delete namespace"
     condition: always()
-
-  - task: Maven@3
-    condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
-    inputs:
-      goals: nexus-staging:release
-      mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
-      mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-    displayName: "Maven - stage successful release"
-
-  - task: Maven@3
-    condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
-    inputs:
-      goals: org.codehaus.mojo:versions-maven-plugin:2.7:set -DgenerateBackupPoms=false -DnextSnapshot
-      mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
-      mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-    displayName: "Maven - set next snapshot version"
-    enabled: false
-
-  - script: |
-      git config user.email pborchert@intershop.com
-      git config user.name "Azure DevOps Build User"
-      git add pom.xml
-      git commit -m "[skip ci] set next snapshot version"
-      git push
-    workingDirectory: '$(ARCHETYPE_PATH)'
-    displayName: "Git - push changes to pom.xml"
-    condition: and(succeeded(), eq(variables.IS_RELEASE_BUILD, 'true'))
-    enabled: false
-
-  - task: Maven@3
-    condition: and(failed(), eq(variables.IS_RELEASE_BUILD, 'true'))
-    inputs:
-      goals: nexus-staging:drop
-      mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
-      mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
-    displayName: "Maven - rollback failed release in sonatype nexus"

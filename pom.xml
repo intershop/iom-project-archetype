@@ -99,17 +99,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.sonatype.plugins</groupId>
-                <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.13</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <serverId>ossrh</serverId>
-                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -173,9 +162,13 @@
     </profiles>
     
     <distributionManagement>
+        <repository>
+            <id>order-iom-releases</id>
+            <url>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/order-iom-releases/maven/v1</url>
+        </repository>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>order-iom-snapshots</id>
+            <url>https://pkgs.dev.azure.com/intershop-com/Products/_packaging/order-iom-snapshots/maven/v1</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
