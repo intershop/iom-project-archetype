@@ -5,6 +5,8 @@
 replicaCount: 1
 downtime: true
 
+kubectlImageRepository: "registry.k8s.io/kubectl:v1.32.1"
+
 image:
   repository: archetype-project-iom
   # Overrides the image tag whose default is the chart version.
@@ -20,8 +22,8 @@ dbaccount:
   # searchPath: "testcases"
   searchPath:
   image:
-    repository: docker.tools.intershop.com/iom/intershophub/iom-dbaccount
-    tag:        2.0.0
+    repository: iomdevopsacr.azurecr.io/iom-dbaccount
+    tag:        2.1.0
     pullPolicy: IfNotPresent
   resources: {}
   
@@ -88,8 +90,7 @@ resources:
     memory: 2048Mi
 
 imagePullSecrets:
-  - name: intershop-pull-secret
-  - name: devops-pull-secret
+  - name: iomdevops-pull-secret
   
 serviceAccount:
   # Specifies whether a service account should be created

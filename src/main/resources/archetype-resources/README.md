@@ -17,6 +17,10 @@ further information, e.g.:
 - [Directory structure of IOM projects](https://github.com/intershop/iom-project-archetype/wiki/Directory-Structure-of-IOM-Projects),
 - [Migrating your project](https://github.com/intershop/iom-project-archetype/wiki/Migration-Guide) to a newer version of *IOM Project Archetype*.
 
+## Prerequisites
+
+- **Maven 3.9.16** — required to build this project (IOM 6.0.0)
+
 ## devenv-4-iom
 
 [*devenv-4-iom*](https://github.com/intershop/devenv-4-iom) is a software project, maintained by Intershop, that helps IOM developers to run
@@ -40,6 +44,14 @@ to get information about it:
 - [Log messages](https://github.com/intershop/devenv-4-iom/blob/main/doc/06_log_messages.md) and
 - [Troubleshooting](https://github.com/intershop/devenv-4-iom/blob/main/doc/07_troubleshooting.md).
 
+## IOM Maven Repository
+
+All IOM build artifacts — including the IOM platform libraries and the IOM test framework — are provided through a dedicated Maven feed in your Azure DevOps Environment. This feed is named *iom-maven-artifacts* and its URL is specific to your project; it is already configured in your `pom.xml`.
+
+**This feed is not publicly accessible.** Before you can build the project locally, your machine must have read access to it. To set up access, follow the instructions in the [devenv-4-iom documentation: Get Access to IOM Maven Repository](https://github.com/intershop/devenv-4-iom/blob/main/doc/03_devops_integration.md#get-access-to-iom-maven-repository). In short, you need to create or update `~/.m2/settings.xml` with credentials (a Personal Access Token) obtained from your Azure DevOps Environment.
+
+**Note:** The `iom-test-framework` artifact is also published to this feed — not to Maven Central. Any developer working on integration tests must have feed access configured.
+
 ## IOM Blueprint Project
 
 [*IOM Blueprint Project*](https://github.com/intershop/iom-blueprint-project) is a software project, maintained by Intershop, that helps IOM developers
@@ -49,4 +61,3 @@ to understand the customization concepts and demonstrates solutions for common r
 [documentation](https://support.intershop.com/kb/30U296) of *IOM Blueprint Project* in order to understand basic IOM concepts.
 Good starting points are [Guide - IOM How to Start](https://support.intershop.com/kb/30097C) and
 [Concept - The Intershop Order Management Blueprint Project](https://support.intershop.com/kb/30U296).
-
