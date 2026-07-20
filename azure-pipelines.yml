@@ -211,13 +211,32 @@ jobs:
   #   release    -> order-iom-releases  (distributionManagement/repository)
   # archetype.test.skip avoids re-running the integration test that already ran
   # during the "clean verify" build above.
-  - task: Maven@4
+  - script: |
+      mvn deploy -Darchetype.test.skip=true -Xmx1024m \
+        -f "$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml" \
+        $MAVEN_OPTS 2>&1 | tee /tmp/mvn-deploy.log
+      MVN_EXIT=${PIPESTATUS[0]}
+
+      if [ "$MVN_EXIT" -ne 0 ]; then
+        # On main or in a PR targeting main, a 409 means the release artifact
+        # already exists in the feed — treat it as success instead of failing.
+        # this allows to push releases to main taht were aleady published in a branch
+        IS_MAIN_OR_PR_TO_MAIN="false"
+        if [ "$(Build.SourceBranch)" = "refs/heads/main" ]; then
+          IS_MAIN_OR_PR_TO_MAIN="true"
+        fi
+        if [ "$(Build.Reason)" = "PullRequest" ] && \
+           echo "$(System.PullRequest.TargetBranch)" | grep -qE "^(refs/heads/)?main$"; then
+          IS_MAIN_OR_PR_TO_MAIN="true"
+        fi
+
+        if grep -q "status code: 409" /tmp/mvn-deploy.log && [ "$IS_MAIN_OR_PR_TO_MAIN" = "true" ]; then
+          echo "##[warning] Artifact already exists in feed (409 Conflict) - skipping re-upload on main / PR to main."
+          exit 0
+        fi
+        exit "$MVN_EXIT"
+      fi
     condition: succeeded()
-    inputs:
-      goals: deploy
-      options: '-Darchetype.test.skip=true'
-      mavenPomFile: '$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml'
-      mavenOptions: '-Xmx1024m $(MAVEN_OPTS)'
     displayName: "Maven - deploy archetype to order-iom feed"
 
   - script: |
