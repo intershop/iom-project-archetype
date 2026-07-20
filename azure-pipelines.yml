@@ -212,9 +212,10 @@ jobs:
   # archetype.test.skip avoids re-running the integration test that already ran
   # during the "clean verify" build above.
   - script: |
-      mvn deploy -Darchetype.test.skip=true -Xmx1024m \
+      MAVEN_OPTS="-Xmx1024m $MAVEN_OPTS" \
+      mvn deploy -Darchetype.test.skip=true \
         -f "$(Agent.BuildDirectory)/$(ARCHETYPE_PATH)/pom.xml" \
-        $MAVEN_OPTS 2>&1 | tee /tmp/mvn-deploy.log
+        2>&1 | tee /tmp/mvn-deploy.log
       MVN_EXIT=${PIPESTATUS[0]}
 
       if [ "$MVN_EXIT" -ne 0 ]; then
